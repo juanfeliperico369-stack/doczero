@@ -4,7 +4,8 @@
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '1.1.0',
+  VERSION: '1.2.0',
+  URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
   CHANNEL_URL: '',          // canal multiplataforma con los videos de cada nivel
@@ -405,5 +406,7 @@ const GUIDE = [
  ['BATALLA','Elige hasta 4 cartas. Lee el escáner y deduce la debilidad de la amenaza. Toca una carta para lanzarla; si la lanzas cuando el anillo dorado coincide con la amenaza (punto débil), haces CRÍTICO ×1,5. Acertar seguido sube el combo hasta ×2. Desde el nivel 6 las amenazas se propagan (recuperan vida). Daño = Σ(propiedad × debilidad − propiedad × lo que la alimenta) × 2 × potencia × combo.'],
  ['ESTRELLAS','Síntesis, forja, reactor y destilación: ★★★ si usas menos del 40 % del tiempo, ★★ menos del 70 %. Batalla: ★★★ con 70 % de integridad o más. En los niveles 1–2 el tiempo no hace perder.'],
  ['CIENCIA REAL','Compuestos, reacciones, energías de enlace (fórmula semiempírica de Weizsäcker) y datos curiosos son reales. Simplificaciones honestas: los sólidos iónicos se muestran como una sola unidad (NaCl) y el valle de estabilidad es una aproximación. Los híbridos y el Eternio son ficción casi real.'],
+ ['RETO DIARIO','Desde el nivel 1: cinco moléculas nuevas cada día, iguales para todo el mundo, con todos los elementos comunes. Mantén tu racha 🔥 y comparte tu tiempo.'],
+ ['DUELOS','Duelo de síntesis: 5 moléculas iguales para los dos; gana el más rápido. LAN: en vivo por Wi-Fi o punto de acceso, emparejando con un QR (sin internet ni servidor). Bluetooth: el reto se envía con Compartir (Bluetooth, Quick Share, AirDrop) y el rival devuelve su tiempo; los navegadores no permiten tiempo real directo por Bluetooth.'],
  ['TU PARTIDA','Todo se guarda solo en este dispositivo. Exporta o importa tu partida en Ajustes. Se juega en horizontal: gira el teléfono o usa pantalla completa (⛶).']
 ];

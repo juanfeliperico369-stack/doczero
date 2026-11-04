@@ -90,10 +90,39 @@ for (const v of views) {
   console.log('UI:', ui.join(' · '));
   console.log('Datos:', res.a.stats, '| errores', res.a.errors.length, '| avisos', res.a.warnings.length);
   res.a.errors.forEach(e => console.log('  ✕', e)); res.a.warnings.slice(0, 8).forEach(w => console.log('  ⚠', w));
-  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · resueltos siguiendo la guía ${res.s.guided} · fusiones de recarga ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
+  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · guía ${res.s.guided} · reto diario ${res.s.daily} · recargas ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
   console.log(`Monkey: ${res.m.games} partidas · ${res.m.actions} acciones · ${res.m.errors.length} errores`); res.m.errors.slice(0, 15).forEach(e => console.log('  ✕', e));
   console.log('Consola/página:', errs.length); errs.slice(0, 10).forEach(e => console.log('  ✕', e));
   await ctx.close();
+}
+// ---------- duelo LAN real entre dos páginas (WebRTC sin servidor) + QR + Bluetooth ----------
+{
+  const ctx = await browser.newContext({ viewport: { width: 1100, height: 640 } }), errs = [], out = [];
+  const A = await ctx.newPage(), B = await ctx.newPage();
+  for (const p of [A, B]) { p.on('pageerror', e => errs.push('pageerror: ' + e.message)); await p.goto(url); await p.waitForSelector('#cover'); await p.click('[data-act=newgame]'); await p.click('[data-act=sskip]'); await p.evaluate(() => DE.ui.closeModal()); }
+  try {
+    await B.evaluate(() => { DE.k.S().name = 'Rival'; });
+    const offer = await A.evaluate(() => DE.net.host());
+    const qrOk = await A.evaluate(c => { const cv = DE.net.qrCanvas(c), g = cv.getContext('2d'), r = jsQR(g.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height); return !!r && r.data === c; }, offer);
+    out.push('QR ida y vuelta: ' + qrOk + ' (' + offer.length + ' car.)');
+    const ans = await B.evaluate(c => DE.net.join(c), offer);
+    await A.evaluate(c => DE.net.accept(c), ans);
+    let open = false; for (let i = 0; i < 60 && !open; i++) { await A.waitForTimeout(200); open = await A.evaluate(() => DE.net.Net.state === 'open') && await B.evaluate(() => DE.net.Net.state === 'open'); }
+    out.push('LAN conectado: ' + open);
+    if (open) {
+      await A.waitForTimeout(200); await A.evaluate(() => DE.net.act('duelGo')); await B.waitForTimeout(400);
+      const la = await A.evaluate(() => DE.ui.CH() && DE.ui.CH().list.join()), lb = await B.evaluate(() => DE.ui.CH() && DE.ui.CH().list.join());
+      out.push('misma semilla: ' + (!!la && la === lb));
+      const solve = p => p.evaluate(() => { for (let q = 0; q < 6 && DE.ui.CH(); q++) { DE.ui.tick(2); DE.ui.clearLab(true); DE.ui.buildSmiles(DE.DB.comp[DE.ui.MIS().p.id].smiles[0]); DE.ui.synth(); } });
+      await solve(B); await B.waitForTimeout(300); await solve(A); await A.waitForTimeout(600);
+      const ra = await A.evaluate(() => ({ me: DE.net.Net.me, rv: DE.net.Net.rival, h: document.querySelector('.sheet h2') && document.querySelector('.sheet h2').textContent }));
+      out.push('resultado: ' + ra.h + ' · rival terminó ' + !!(ra.rv && ra.rv.done));
+    }
+    const btc = await A.evaluate(() => DE.net.btEncode(777, 95.2)); const bt = await B.evaluate(c => DE.net.btDecode(c), btc);
+    out.push('reto Bluetooth: ' + (bt.seed === 777 && bt.el === 95.2));
+  } catch (e) { errs.push('Duelo: ' + e.message.split('\n')[0]); }
+  console.log('\n== duelo LAN / QR / Bluetooth ==\n' + out.join(' · ') + '\nConsola/página: ' + errs.length); errs.forEach(e => console.log('  ✕', e));
+  fails += errs.length + out.filter(x => /false|null|undefined/.test(x)).length; await ctx.close();
 }
 await browser.close();
 console.log(fails ? `\nRESULTADO: ${fails} problemas` : '\nRESULTADO: OK, 0 errores');

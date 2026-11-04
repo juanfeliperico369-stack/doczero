@@ -78,6 +78,33 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
   - Editor de niveles.
 - Ya hecho en v1.1: reactor de ecuaciones con balanceo, destilación, guía progresiva y personajes.
 
+## 7b. v1.2: publicación, multijugador y extras
+- **Enlace público (GitHub Pages, rama `gh-pages`)**: https://juanfeliperico369-stack.github.io/doczero/ . Publicar:
+  - `node tools/build.mjs`.
+  - Copiar `dist/web/` a la rama `gh-pages`, que lleva `.nojekyll`.
+  - Hacer push.
+  - Verificar con `node tools/verify-pages.mjs`: carga, service worker activado, abre sin conexión, 0 errores de instalabilidad (CDP) y etiquetas.
+- **PWA**:
+  - `manifest.webmanifest`: standalone, horizontal, íconos 192, 512 y 512 maskable.
+  - `sw.js`: la caché `doc-element-v<versión>` se renueva al cambiar `CFG.VERSION`.
+  - `apple-touch-icon.png` de 180 px opaco, `favicon.png` y `compartir.png` 1200×630 para WhatsApp (og:image absoluta).
+  - Los gráficos se regeneran con `node tools/assets.mjs`.
+- **APK (Android, prueba)**: `ANDROID_HOME=~/android-sdk bash tools/apk.sh` genera `dist/DocElement-v<versión>.apk` (Capacitor 7, debug).
+  - Va en horizontal (sensorLandscape) y pide cámara para el QR.
+  - Usa el plugin Share para Bluetooth y Quick Share.
+  - Para la Play Store hace falta firmar un AAB de release.
+- **Duelo LAN** (`src/online.js`): WebRTC DataChannel sin servidor ni STUN.
+  - El SDP se comprime a un código de unos 130 caracteres (`DEO|…` oferta / `DEA|…` respuesta) con ufrag, pwd, huella y candidatos UDP.
+  - El código viaja por QR (qrcode-generator, MIT) y se escanea con BarcodeDetector o jsQR (Apache-2.0); también se puede pegar.
+  - Mensajes: hi · start{seed} · prog{idx,el} · done{el}.
+- **Duelo "Bluetooth"**: el navegador no permite Bluetooth directo entre teléfonos.
+  - El reto `DUELO-DOC-ELEMENT|1|semilla|décimas|nombre` se envía con Compartir (Bluetooth, Quick Share, AirDrop).
+  - El rival lo pega y juega la misma semilla. Es asíncrono.
+  - Tiempo real por Bluetooth requeriría un plugin nativo en el APK (pendiente).
+- **Reto diario**: semilla AAAAMMDD, 5 moléculas por niveles de dificultad (`chalList`), racha 🔥 en `S.daily`, se puede compartir el resultado.
+- **Música** procedimental por modo (laboratorio, batalla, destilación, menú) y efectos con ruido para explosiones y forja.
+- **Informe de prueba CSV** (intentos, victorias, fallos, pistas y tiempos por problema, en `S.pt`) y **cartas imprimibles** A4 de 63×88 mm, base para el juego físico.
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

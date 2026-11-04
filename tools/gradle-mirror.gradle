@@ -1,0 +1,5 @@
+// Usa el espejo de Maven Central de Google si repo.maven.apache.org limita las descargas (HTTP 429).
+allprojects {
+  buildscript { repositories { maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' } } }
+  repositories { maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' } }
+}

@@ -80,6 +80,8 @@ function selfTest() {
       } else E.push(tag + 'tipo desconocido ' + p.k);
     });
   });
+  if (D.ui && D.ui.chalList) for (let sd = 1; sd <= 40; sd++) { const l = D.ui.chalList(sd * 7919); if (l.length !== 5 || new Set(l).size !== 5 || l.some(id => !DB.comp[id])) E.push('Reto con semilla ' + sd + ' mal formado'); }
+  if (D.net) { try { const sdp = 'v=0\r\na=ice-ufrag:abcd\r\na=ice-pwd:0123456789abcdefghijklmn\r\na=fingerprint:sha-256 ' + Array.from({ length: 32 }, (_, i) => ((i * 37) & 255).toString(16).padStart(2, '0').toUpperCase()).join(':') + '\r\na=candidate:1 1 udp 2122260223 192.168.1.20 50000 typ host generation 0\r\n', c = D.net.pack({ type: 'offer', sdp }), u = D.net.unpack(c); if (!/192\.168\.1\.20 50000/.test(u.sdp) || !/ice-pwd:0123456789abcdefghijklmn/.test(u.sdp) || !u.sdp.includes(sdp.match(/sha-256 (\S+)/)[1])) E.push('Código LAN no reconstruye la sesión'); const bt = D.net.btDecode(D.net.btEncode(4242, 83.4)); if (bt.seed !== 4242 || bt.el !== 83.4) E.push('Código Bluetooth no reconstruye el reto'); } catch (e) { E.push('Códigos de duelo: ' + e.message); } }
   return { ok: !E.length, errors: E, warnings: W, stats: Object.keys(DB.comp).length + ' compuestos · ' + Object.keys(DB.poly).length + ' polímeros · ' + Object.keys(REACT.rx).length + ' reacciones · ' + n.m + ' síntesis · ' + n.r + ' reacciones · ' + n.f + ' forjas · ' + n.p + ' polímeros · ' + n.s + ' destilaciones · ' + n.b + ' batallas' };
 }
 
@@ -146,6 +148,10 @@ function solver() {
       if (L.n < 10 && U.state().unl !== L.n + 1) out.failed.push('No se abrió el nivel ' + (L.n + 1));
     }
     out.eternio = !!U.state().eternio; out.stars = D.totalStars(U.state());
+    // reto diario completo con la UI
+    const d = new Date(); U.startChallenge('daily', d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
+    for (let q = 0; q < 6 && U.CH(); q++) { U.clearLab(true); U.buildSmiles(DB.comp[U.MIS().p.id].smiles[0]); U.synth(); }
+    out.daily = !U.CH() && U.state().daily.streak >= 1; if (!out.daily) out.failed.push('Reto diario no se completó'); U.closeModal();
   } finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }
   return out;
 }
@@ -179,9 +185,10 @@ function monkey(n, seed) {
     detail: () => { const S = U.state(), ids = [...Object.keys(S.fr), ...Object.keys(S.el).map(s => 'el:' + s)]; if (ids.length) U.detail(pickA(ids)); },
     modal: () => pickA([U.menu, U.guide, U.credits, U.settings, () => U.txLevel(1 + Math.floor(r() * 10))])(),
     close: () => U.closeModal(), render: () => U.render(), flee: () => U.flee(), side: () => U.renderSide(),
-    abandon: () => { if (U.MIS()) U.failMission('bot'); }
+    abandon: () => { if (U.MIS()) U.failMission('bot'); },
+    daily: () => { if (!U.CH()) U.startChallenge(r() < .5 ? 'daily' : 'async', Math.floor(r() * 1e6)); else if (r() < .3) U.chalSkip(); else if (r() < .1) U.chalEnd(true); else if (U.MIS()) { U.clearLab(true); U.buildSmiles(DB.comp[U.MIS().p.id].smiles[0]); U.synth(); } else errors.push('reto activo sin objetivo'); }
   };
-  const names = Object.keys(ACTS), weights = { spawn: 9, tapAtom: 6, tapBond: 3, drop: 3, synth: 4, autoH: 2, smiles: 2, guide: 3, tick: 5, throw: 5, fuse: 4, rx: 4, sort: 5 };
+  const names = Object.keys(ACTS), weights = { daily: 3, spawn: 9, tapAtom: 6, tapBond: 3, drop: 3, synth: 4, autoH: 2, smiles: 2, guide: 3, tick: 5, throw: 5, fuse: 4, rx: 4, sort: 5 };
   const bag = names.flatMap(k => Array(weights[k] || 1).fill(k));
   try {
     for (let g = 0; g < n; g++) {
@@ -208,6 +215,7 @@ function monkey(n, seed) {
         }
       }
       if (U.BT()) { U.flee(); U.tick(.1); }
+      if (U.CH()) U.chalEnd(true);
       if (U.MIS()) U.failMission('bot');
       if (U.SO()) U.squit();
     }

@@ -12,6 +12,11 @@ const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [..
 let S = D.newState(), QUIET = false;
 const dOf = L => DIFF[(L || S.cur) - 1] || DIFF[0];
 const curL = () => MIS ? MIS.L : S.cur;
+const COMMON = ['H', 'Li', 'C', 'N', 'O', 'F', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ca', 'Fe', 'Cu'];
+let CH = null;
+const labEls = () => CH ? COMMON : D.labElements(S);
+const fmtT = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0') + '.' + Math.floor((s * 10) % 10);
+const PT0 = {};
 
 /* ---------- guardado ---------- */
 function load() { try { const raw = localStorage.getItem(KEY); S = D.sanitize(raw ? JSON.parse(raw) : null); } catch (e) { S = D.newState(); } S.seen = S.seen || {}; }
@@ -24,9 +29,24 @@ const SFX = { tap: [[660], .05, 'square', .03], bond: [[880], .08, 'triangle', .
 function sfx(k) {
   if (!S.set.snd || TEST || QUIET) return;
   try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const P = SFX[k]; if (!P) return; let t = AC.currentTime;
+    if (k === 'boom' || k === 'fuse') { const n = AC.sampleRate * .45 | 0, bf = AC.createBuffer(1, n, AC.sampleRate), d = bf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, k === 'boom' ? 2 : 4); const sn = AC.createBufferSource(), fl = AC.createBiquadFilter(), gn = AC.createGain(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(k === 'boom' ? 1400 : 3000, t); fl.frequency.exponentialRampToValueAtTime(120, t + .4); gn.gain.value = k === 'boom' ? .28 : .1; sn.buffer = bf; sn.connect(fl).connect(gn).connect(AC.destination); sn.start(t); }
     P[0].forEach(f => { const o = AC.createOscillator(), g = AC.createGain(); o.type = P[2]; o.frequency.value = f; g.gain.setValueAtTime(P[3], t); g.gain.exponentialRampToValueAtTime(.0001, t + P[1]); o.connect(g).connect(AC.destination); o.start(t); o.stop(t + P[1] + .02); t += P[1] * .8; });
   } catch (e) { }
 }
+/* ---------- música procedimental (sin archivos): cambia con el modo de juego ---------- */
+const MUS = { ctx: null, g: null, lp: null, mode: 'menu', timer: 0, step: 0, next: 0,
+  M: { lab: { bpm: 84, root: 57, sc: [0, 3, 5, 7, 10], pad: [0, 7, 12] }, battle: { bpm: 132, root: 52, sc: [0, 1, 5, 7, 8], pad: [0, 7], bass: 1 }, sort: { bpm: 96, root: 60, sc: [0, 2, 4, 7, 9], pad: [0, 4, 7] }, menu: { bpm: 70, root: 55, sc: [0, 3, 7, 10, 14], pad: [0, 7, 15] } },
+  start() { if (MUS.ctx || !S.set.mus || TEST || QUIET) return; try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); MUS.ctx = AC; MUS.g = AC.createGain(); MUS.g.gain.value = .045; MUS.g.connect(AC.destination); MUS.lp = AC.createBiquadFilter(); MUS.lp.type = 'lowpass'; MUS.lp.frequency.value = 800; MUS.lp.connect(MUS.g); MUS.next = AC.currentTime + .1; MUS.timer = setInterval(MUS.sched, 100); } catch (e) { } },
+  stop() { clearInterval(MUS.timer); MUS.timer = 0; try { MUS.g && MUS.g.disconnect(); } catch (e) { } MUS.ctx = MUS.g = MUS.lp = null; },
+  note(f, t, d, type, vol, dest) { const o = MUS.ctx.createOscillator(), g = MUS.ctx.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + Math.min(.08, d / 4)); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(dest || MUS.g); o.start(t); o.stop(t + d + .05); },
+  sched() { const c = MUS.ctx; if (!c) return; const m = MUS.M[MUS.mode] || MUS.M.lab, sp = 60 / m.bpm / 2, hz = n => 440 * Math.pow(2, (n - 69) / 12);
+    while (MUS.next < c.currentTime + .35) { const t = MUS.next, s = MUS.step++;
+      if (s % 16 === 0) m.pad.forEach(p => MUS.note(hz(m.root - 12 + p), t, sp * 15, 'sawtooth', .22, MUS.lp));
+      const r = Math.sin(s * 12.9898 + m.root) * 43758.5453, pick = Math.floor((r - Math.floor(r)) * m.sc.length);
+      if (s % 2 === 0 || m.bass) MUS.note(hz(m.root + 12 + m.sc[pick] + (s % 32 > 15 ? 12 : 0)), t, sp * 1.6, 'triangle', .3);
+      if (m.bass && s % 4 === 0) MUS.note(hz(m.root - 24), t, sp * 1.8, 'sine', .9);
+      MUS.next += sp; } }
+};
 function vib(ms) { if (S.set.vib && !TEST && !QUIET && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { } }
 
 /* ---------- toast / efectos / modal ---------- */
@@ -92,14 +112,14 @@ function snap() { Lab.hist.push(JSON.stringify([Lab.atoms, Lab.bonds, Lab.uid]))
 function undo() { const s = Lab.hist.pop(); if (!s) return toast('Nada que deshacer'); [Lab.atoms, Lab.bonds, Lab.uid] = JSON.parse(s); Lab.sel = null; syncGhost(); redraw(); }
 function redraw() { Lab.dirty = true; }
 function syncGhost() { const g = Lab.ghost; if (!g) return; g.atoms.forEach(s => s.f = null); Lab.atoms.forEach(a => { if (a.slot != null && g.atoms[a.slot]) g.atoms[a.slot].f = a.id; }); }
-let CW = 300, CH = 300, DPR = 1, ctx = null;
+let CW = 300, CHh = 300, DPR = 1, ctx = null;
 function resize() {
   const cv = $('#cv'); if (!cv) return; const r = cv.parentElement.getBoundingClientRect();
-  if (r.width < 2) return; DPR = Math.min(2, window.devicePixelRatio || 1); CW = r.width; CH = r.height;
-  cv.width = Math.round(CW * DPR); cv.height = Math.round(CH * DPR); ctx = cv.getContext('2d'); redraw();
+  if (r.width < 2) return; DPR = Math.min(2, window.devicePixelRatio || 1); CW = r.width; CHh = r.height;
+  cv.width = Math.round(CW * DPR); cv.height = Math.round(CHh * DPR); ctx = cv.getContext('2d'); redraw();
 }
-const w2s = (x, y) => [(x - Lab.view.x) * Lab.view.z + CW / 2, (y - Lab.view.y) * Lab.view.z + CH / 2];
-const s2w = (x, y) => [(x - CW / 2) / Lab.view.z + Lab.view.x, (y - CH / 2) / Lab.view.z + Lab.view.y];
+const w2s = (x, y) => [(x - Lab.view.x) * Lab.view.z + CW / 2, (y - Lab.view.y) * Lab.view.z + CHh / 2];
+const s2w = (x, y) => [(x - CW / 2) / Lab.view.z + Lab.view.x, (y - CHh / 2) / Lab.view.z + Lab.view.y];
 const rad = a => a.mono ? 0 : a.el === 'H' ? 13 : 19;
 const colOf = el => { const z = D.SYM[el]; return z ? D.CAT[D.catOf(z)][1] : '#fff'; };
 function freeSpot() {
@@ -205,8 +225,8 @@ const AUTOH = new Set(['B', 'C', 'N', 'O', 'Si', 'P', 'S', 'F', 'Cl', 'Br', 'I']
 function autoH() {
   const tg = Lab.atoms.filter(a => !a.mono && AUTOH.has(a.el) && need(a) > 0);
   if (!tg.length) return toast('No hay manos libres que llenar con hidrógeno');
-  if (!D.labElements(S).includes('H')) return toast('Aún no tienes hidrógeno', 'bad');
-  const c = dOf(curL()).ah; if (c && S.en < c) return toast('⚡H cuesta ⚡' + c + ' en este nivel', 'bad');
+  if (!labEls().includes('H')) return toast('Aún no tienes hidrógeno', 'bad');
+  const c = MIS && MIS.ch ? 0 : dOf(curL()).ah; if (c && S.en < c) return toast('⚡H cuesta ⚡' + c + ' en este nivel', 'bad');
   snap(); let n = 0; S.en -= c;
   tg.forEach(a => { for (let k = need(a); k > 0; k--) { const h = { id: Lab.uid++, el: 'H', ...nearSpot(a, 46) }; Lab.atoms.push(h); Lab.bonds.push({ a: a.id, b: h.id, o: 1 }); n++; } });
   Lab.sel = null; sfx('bond'); toast('⚡H: ' + n + ' hidrógenos' + (c ? ' · −⚡' + c : '')); hud(); redraw();
@@ -308,9 +328,9 @@ function stepText(st) {
 }
 /* ---------- dibujo ---------- */
 function draw() {
-  if (!ctx) return; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, CW, CH);
+  if (!ctx) return; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, CW, CHh);
   const z = Lab.view.z, gs = 32 * z, now = performance.now() / 1000, pulse = .5 + .5 * Math.sin(now * 5);
-  if (gs > 10) { ctx.fillStyle = 'rgba(164,44,255,.2)'; const [ox, oy] = w2s(0, 0); for (let x = ((ox % gs) + gs) % gs; x < CW; x += gs) for (let y = ((oy % gs) + gs) % gs; y < CH; y += gs) ctx.fillRect(x - .75, y - .75, 1.5, 1.5); }
+  if (gs > 10) { ctx.fillStyle = 'rgba(164,44,255,.2)'; const [ox, oy] = w2s(0, 0); for (let x = ((ox % gs) + gs) % gs; x < CW; x += gs) for (let y = ((oy % gs) + gs) % gs; y < CHh; y += gs) ctx.fillRect(x - .75, y - .75, 1.5, 1.5); }
   const st = MIS && MIS.p.k === 'm' ? guideStep() : null, F = w => (w * z) + 'px Titulos,Arial Narrow,sans-serif';
   if (Lab.ghost) { // plano punteado
     const g = Lab.ghost; ctx.setLineDash([4 * z, 4 * z]); ctx.lineWidth = 1.5 * z;
@@ -369,7 +389,7 @@ function analysis() {
 function fit(list) {
   list = list || Lab.atoms; if (!list.length) { Lab.view = { x: 0, y: 0, z: 1 }; return redraw(); }
   const xs = list.map(a => a.x), ys = list.map(a => a.y), w = Math.max(...xs) - Math.min(...xs) + 130, h = Math.max(...ys) - Math.min(...ys) + 130;
-  Lab.view = { x: (Math.max(...xs) + Math.min(...xs)) / 2, y: (Math.max(...ys) + Math.min(...ys)) / 2, z: D.clamp(Math.min(CW / w, CH / h), .35, 1.4) }; redraw();
+  Lab.view = { x: (Math.max(...xs) + Math.min(...xs)) / 2, y: (Math.max(...ys) + Math.min(...ys)) / 2, z: D.clamp(Math.min(CW / w, CHh / h), .35, 1.4) }; redraw();
 }
 function zoom(f) { Lab.view.z = D.clamp(Lab.view.z * f, .35, 2.2); redraw(); }
 function hitAtom(sx, sy) { const [x, y] = s2w(sx, sy); for (let i = Lab.atoms.length - 1; i >= 0; i--) { const a = Lab.atoms[i]; if (a.mono ? Math.abs(a.x - x) < 44 && Math.abs(a.y - y) < 20 : Math.hypot(a.x - x, a.y - y) < rad(a) + 8) return a; } return null; }
@@ -409,7 +429,7 @@ function bindCanvas() {
   cv.addEventListener('wheel', e => { e.preventDefault(); zoom(e.deltaY < 0 ? 1.1 : 1 / 1.1); }, { passive: false });
 }
 function renderTray() {
-  const els = D.labElements(S);
+  const els = labEls();
   let h = els.map(s => { const z = D.SYM[s], v = D.valence(s); return `<button class="at" style="--c:${colOf(s)}" data-act="spawn" data-arg="${s}" aria-label="${esc(D.elem(z).name)}"><span class="z">${z}</span><span class="v">${v[0] ? '✋' + Math.max(...v) : '·'}</span><span class="s">${s}</span><span class="n">${esc(D.elem(z).name)}</span></button>`; }).join('');
   const monos = Object.keys(S.fr).filter(id => DB.comp[id] && DB.comp[id].mono);
   if ((S.unl >= 8 || S.set.sandbox) && monos.length) h += '<span class="tsec">Monómeros</span>' + monos.map(id => `<button class="at mono" style="--c:#2dffb3" data-act="mono" data-arg="${id}"><span class="s">${fHTML(DB.comp[id].f)}</span><span class="n">${esc(DB.comp[id].name)}</span></button>`).join('');
@@ -554,6 +574,8 @@ function nextOpen() { for (let L = 1; L <= S.unl; L++) for (let i = 0; i < 10; i
 function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
+  if (CH) chalEnd(true);
+  { const k = D.pk(L, i), t = S.pt[k] || (S.pt[k] = {}); t.a = (t.a || 0) + 1; PT0[k] = Date.now(); }
   S.cur = L; hud();
   if (p.k === 'b') return openDeck(L, i);
   endMission();
@@ -570,20 +592,52 @@ function startProblem(L, i) {
   renderSide(); renderTray();
 }
 function endMission() { MIS = null; Lab.ghost = null; redraw(); renderSide(); }
-function completeMission() { const m = MIS; if (!m) return; const used = 1 - m.t / m.T, stars = m.late ? 1 : used <= .4 ? 3 : used <= .7 ? 2 : 1; endMission(); win(m.L, m.i, stars, Math.round(Math.max(0, m.t)) * 2); }
+function completeMission() { const m = MIS; if (!m) return; if (m.ch) return chalNext(); const used = 1 - m.t / m.T, stars = m.late ? 1 : used <= .4 ? 3 : used <= .7 ? 2 : 1; endMission(); win(m.L, m.i, stars, Math.round(Math.max(0, m.t)) * 2); }
 function failMission(why) {
-  const m = MIS; if (!m) return; endMission(); const p = m.p;
+  const m = MIS; if (!m) return; if (m.ch) { chalEnd(true); return; } endMission(); const p = m.p;
   const hint = p.k === 'f' ? 'Receta posible: ' + esc(p.r.replace(/\+/g, ' + ')) : p.k === 'r' ? 'Ecuación: ' + esc(REACT.rx[p.id].eq.replace(/@/g, '').replace(/\+/g, ' + ').replace('=', ' → ')) : 'Fórmula: ' + fHTML(DB.comp[p.id] ? DB.comp[p.id].f : DB.poly[p.id] ? DB.poly[p.id].mk : p.id) + '. Cuenta las manos de cada átomo.';
   lose(m.L, m.i, why, hint);
 }
 function missionCheck(made) { if (!MIS || (MIS.p.k !== 'm' && MIS.p.k !== 'p')) return; if (made.some(r => r.id === MIS.p.id)) completeMission(); }
 function useHint() {
   if (!MIS) return; const c = MIS.p.k === 'r' ? 15 : 20; if (S.en < c) return toast('Necesitas ⚡' + c, 'bad');
-  S.en -= c; MIS.hint = true; if (MIS.p.k === 'r') { React_.auto = true; syncRx(true); renderReact(); } hud(); renderSide(); sfx('tap');
+  S.en -= c; MIS.hint = true; if (MIS.i >= 0) { const t = S.pt[D.pk(MIS.L, MIS.i)] || (S.pt[D.pk(MIS.L, MIS.i)] = {}); t.h = (t.h || 0) + 1; } if (MIS.p.k === 'r') { React_.auto = true; syncRx(true); renderReact(); } hud(); renderSide(); sfx('tap');
+}
+/* ---------- desafíos: reto diario y duelos (5 moléculas con semilla) ---------- */
+function dateKey(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function chalList(seed) {
+  const r = D.mulberry(seed), cand = Object.values(DB.comp).filter(c => !c.s2 && c.atoms >= 2 && c.atoms <= 16 && Object.keys(c.cnt).every(e => COMMON.includes(e))), out = [];
+  [[2, 3], [3, 5], [4, 7], [6, 10], [8, 16]].forEach(([a, b]) => { const pool = cand.filter(c => c.atoms >= a && c.atoms <= b && !out.includes(c.id)); out.push(pool[Math.floor(r() * pool.length)].id); });
+  return out;
+}
+function startChallenge(kind, seed, opt) {
+  closeModal(); if (BT) { BT = null; $('#battle').hidden = true; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
+  CH = Object.assign({ kind, seed, list: chalList(seed), idx: 0, el: 0, skips: 0, rival: null }, opt || {});
+  setTab('lab'); setMode('mol'); chalTarget();
+  showLine(['eter', 'feliz', kind === 'daily' ? 'Reto diario: cinco moléculas, todos los elementos comunes. El reloj corre.' : 'Duelo: las mismas cinco moléculas para los dos. Que gane la mejor química.']);
+}
+function chalTarget() { const id = CH.list[CH.idx]; clearLab(true); Lab.ghost = null; Lab.view = { x: 0, y: 0, z: 1 }; MIS = { L: S.cur, i: -1, ch: 1, p: { k: 'm', id, t: 'Reto ' + (CH.idx + 1) + '/' + CH.list.length, d: 'Construye ' + DB.comp[id].name + ' con cualquier elemento común.', T: 1 }, t: 1, T: 1, hint: true }; renderTray(); renderSide(); }
+function chalNext() { MIS = null; CH.idx++; sfx('win'); vib(30); if (CH.onProg) CH.onProg(CH.idx, CH.el + CH.skips * 30); if (CH.idx >= CH.list.length) return chalEnd(); toast('✓ ' + CH.idx + '/' + CH.list.length + ' · ' + fmtT(CH.el + CH.skips * 30), 'ok'); chalTarget(); }
+function chalSkip() { if (!CH) return; CH.skips++; toast('+30 s de penalización', 'bad'); chalNext(); }
+function chalEnd(quit) {
+  const c = CH; if (!c) return; CH = null; MIS = null; Lab.ghost = null; renderTray(); renderSide();
+  if (quit) { if (c.kind === 'duel' && c.onEnd) c.onEnd(9999); toast('Reto abandonado'); return; }
+  const total = c.el + c.skips * 30;
+  if (c.kind === 'daily') {
+    const today = dateKey(), y = dateKey(new Date(Date.now() - 864e5)), d = S.daily, first = d.last !== today;
+    if (first) { d.streak = d.last === y ? d.streak + 1 : 1; d.last = today; S.en = D.clamp(S.en + 50, 0, MAXE); S.sc += 300; }
+    d.best[today] = Math.min(d.best[today] || 1e9, total); const ks = Object.keys(d.best).sort(); while (ks.length > 60) delete d.best[ks.shift()];
+    save(true); hud(); sfx('win'); say('win');
+    const txt = '🔥 Reto diario de Doc Element (' + today + '): 5 moléculas en ' + fmtT(total) + ' · racha ' + d.streak + ' días. ¿Me ganas? ' + CFG.URL;
+    modal(`<div class="res"><div class="por big">${D.CH.doc('loco', rankN())}</div><div><div class="pag">Reto diario · ${today}</div><h2 class="mega">${fmtT(total)}</h2><p>Racha: <b class="gold">🔥 ${d.streak} día(s)</b> · mejor de hoy ${fmtT(d.best[today])}${c.skips ? ' · ' + c.skips + ' salto(s)' : ''}${first ? ' · ⚡ +50' : ''}</p><p class="m sm">Vuelve mañana: cada día hay cinco moléculas nuevas, iguales para todo el mundo.</p><div class="row"><button class="btn pri" data-act="dshare" data-arg="${esc(txt)}">⇪ Compartir resultado</button><button class="btn gh" data-act="close">Cerrar</button></div></div></div>`);
+    return;
+  }
+  if (c.onEnd) c.onEnd(total);
 }
 function win(L, i, stars, bonus) {
   const k = D.pk(L, i), was = D.levelDone(S, L), prev = S.prog[k] || 0;
-  S.prog[k] = Math.max(prev, stars); const sc = 100 * stars + bonus; S.sc += sc; S.en = D.clamp(S.en + 20 + 10 * stars, 0, MAXE); S.st.win++;
+  S.prog[k] = Math.max(prev, stars); { const t = S.pt[k] || (S.pt[k] = {}); t.w = (t.w || 0) + 1; if (PT0[k]) { t.s = (t.s || 0) + (Date.now() - PT0[k]) / 1000; delete PT0[k]; } }
+  const sc = 100 * stars + bonus; S.sc += sc; S.en = D.clamp(S.en + 20 + 10 * stars, 0, MAXE); S.st.win++;
   let up = false; if (!was && D.levelDone(S, L) && S.unl === L && L < LEVELS.length) { S.unl = L + 1; giftLevel(L + 1); up = true; }
   save(true); hud(); sfx('win'); vib([30, 40, 60]);
   const lvl = LEVELS[L - 1], done = !was && D.levelDone(S, L), isEnd = L === LEVELS.length && done; if (up) S.cur = L + 1; const nx = nextOpen();
@@ -594,7 +648,7 @@ function win(L, i, stars, bonus) {
   renderMap(); renderTray(); renderSide(); if (up) levelTalk(L + 1);
 }
 function lose(L, i, why, hint) {
-  S.st.fail++; save(); sfx('lose'); vib(120); say('lose');
+  S.st.fail++; { const t = S.pt[D.pk(L, i)] || (S.pt[D.pk(L, i)] = {}); t.f = (t.f || 0) + 1; } save(); sfx('lose'); vib(120); say('lose');
   ADS.inter(() => modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced bad-b">Fallo</div><h2 class="mega">${esc(LEVELS[L - 1].P[i].t)}</h2><p class="w">${esc(why)}</p><div class="film">ÉTER: ${hint}</div><div class="row" style="margin-top:10px"><button class="btn pri" data-act="go" data-arg="${L},${i}">Reintentar ▸</button><button class="btn gh" data-act="close">Laboratorio</button></div></div></div>`));
 }
 
@@ -616,7 +670,7 @@ const GLYPH = ['☣', '✹', '☢', '⚠', '❂', '✺', '⌬', '☄', '✷', '�
 function startBattle(L, i, ids) {
   ids = ids || [...DECK]; if (!ids.length) return toast('Elige al menos una carta', 'bad');
   const cards = ids.map(id => D.cardFromId(S, id)).filter(Boolean).slice(0, 4); S.deck = ids.slice(0, 4);
-  closeModal(); endMission(); const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
+  closeModal(); if (CH) chalEnd(true); endMission(); const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
   const el = $('#battle');
   el.innerHTML = `<div class="bt-top"><span class="mega">${esc(p.t)}</span><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>
   <div class="bt-main"><div class="bt-left"><div class="bars"><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div>${b.rg ? `<div class="m sm">☣ Se propaga +${b.rg}/s: ataca rápido</div>` : ''}</div>
@@ -661,9 +715,14 @@ function flee() { if (!BT) return; BT.b.over = true; BT.b.win = false; BT.b.why 
    ============================================================ */
 function renderSide() {
   const box = $('#mis'); if (!box) return;
+  if (MIS && MIS.ch) {
+    const c = DB.comp[MIS.p.id], cnt = D.countOf(toGraph()), rv = CH.rival;
+    box.innerHTML = `<div class="pag">${{ daily: '🔥 Reto diario', duel: '⚔ Duelo LAN', async: '⚔ Duelo Bluetooth' }[CH.kind]} · ${CH.idx + 1}/${CH.list.length}</div><div class="mt">${esc(c.name)}</div><div class="obj"><b>${fHTML(c.f)}</b></div><div class="chk">${Object.keys(c.cnt).map(e => `<span class="${(cnt[e] || 0) === c.cnt[e] ? 'ok' : (cnt[e] || 0) > c.cnt[e] ? 'bad' : ''}">${e} ${cnt[e] || 0}/${c.cnt[e]}</span>`).join('')}</div><div class="tbar"><i style="width:${CH.idx * 20}%;background:var(--grn)"></i></div>${rv ? `<div class="m sm">Rival ${esc(rv.name || '')}: ${rv.done ? '✓ ' + fmtT(rv.el) : (rv.idx || 0) + '/5'}</div><div class="tbar"><i style="width:${(rv.done ? 5 : rv.idx || 0) * 20}%;background:var(--mag)"></i></div>` : ''}<div class="row"><span class="tm" id="mT">${fmtT(CH.el + CH.skips * 30)}</span><button class="btn gh sm" data-act="chskip">Saltar +30 s</button><button class="btn gh sm" data-act="chquit">Rendirse</button></div>`;
+    analysis(); return;
+  }
   if (!MIS) {
-    const nx = nextOpen();
-    box.innerHTML = `<div class="pag">Sin misión activa</div>${nx ? `<button class="btn pri wide" data-act="go" data-arg="${nx[0]},${nx[1]}">▶ ${esc(LEVELS[nx[0] - 1].P[nx[1]].t)}</button><span class="m sm">Nivel ${nx[0]} · problema ${nx[1] + 1}</span>` : '<span class="ok">¡Temporada completada!</span>'}`;
+    const nx = nextOpen(), ready = D.levelDone(S, 1);
+    box.innerHTML = `<div class="pag">Sin misión activa</div>${nx ? `<button class="btn pri wide" data-act="go" data-arg="${nx[0]},${nx[1]}">▶ ${esc(LEVELS[nx[0] - 1].P[nx[1]].t)}</button><span class="m sm">Nivel ${nx[0]} · problema ${nx[1] + 1}</span>` : '<span class="ok">¡Temporada completada!</span>'}<div class="row"><button class="btn sm" data-act="daily" ${ready ? '' : 'disabled'}>🔥 Reto diario${S.daily.streak ? ' ' + S.daily.streak : ''}</button><button class="btn sm" data-act="duel" ${ready ? '' : 'disabled'}>⚔ Duelo</button></div>${ready ? '' : '<span class="m sm">Reto diario y duelos: completa el nivel 1.</span>'}`;
   } else {
     const p = MIS.p, L = MIS.L, g = dOf(L).g, kind = { m: '⚗ Síntesis', p: '⛓ Polímero', f: '☢ Forja', r: '⇄ Reacción' }[p.k];
     let obj = '', list = '';
@@ -680,7 +739,7 @@ function renderSide() {
   }
   analysis();
 }
-function updTimer() { if (!MIS) return; const b = $('#mBar'), t = $('#mT'); if (b) b.style.width = (100 * Math.max(0, MIS.t) / MIS.T) + '%'; if (t) { t.textContent = MIS.late ? 'sin prisa' : Math.ceil(MIS.t) + ' s'; t.classList.toggle('low', MIS.t < 15 && dOf(MIS.L).fail); } }
+function updTimer() { if (!MIS) return; if (MIS.ch) { const t = $('#mT'); if (t) t.textContent = fmtT(CH.el + CH.skips * 30); return; } const b = $('#mBar'), t = $('#mT'); if (b) b.style.width = (100 * Math.max(0, MIS.t) / MIS.T) + '%'; if (t) { t.textContent = MIS.late ? 'sin prisa' : Math.ceil(MIS.t) + ' s'; t.classList.toggle('low', MIS.t < 15 && dOf(MIS.L).fail); } }
 
 /* ============================================================
    FRASCOS · MAPA · TRANSMISIONES
@@ -779,18 +838,38 @@ function enterGame() {
   if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => { levelTalk(1); startProblem(1, 0); }); }
   else { levelTalk(S.cur); if (!TQ.length) say('win'); }
 }
-function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
+function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
   modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporada 1: Núcleo</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
-  <div class="gcols"><div><div class="sec-t">Idea, historia y dirección</div><p>${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</p><div class="sec-t">Personajes</div><p>Doc, el científico despierto · ÉTER, la inteligencia de la Ouroboros.</p></div><div><div class="sec-t">Ciencia</div><p>Datos públicos de química y física nuclear (IUPAC, energías de enlace nuclear de referencia, fórmula semiempírica de Weizsäcker). Los híbridos y la isla de estabilidad son ficción casi real.</p></div><div><div class="sec-t">Tipografías</div><p>TeX Gyre Heros Condensed (GUST e-foundry, licencia GUST) · Inter (Rasmus Andersson, SIL OFL 1.1).</p><div class="sec-t">Apoyo</div><p>El juego es gratis. Donación voluntaria en la Página Oficial.</p></div></div><div class="row"><button class="btn pri" data-act="donate">☕ Apoyar</button><button class="btn gh" data-act="close">Cerrar</button></div>`);
+  <div class="gcols"><div><div class="sec-t">Idea, historia y dirección</div><p>${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</p><div class="sec-t">Personajes</div><p>Doc, el científico despierto · ÉTER, la inteligencia de la Ouroboros.</p></div><div><div class="sec-t">Ciencia</div><p>Datos públicos de química y física nuclear (IUPAC, energías de enlace nuclear de referencia, fórmula semiempírica de Weizsäcker). Los híbridos y la isla de estabilidad son ficción casi real.</p></div><div><div class="sec-t">Tipografías y librerías</div><p>TeX Gyre Heros Condensed (GUST e-foundry, licencia GUST) · Inter (Rasmus Andersson, SIL OFL 1.1) · qrcode-generator (Kazuhiko Arase, MIT) · jsQR (Cosmo Wolfe, Apache-2.0).</p><div class="sec-t">Apoyo</div><p>El juego es gratis. Donación voluntaria en la Página Oficial.</p></div></div><div class="row"><button class="btn pri" data-act="donate">☕ Apoyar</button><button class="btn gh" data-act="close">Cerrar</button></div>`);
 }
 function settings() {
   const tg = (k, t) => `<button class="btn ${S.set[k] ? 'pri' : 'gh'}" data-act="set" data-arg="${k}">${t}: ${S.set[k] ? 'Sí' : 'No'}</button>`;
-  modal(`<div class="pag">Ajustes · tu partida es tuya</div><h2 class="mega">Ajustes</h2><div class="row">${tg('snd', '♪ Sonido')}${tg('vib', '≋ Vibración')}${tg('sandbox', '⚛ Sandbox')}</div><p class="m">Sandbox: todos los elementos comunes en la bandeja para experimentar libremente.</p><div class="sec-t">Partida</div><div class="row"><button class="btn" data-act="export">⇩ Exportar</button><label class="btn">⇧ Importar<input type="file" accept=".json,application/json" id="impF" hidden></label><button class="btn gh" data-act="reset" style="border-color:var(--mag)">Borrar partida</button></div>`);
+  modal(`<div class="pag">Ajustes · tu partida es tuya</div><h2 class="mega">Ajustes</h2><div class="row">${tg('snd', '♪ Sonido')}${tg('mus', '♫ Música')}${tg('vib', '≋ Vibración')}${tg('sandbox', '⚛ Sandbox')}</div><p class="m">Sandbox: todos los elementos comunes en la bandeja para experimentar libremente.</p><div class="sec-t">Partida</div><div class="row"><button class="btn" data-act="export">⇩ Exportar</button><label class="btn">⇧ Importar<input type="file" accept=".json,application/json" id="impF" hidden></label><button class="btn gh" data-act="reset" style="border-color:var(--mag)">Borrar partida</button></div><div class="sec-t">Pruebas con jugadores</div><p class="m sm">El juego anota intentos, fallos, pistas y tiempos por problema (solo en este dispositivo). Exporta el informe para ajustar la dificultad.</p><div class="row"><button class="btn" data-act="report">⇩ Informe de prueba (CSV)</button><button class="btn" data-act="cards">🃏 Cartas imprimibles</button></div>`);
   $('#impF').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = D.sanitize(JSON.parse(rd.result)); if (!o.intro && !Object.keys(o.prog).length) throw 0; S = o; S.seen = S.seen || {}; save(true); closeModal(); hud(); renderTray(); setTab(TAB); toast('Partida importada', 'ok'); } catch (x) { toast('Archivo inválido', 'bad'); } }; rd.readAsText(f); });
 }
-function exportSave() { try { const b = new Blob([JSON.stringify(S)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'doc-element-partida.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); } catch (e) { toast('No se pudo exportar', 'bad'); } }
+function download(text, fname, mime) { try { const b = new Blob([text], { type: mime || 'text/plain' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = fname; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800); toast('Archivo: ' + esc(fname), 'ok'); return true; } catch (e) { toast('No se pudo guardar el archivo', 'bad'); return false; } }
+function exportSave() { download(JSON.stringify(S), 'doc-element-partida-' + dateKey() + '.json', 'application/json'); }
+async function shareOut(text, fname) { // Compartir del sistema (Bluetooth, Quick Share, AirDrop, WhatsApp…) → portapapeles → archivo
+  const C = window.Capacitor;
+  try { if (C && C.Plugins && C.Plugins.Share) { await C.Plugins.Share.share({ title: 'Doc Element', text, dialogTitle: 'Enviar por Bluetooth, Quick Share o WhatsApp' }); return 'share'; } } catch (e) { }
+  try { if (navigator.share) { if (fname && navigator.canShare) { const f = new File([text], fname, { type: 'text/plain' }); if (navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Doc Element', text }); return 'share'; } } await navigator.share({ title: 'Doc Element', text }); return 'share'; } } catch (e) { if (e && e.name === 'AbortError') return 'abort'; }
+  try { await navigator.clipboard.writeText(text); toast('Copiado: pégalo donde quieras', 'ok'); return 'copy'; } catch (e) { }
+  if (fname) download(text, fname); return 'file';
+}
+function reportCSV() {
+  const rows = [['nivel', 'problema', 'titulo', 'tipo', 'intentos', 'victorias', 'fallos', 'pistas', 'segundos_promedio', 'estrellas']];
+  LEVELS.forEach(L => L.P.forEach((p, i) => { const k = D.pk(L.n, i), t = S.pt[k] || {}; rows.push([L.n, i + 1, p.t, p.boss ? 'jefe' : p.k, t.a || 0, t.w || 0, t.f || 0, t.h || 0, t.w ? Math.round((t.s || 0) / t.w) : '', S.prog[k] || 0]); }));
+  return rows.map(r => r.map(x => /[",;\n]/.test(String(x)) ? '"' + String(x).replace(/"/g, '""') + '"' : x).join(',')).join('\n');
+}
+function cardsHTML() {
+  const cards = D.allCards(S), K = { el: 'Elemento', mol: 'Molécula', poly: 'Polímero', hyb: 'Híbrido' };
+  const desc = c => c.kind === 'el' ? 'Elemento puro de la tabla periódica.' : ((DB.comp[c.id] || DB.poly[c.id] || S.hyb[c.id] || {}).desc || '');
+  const one = c => `<div class="c ${c.kind}"><div class="k">${K[c.kind]} · ×${c.pow.toFixed(1)}</div><div class="f">${fHTML(c.f)}</div><div class="n">${esc(c.name)}</div><div class="s">${Object.keys(c.tags).map(t => `<span>${TAGS[t][1]} ${TAGS[t][0]} ${'●'.repeat(c.tags[t])}${'○'.repeat(3 - c.tags[t])}</span>`).join('')}</div><div class="d">${esc(desc(c))}</div><div class="p">DOC ELEMENT · ${esc(CFG.STUDIO)}</div></div>`;
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Cartas · Doc Element</title><style>@page{size:A4;margin:8mm}*{box-sizing:border-box}body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif}.g{display:grid;grid-template-columns:repeat(3,63mm);gap:3mm;justify-content:center}.c{width:63mm;height:88mm;border:2.4mm solid #a42cff;background:#05010b;color:#e9f6ff;padding:3mm;display:flex;flex-direction:column;gap:1.4mm;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}.c.poly{border-color:#2dffb3}.c.hyb{border-color:#ff2fb3;border-style:dashed}.c.el{border-color:#39c8ff}.k{font-size:7pt;letter-spacing:.2em;text-transform:uppercase;color:#ffc23a}.f{font:700 24pt 'Arial Narrow',Impact,sans-serif;color:#39c8ff}.n{font-size:10pt;font-weight:700}.s{display:flex;flex-direction:column;gap:.6mm;font-size:7.5pt}.d{font-size:7pt;color:#8fb3ff;flex:1;overflow:hidden}.p{font-size:6pt;letter-spacing:.3em;color:#5d6c9a;text-align:center}sub{font-size:.6em}</style></head><body><div class="g">${cards.map(one).join('')}</div><script>setTimeout(function(){print()},500)<\/script></body></html>`;
+}
+function printCards() { const html = cardsHTML(); let w = null; try { w = window.open('', '_blank'); } catch (e) { } if (w && w.document) { w.document.write(html); w.document.close(); } else download(html, 'cartas-doc-element.html', 'text/html'); }
 function openLink(u, label) { if (u) { try { window.open(u, '_blank', 'noopener'); } catch (e) { } } else toast(label + ': próximamente en la Página Oficial'); }
 function diag() {
   modal('<div class="pag">Diagnóstico</div><h2 class="mega">Bot de pruebas</h2><p id="dg">Validando datos y jugando partidas simuladas…</p>');
@@ -815,7 +894,9 @@ const ACT = {
   abandon: () => { if (MIS) failMission('Abandonaste la misión.'); }, tomap: () => { closeModal(); setTab('bt'); },
   det: id => detail(id), filt: f => { FF = f; renderFr(); }, txl: L => txLevel(+L), talk: () => nextLine(),
   menu: () => menu(), guide: () => guide(), credits: () => credits(), settings: () => settings(), diag: () => diag(), fs: () => fullscreen(), vok: () => document.body.classList.add('vok'),
-  set: k => { S.set[k] = S.set[k] ? 0 : 1; save(); settings(); if (k === 'sandbox') renderTray(); },
+  set: k => { S.set[k] = S.set[k] ? 0 : 1; save(); settings(); if (k === 'sandbox') renderTray(); if (k === 'mus') S.set.mus ? MUS.start() : MUS.stop(); },
+  daily: () => { if (!D.levelDone(S, 1)) return toast('Completa el nivel 1 primero'); closeModal(); const d = new Date(); startChallenge('daily', d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()); },
+  chskip: () => chalSkip(), chquit: () => chalEnd(true), cards: () => printCards(), report: () => download(reportCSV(), 'informe-doc-element-' + dateKey() + '.csv', 'text/csv'), dshare: t => shareOut(t),
   export: () => exportSave(), reset: () => { if (confirm('¿Borrar toda tu partida? No se puede deshacer.')) { S = D.newState(); save(true); location.reload(); } },
   donate: () => openLink(CFG.DONATE_URL, 'Donaciones'), channel: () => openLink(CFG.CHANNEL_URL, 'Videos'),
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(),
@@ -823,7 +904,7 @@ const ACT = {
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
   ending: () => { closeModal(); S.end = 1; save(); slides(STORY.ending, () => credits()); }
 };
-document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act]; if (f) f(b.dataset.arg, b, e); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
@@ -832,13 +913,14 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); }
   else if (e.key === 'Enter') synth();
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
-  else { const s = D.labElements(S).find(x => x.toLowerCase() === e.key.toLowerCase()); if (s && !e.ctrlKey && !e.metaKey) spawn(s); }
+  else { const s = labEls().find(x => x.toLowerCase() === e.key.toLowerCase()); if (s && !e.ctrlKey && !e.metaKey) spawn(s); }
 });
 
 /* ---------- bucle ---------- */
 let last = 0, regen = 0;
 function tick(dt) {
-  if (MIS) { MIS.t -= dt; if (MIS.t <= 0 && !MIS.late) { if (dOf(MIS.L).fail) failMission('Se acabó el tiempo.'); else { MIS.late = true; MIS.t = 0; toast('Sin prisa: sigue a tu ritmo (1 ★)'); } } updTimer(); }
+  if (MIS && MIS.ch) { CH.el += dt; updTimer(); }
+  else if (MIS) { MIS.t -= dt; if (MIS.t <= 0 && !MIS.late) { if (dOf(MIS.L).fail) failMission('Se acabó el tiempo.'); else { MIS.late = true; MIS.t = 0; toast('Sin prisa: sigue a tu ritmo (1 ★)'); } } updTimer(); }
   if (SO) { SO.t -= dt; const e = $('#soT'); if (e) e.textContent = Math.max(0, Math.ceil(SO.t)); if (SO.t <= 0 && !SO.late) { if (dOf(SO.L).fail) { const s = SO; SO = null; $('#sortOv').hidden = true; lose(s.L, s.i, 'Se acabó el tiempo.', 'Deja siempre un tubo vacío para maniobrar.'); } else SO.late = true; } }
   if (BT) { BAT.step(BT.b, dt); battleUI(); }
   regen += dt; if (regen >= 2) { regen = 0; if (S.en < 100) { S.en++; hud(); } }
@@ -847,6 +929,7 @@ let anaT = 0;
 function frame(t) {
   const dt = Math.min(.1, (t - (last || t)) / 1000); last = t;
   if (!TEST) tick(dt);
+  if (MUS.ctx) { const mm = BT ? 'battle' : SO ? 'sort' : document.getElementById('cover') || document.getElementById('story') ? 'menu' : 'lab'; if (mm !== MUS.mode) MUS.mode = mm; }
   if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
   requestAnimationFrame(frame);
 }
@@ -871,9 +954,13 @@ function boot() {
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
   hud(); setTab('lab'); renderTray(); showLine(['eter', 'neutral', 'Sistemas en línea. Toca ▶ en este panel para seguir la historia.']); cover(); requestAnimationFrame(frame);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) save(true); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { save(true); if (MUS.ctx) MUS.stop(); } });
+  document.addEventListener('pointerdown', () => MUS.start());
+  if (window.Capacitor) document.body.classList.add('native', 'vok');
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.Capacitor && !TEST) navigator.serviceWorker.register('./sw.js').catch(() => { });
 }
-DE.ui = { Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
+DE.k = { S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud };
+DE.ui = { startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
   guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

@@ -1,5 +1,21 @@
 # Bitácora de Doc Element
 
+## v1.2.0 — Publicación, duelos LAN/Bluetooth, reto diario, música y APK (2026-11-04)
+1. Publicado como app web instalable en https://juanfeliperico369-stack.github.io/doczero/ (rama `gh-pages` con `.nojekyll`). Incluye manifest, service worker con caché propia, íconos 192/512/maskable, apple-touch-icon de 180 px, favicon y Open Graph con `compartir.png` 1200×630.
+2. Verificado en el enlace publicado con Chrome: carga, service worker activado, abre sin conexión (recarga y pestaña nueva), 0 errores de instalabilidad y 0 errores de consola.
+3. Duelo LAN real: WebRTC entre teléfonos de la misma Wi-Fi, sin servidor, emparejados con QR (código de 127 caracteres). Probado con dos páginas: conecta, comparten semilla y se intercambian los resultados.
+4. Duelo por Bluetooth: el reto se envía con Compartir (Bluetooth, Quick Share o AirDrop) y el rival devuelve su tiempo. El navegador no permite Bluetooth directo; para tiempo real haría falta un plugin nativo.
+5. Reto diario: 5 moléculas iguales para todos cada día, con racha 🔥 y resultado compartible.
+6. Música procedimental por modo y efectos de sonido con más cuerpo.
+7. Para probar con jugadores: informe CSV por problema y cartas imprimibles (base del juego físico).
+8. APK de prueba compilado con Capacitor 7 (horizontal, cámara para el QR, Compartir nativo).
+9. Bot: 100/100 problemas resueltos, reto diario y duelo LAN completados, 2×100 partidas sin errores. Corrigió el choque de nombres CH, un reto huérfano al iniciar una batalla y el estado del service worker.
+10. Falta:
+    - Temporada 2 (fármacos).
+    - Bluetooth en tiempo real nativo.
+    - Firmar la versión para la Play Store.
+    - Pruebas con jugadores reales.
+
 ## v1.1.0 — Pulido: horizontal, guía para principiantes, personajes, reactor y destilación (2026-11-04)
 1. Horizontal primero: navegación a la izquierda, escenario al centro y panel de personajes y misión a la derecha. En teléfonos en vertical aparece "gira tu dispositivo" (con pantalla completa y bloqueo de orientación).
 2. Conexiones intuitivas: plano punteado de la molécula y la pieza o el enlace que toca brillan. Además, unir = arrastrar un átomo sobre otro, las "manos libres" se dibujan como conectores y hay una lista de átomos (C 1/2…).
