@@ -1,5 +1,35 @@
 # Bitácora de Doc Element
 
+## v1.1.0 — Pulido: horizontal, guía para principiantes, personajes, reactor y destilación (2026-11-04)
+1. Horizontal primero: navegación a la izquierda, escenario al centro y panel de personajes y misión a la derecha. En teléfonos en vertical aparece "gira tu dispositivo" (con pantalla completa y bloqueo de orientación).
+2. Conexiones intuitivas: plano punteado de la molécula y la pieza o el enlace que toca brillan. Además, unir = arrastrar un átomo sobre otro, las "manos libres" se dibujan como conectores y hay una lista de átomos (C 1/2…).
+3. Dificultad progresiva (tabla DIFF): plano completo, luego sin H, luego lista, luego solo nombre. ⚡H empieza a costar energía, ÉTER deja de balancear las ecuaciones, los críticos exigen timing y las amenazas se propagan. Los niveles 1–2 no castigan por tiempo.
+4. Personajes originales en SVG: Doc (evoluciona con el rango) y ÉTER (IA de la nave) en comunicaciones, historia, resultados y diálogos de cada nivel y evento.
+5. Referencias aplicadas:
+   - Reactor de ecuaciones reales (Little Alchemy y The Right Mix): 37 reacciones, como termita, Haber-Bosch, fotosíntesis o fermentación.
+   - Destilación como el puzzle de clasificar agua.
+   - Golpe crítico por timing en la batalla (Skywire).
+   - Propagación y mutación de amenazas (Plague Inc).
+   - Humor de ciencia ficción (Rick y Morty, solo como tono).
+6. Contenido rehecho: 100 problemas, ahora 22 síntesis, 17 reacciones, 23 forjas, 6 polímeros, 6 destilaciones y 26 batallas. Hay 3 compuestos nuevos (Li₂CO₃, SO₃, R-22) y frascos de "Bio y fármacos" y "Organismos (T4)".
+7. Anuncios apagados (`CFG.ADS=false`): el fallo ya no muestra anuncio, solo la pista de ÉTER y reintentar.
+8. Probado con el bot:
+   - En móvil horizontal 740×360, PC 1366×768 y móvil vertical: 100/100 problemas resueltos, 12 de ellos siguiendo solo la guía en pantalla.
+   - 2×100 partidas al azar (32 000 acciones) sin errores.
+   - Clics reales: plano, enlace doble tocando, reactor, arrastrar para unir, destilación y forja.
+9. Corregido gracias al bot:
+   - Ruta equivocada del reactor con los mismos reactivos.
+   - Toque fuera de rango en destilación.
+   - Centrado asíncrono del plano.
+   - Clase CSS repetida que escondía el panel de diálogo.
+   - Subíndices partidos y anillo de benceno cruzado en el plano.
+10. Falta:
+    - Probar con jugadores reales (niños y expertos) para ajustar tiempos.
+    - Música y efectos con más cuerpo.
+    - Empaquetar con Capacitor.
+    - Temporada 2.
+    - Anuncios y donaciones reales.
+
 ## v1.0.0 — Temporada 1 "NÚCLEO" (2026-11-04)
 1. Creado: juego completo en un solo `index.html` offline (≈245 KB, sin librerías ni internet), generado desde `src/` con `node tools/build.mjs`.
 2. Estética de la revista EMSAY e INDUSTRY ART llevada a neón negro, morado y azul: portada de revista, cajas espaciadas, números en contorno, marco de película, vallas verticales y sello "Lab advisory".

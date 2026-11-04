@@ -324,12 +324,16 @@ const BAT = {
   },
   mult: combo => Math.min(2, 1 + 0.2 * Math.max(0, combo - 1)),
   phaseOf(p, n) { const q = n === 2 && p.ph2 ? p.ph2 : p; return { d: q.d, w: parseTags(q.w), h: parseTags(q.h), hx: (q.hx || '').split(',').filter(Boolean) }; },
-  create(p, deck) {
-    return { p, deck, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [] };
+  WIN: 1.6, WIN_ON: .34,
+  inWin: b => !!b.crit && (b.cyc % BAT.WIN) < BAT.WIN_ON,
+  create(p, deck, diff) {
+    diff = diff || {};
+    return { p, deck, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
   },
   step(b, dt) {
     if (b.over) return;
-    b.t -= dt; b.integ -= b.p.dps * dt; b.comboT -= dt; if (b.comboT <= 0) b.combo = 0;
+    b.t -= dt; b.cyc += dt; b.integ -= b.p.dps * dt; b.comboT -= dt; if (b.comboT <= 0) b.combo = 0;
+    if (b.rg && b.hp > 0) b.hp = Math.min(b.max, b.hp + b.rg * dt);
     for (const k in b.cd) b.cd[k] = Math.max(0, b.cd[k] - dt);
     b.spikeT -= dt; if (b.spikeT <= 0) { b.spikeT = 5; b.integ -= b.p.dps * 2; b.ev.push({ k: 'spike' }); }
     if (b.integ <= 0 || b.t <= 0) { b.integ = Math.max(0, b.integ); b.over = true; b.win = false; b.why = b.integ <= 0 ? 'La integridad de la nave llegó a 0 %.' : 'Se acabó el tiempo.'; }
@@ -338,12 +342,13 @@ const BAT = {
     if (b.over || (b.cd[card.id] || 0) > 0) return null;
     b.cd[card.id] = BAT.CD;
     const e = BAT.eff(card, b.ph); let dmg, kind;
-    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * 2 * card.pow * BAT.mult(b.combo)); b.hp -= dmg; kind = 'hit'; }
+    const crit = e > 0 && BAT.inWin(b);
+    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * 2 * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1)); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
     else if (e < 0) { b.combo = 0; dmg = Math.round(-e * 2 * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
     else { b.combo = 0; dmg = 1; b.hp -= 1; kind = 'none'; }
     if (b.phase === 1 && b.p.ph2 && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
     if (b.hp <= 0) { b.hp = 0; b.over = true; b.win = true; b.stars = b.integ >= 70 ? 3 : b.integ >= 40 ? 2 : 1; }
-    return { e, dmg, kind };
+    return { e, dmg, kind, crit };
   }
 };
 function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.kind === 'hyb' ? 0.9 : 1 + Math.min(0.5, (c.atoms || 2) / 40); }
@@ -351,7 +356,7 @@ function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.k
 /* ---------- partida ---------- */
 function newState() {
   return { v: 1, intro: 0, unl: 1, cur: 1, prog: {}, el: { H: 1, O: 1 }, nuc: { p: 1, n: 1 }, fr: {}, hyb: {}, en: 100, sc: 0,
-    set: { snd: 1, vib: 1, sandbox: 0 }, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
+    set: { snd: 1, vib: 1, sandbox: 0 }, seen: {}, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
 }
 function sanitize(S) {
   const d = newState();
@@ -387,4 +392,123 @@ function allCards(S) {
   return out.filter(Boolean);
 }
 
-Object.assign(DE, { CFG, ELEMENTS, SYM, CAT, elem, elBySym, catOf, valence, maxVal, tablePos, parseFormula, hill, fHTML, fUni, molarMass, parseSmiles, components, subgraph, wlHash, molKey, groupsOf, bondSums, freeOf, countOf, bondType, DB, buildDB, makeHybrid, NUC, BAT, newState, sanitize, pk, levelDone, problemOpen, starsOf, totalStars, rankOf, labElements, cardFromId, allCards, parseTags, mulberry, esc, sup, clamp, djb });
+
+/* ---------- distribución 2D (planos de moléculas) ---------- */
+function layout2D(g) {
+  const n = g.atoms.length, adj = adjOf(g);
+  if (!n) return [];
+  const L = (i, j) => (g.atoms[i].el === 'H' || g.atoms[j].el === 'H') ? 46 : 62;
+  const relax = P => {
+    for (let it = 0, step = 1; it < 300; it++, step *= .99) {
+      const F = P.map(() => [0, 0]);
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+        const dx = P[j][0] - P[i][0], dy = P[j][1] - P[i][1], d = Math.hypot(dx, dy) || .1;
+        if (d < 150) { const f = 1800 / (d * d); F[i][0] -= dx / d * f; F[i][1] -= dy / d * f; F[j][0] += dx / d * f; F[j][1] += dy / d * f; }
+      }
+      g.bonds.forEach(b => { const i = b.a, j = b.b, dx = P[j][0] - P[i][0], dy = P[j][1] - P[i][1], d = Math.hypot(dx, dy) || .1, f = (d - L(i, j)) * .35; F[i][0] += dx / d * f; F[i][1] += dy / d * f; F[j][0] -= dx / d * f; F[j][1] -= dy / d * f; });
+      for (let i = 0; i < n; i++) { const m = Math.hypot(F[i][0], F[i][1]), lim = 9 * step, k = m > lim ? lim / m : 1; P[i][0] += F[i][0] * k; P[i][1] += F[i][1] * k; }
+    }
+    return P;
+  };
+  const cross = P => {
+    let c = 0; const B = g.bonds;
+    const ccw = (a, b, q) => (q[1] - a[1]) * (b[0] - a[0]) > (b[1] - a[1]) * (q[0] - a[0]);
+    for (let i = 0; i < B.length; i++) for (let j = i + 1; j < B.length; j++) {
+      const x = B[i], y = B[j]; if (x.a === y.a || x.a === y.b || x.b === y.a || x.b === y.b) continue;
+      const p1 = P[x.a], p2 = P[x.b], p3 = P[y.a], p4 = P[y.b];
+      if (ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4)) c++;
+    }
+    return c;
+  };
+  const bfs = () => {
+    const P = new Array(n), seen = new Array(n).fill(false), q = [[0, null]]; P[0] = [0, 0]; seen[0] = true;
+    while (q.length) {
+      const [v, ain] = q.shift(), ch = adj[v].map(x => x[0]).filter(u => !seen[u]), k = ch.length;
+      ch.forEach((u, i) => { const a = ain == null ? -Math.PI / 2 + i * 2 * Math.PI / k : ain + (k === 1 ? (v % 2 ? .55 : -.55) : -1.1 + i * 2.2 / (k - 1)); P[u] = [P[v][0] + Math.cos(a) * L(v, u), P[v][1] + Math.sin(a) * L(v, u)]; seen[u] = true; q.push([u, a]); });
+    }
+    for (let i = 0; i < n; i++) if (!P[i]) P[i] = [i * 30, 80];
+    return P;
+  };
+  const r = mulberry(n * 7 + g.bonds.length); let best = null, bs = Infinity;
+  for (let t = 0; t < (n > 3 ? 8 : 1); t++) {
+    const P = relax(t ? g.atoms.map((_, i) => { const a = i / n * 6.283 + r() * 2, R = 40 + r() * 80; return [Math.cos(a) * R, Math.sin(a) * R]; }) : bfs());
+    const sc = cross(P) * 1e5 + g.bonds.reduce((s, b) => { const d = Math.hypot(P[b.a][0] - P[b.b][0], P[b.a][1] - P[b.b][1]) - L(b.a, b.b); return s + d * d; }, 0);
+    if (sc < bs) { bs = sc; best = P; } if (bs < 50) break;
+  }
+  const cx = best.reduce((s, p) => s + p[0], 0) / n, cy = best.reduce((s, p) => s + p[1], 0) / n;
+  return best.map(p => [Math.round(p[0] - cx), Math.round(p[1] - cy)]);
+}
+function blueprint(smi, withH) {
+  const g = parseSmiles(smi), P = layout2D(g), keep = g.atoms.map((a, i) => withH || a.el !== 'H' ? i : -1).filter(i => i >= 0), ix = new Map(keep.map((v, k) => [v, k]));
+  return { atoms: keep.map(i => ({ el: g.atoms[i].el, x: P[i][0], y: P[i][1] })), bonds: g.bonds.filter(b => ix.has(b.a) && ix.has(b.b)).map(b => ({ a: ix.get(b.a), b: ix.get(b.b), o: b.o })), cnt: countOf(g) };
+}
+
+/* ---------- reactor: ecuaciones químicas ---------- */
+const REACT = {
+  rx: {}, byKey: {}, errors: [],
+  parse(eq) { const side = s => s.split('+').map(t => { const m = t.match(/^(\d*)(@?[A-Za-z0-9]+)$/); if (!m) throw new Error('término ' + t); return [m[1] ? +m[1] : 1, m[2]]; }); const [l, r] = eq.split('='); return { L: side(l), R: side(r) }; },
+  cnt(id) { if (id[0] === '@') return SYM[id.slice(1)] ? { [id.slice(1)]: 1 } : null; const c = DB.comp[id]; return c ? c.cnt : null; },
+  sum(terms) { const o = {}; terms.forEach(([k, id]) => { const c = REACT.cnt(id) || {}; for (const e in c) o[e] = (o[e] || 0) + k * c[e]; }); return o; },
+  balanced(L, R) { return sameCount(REACT.sum(L), REACT.sum(R)); },
+  key: ids => [...new Set(ids)].sort().join('+'),
+  energy: x => clamp(Math.round(-x.dH / 40), -90, 80),
+  name(id) { if (id[0] === '@') { const e = elBySym(id.slice(1)); return e ? e.name : id; } return DB.comp[id] ? DB.comp[id].name : id; },
+  form(id) { return id[0] === '@' ? id.slice(1) : DB.comp[id] ? DB.comp[id].f : id; },
+  build() {
+    REACT.rx = {}; REACT.byKey = {}; REACT.errors = [];
+    REACTIONS.forEach(([id, name, eq, dH, desc]) => {
+      try {
+        const { L, R } = REACT.parse(eq);
+        [...L, ...R].forEach(([, x]) => { if (!REACT.cnt(x)) REACT.errors.push(id + ': sustancia desconocida ' + x); });
+        if (!REACT.balanced(L, R)) REACT.errors.push(id + ': ecuación desbalanceada');
+        const k = REACT.key(L.map(t => t[1])); (REACT.byKey[k] = REACT.byKey[k] || []).push(id);
+        REACT.rx[id] = { id, name, eq, dH, desc, L, R };
+      } catch (e) { REACT.errors.push(id + ': ' + e.message); }
+    });
+  },
+  find(ids) { return (REACT.byKey[REACT.key(ids)] || []).map(id => REACT.rx[id]); }
+};
+REACT.build();
+
+/* ---------- destilación (clasificación de líquidos) ---------- */
+const SORT = {
+  CAP: 4,
+  top: t => t[t.length - 1],
+  can(st, a, b) { return a !== b && st[a].length > 0 && st[b].length < SORT.CAP && (!st[b].length || SORT.top(st[b]) === SORT.top(st[a])); },
+  pour(st, a, b) {
+    if (!SORT.can(st, a, b)) return 0; const c = SORT.top(st[a]); let n = 0;
+    while (st[a].length && SORT.top(st[a]) === c && st[b].length < SORT.CAP) { st[b].push(st[a].pop()); n++; }
+    return n;
+  },
+  solved: st => st.every(t => !t.length || (t.length === SORT.CAP && t.every(x => x === t[0]))),
+  solve(st0, limit) {
+    limit = limit || 80000; const seen = new Set(), path = []; let nodes = 0;
+    const key = st => st.map(t => t.join('')).sort().join('|');
+    const dfs = st => {
+      if (SORT.solved(st)) return true; if (++nodes > limit) return false;
+      const k = key(st); if (seen.has(k)) return false; seen.add(k);
+      for (let a = 0; a < st.length; a++) for (let b = 0; b < st.length; b++) {
+        if (!SORT.can(st, a, b)) continue;
+        if (!st[b].length && st[a].every(x => x === st[a][0])) continue;
+        const nx = st.map(t => t.slice()); SORT.pour(nx, a, b); path.push([a, b]);
+        if (dfs(nx)) return true; path.pop();
+      }
+      return false;
+    };
+    return dfs(st0.map(t => t.slice())) ? path.slice() : null;
+  },
+  gen(n, seed) {
+    const r = mulberry(seed || 1);
+    for (let tries = 0; tries < 80; tries++) {
+      const u = []; for (let c = 0; c < n; c++) for (let k = 0; k < SORT.CAP; k++) u.push(c);
+      for (let i = u.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [u[i], u[j]] = [u[j], u[i]]; }
+      const st = []; for (let t = 0; t < n; t++) st.push(u.slice(t * SORT.CAP, t * SORT.CAP + SORT.CAP));
+      st.push([], []);
+      if (SORT.solved(st) || st.some(t => t.length && t.every(x => x === t[0]))) continue;
+      const sol = SORT.solve(st); if (sol) return { st, sol };
+    }
+    return null;
+  }
+};
+
+Object.assign(DE, { layout2D, blueprint, REACT, SORT, CFG, ELEMENTS, SYM, CAT, elem, elBySym, catOf, valence, maxVal, tablePos, parseFormula, hill, fHTML, fUni, molarMass, parseSmiles, components, subgraph, wlHash, molKey, groupsOf, bondSums, freeOf, countOf, bondType, DB, buildDB, makeHybrid, NUC, BAT, newState, sanitize, pk, levelDone, problemOpen, starsOf, totalStars, rankOf, labElements, cardFromId, allCards, parseTags, mulberry, esc, sup, clamp, djb });

@@ -10,7 +10,7 @@ execFileSync('node', [root + 'tools/build.mjs'], { stdio: 'inherit' });
 const N = +process.argv[2] || 100, shotsAt = process.argv.indexOf('--shots'), shots = shotsAt > 0 ? process.argv[shotsAt + 1] : null;
 const url = 'file://' + root + 'index.html?test=1';
 const browser = await chromium.launch();
-const views = [{ name: 'movil', viewport: { width: 360, height: 740 }, hasTouch: true, isMobile: true }, { name: 'pc', viewport: { width: 1366, height: 768 } }];
+const views = [{ name: 'movil-h', viewport: { width: 740, height: 360 }, hasTouch: true, isMobile: true }, { name: 'pc', viewport: { width: 1366, height: 768 } }, { name: 'movil-v', viewport: { width: 360, height: 740 }, hasTouch: true, isMobile: true, quick: true }];
 let fails = 0;
 for (const v of views) {
   const ctx = await browser.newContext({ viewport: v.viewport, hasTouch: !!v.hasTouch, isMobile: !!v.isMobile, deviceScaleFactor: 1 });
@@ -18,40 +18,79 @@ for (const v of views) {
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
   await page.goto(url); await page.waitForSelector('#cover');
-  const click = async (sel) => { await page.locator(sel).first().click(); await page.waitForTimeout(40); };
+  let lastSel = '';
+  const click = async (sel) => { lastSel = sel; await page.locator(sel).first().click({ timeout: 8000 }); await page.waitForTimeout(40); };
+  const ev = f => page.evaluate(f);
   const ui = [];
   try {
-    if (shots) await page.screenshot({ path: `${shots}/${v.name}-portada.png` });
-    await click('[data-act=newgame]'); await click('[data-act=sskip]');
-    await page.waitForSelector('.sheet [data-act=go]'); await click('.sheet [data-act=go]');
-    await click('#tray [data-arg=H]'); await click('#tray [data-arg=H]'); await click('[data-act=synth]');
-    ui.push('1-1 por clics: ' + (await page.evaluate(() => DE.ui.state().prog['1-0'] || 0)) + '★');
-    await page.evaluate(() => DE.ui.closeModal());
-    // tocar el lienzo con el puntero real: crear O, enlazar O–O y tocar el enlace para hacerlo doble
-    await click('[data-act=go][data-arg="1,1"], [data-act=open][data-arg="1,1"]').catch(() => {});
-    await page.evaluate(() => DE.ui.openProblem(1, 1)); await click('.sheet [data-act=go]');
-    await click('#tray [data-arg=O]'); await click('#tray [data-arg=O]');
-    const pos = await page.evaluate(() => { const r = document.getElementById('cv').getBoundingClientRect(), L = DE.ui.Lab, [a, b] = L.atoms; const s = (x, y) => [(x - L.view.x) * L.view.z + r.width / 2 + r.left, (y - L.view.y) * L.view.z + r.height / 2 + r.top]; return [s((a.x + b.x) / 2, (a.y + b.y) / 2), s(a.x, a.y)]; });
-    if (v.hasTouch) await page.touchscreen.tap(...pos[0]); else await page.mouse.click(...pos[0]);
-    await page.waitForTimeout(40); await click('[data-act=synth]');
-    ui.push('1-2 O=O tocando el enlace: ' + (await page.evaluate(() => DE.ui.state().prog['1-1'] || 0)) + '★');
-    await page.evaluate(() => DE.ui.closeModal());
-    if (shots && v.name === 'movil') { await page.evaluate(() => { DE.ui.buildSmiles('CC(=O)OC1=CC=CC=C1C(=O)O', 0, 0); }); await page.waitForTimeout(120); await page.screenshot({ path: `${shots}/${v.name}-lab.png` }); await page.evaluate(() => DE.ui.clearLab(true)); }
-    for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#tabs [data-arg=${t}]`);
-    await click('[data-act=mode][data-arg=forge]'); await click('.nuc >> nth=0'); await click('.nuc >> nth=1'); await click('[data-act=fuse]');
-    ui.push('forja p+n: ' + (await page.evaluate(() => !!DE.ui.state().nuc.D)));
-    await click('[data-act=mode][data-arg=mol]');
-    for (const a of ['guide', 'credits', 'settings', 'diag']) { await click('#bMenu'); await click(`.sheet [data-act=${a}]`); await page.waitForTimeout(a === 'diag' ? 1500 : 30); await page.evaluate(() => DE.ui.closeModal()); }
-    if (shots && v.name === 'pc') { await page.evaluate(() => DE.ui.setTab('bt')); await page.waitForTimeout(80); await page.screenshot({ path: `${shots}/${v.name}-mapa.png` }); }
-  } catch (e) { errs.push('UI: ' + e.message.split('\n')[0]); }
+    if (v.quick) {
+      ui.push('aviso girar: ' + (await page.locator('#rotate').isVisible()));
+      await click('#rotate [data-act=vok]'); ui.push('seguir en vertical: ' + !(await page.locator('#rotate').isVisible()));
+      await click('[data-act=newgame]'); await click('[data-act=sskip]'); await click('#tray [data-arg=H]'); await click('#tray [data-arg=H]'); await click('#bSyn');
+      ui.push('1-1 en vertical: ' + (await ev(() => DE.ui.state().prog['1-0'] || 0)) + '★');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}.png` });
+    } else {
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-portada.png` });
+      await click('[data-act=newgame]');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-historia.png` });
+      await click('[data-act=sskip]');
+      // 1-1 guiado: plano punteado, la pieza correcta brilla
+      ui.push('pista H: ' + (await page.locator('#tray [data-arg=H].hint').count()));
+      await click('#tray [data-arg=H]');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-guia.png` });
+      await click('#tray [data-arg=H]'); await click('#bSyn');
+      ui.push('1-1 H₂: ' + (await ev(() => DE.ui.state().prog['1-0'] || 0)) + '★');
+      await click('.sheet [data-act=go]');
+      // 1-2: dos O y tocar el enlace con el puntero real
+      await click('#tray [data-arg=O]'); await click('#tray [data-arg=O]');
+      const pos = await ev(() => { const r = document.getElementById('cv').getBoundingClientRect(), L = DE.ui.Lab, [a, b] = L.atoms; const s = (x, y) => [(x - L.view.x) * L.view.z + r.width / 2 + r.left, (y - L.view.y) * L.view.z + r.height / 2 + r.top]; return s((a.x + b.x) / 2, (a.y + b.y) / 2); });
+      if (v.hasTouch) await page.touchscreen.tap(...pos); else await page.mouse.click(...pos);
+      await page.waitForTimeout(40); await click('#bSyn');
+      ui.push('1-2 O=O tocando el enlace: ' + (await ev(() => DE.ui.state().prog['1-1'] || 0)) + '★');
+      await click('.sheet [data-act=go]');
+      // 1-3 reactor con clics: H₂ + O₂ → ÉTER balancea → reaccionar
+      await click('#reactPane [data-act=rxadd][data-arg=H2]'); await click('#reactPane [data-act=rxadd][data-arg=O2]');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-reactor.png` });
+      await click('#reactPane [data-act=react]');
+      ui.push('1-3 reactor: ' + (await ev(() => DE.ui.state().prog['1-2'] || 0)) + '★');
+      await ev(() => DE.ui.closeModal());
+      // arrastrar un átomo sobre otro para unirlos (puntero real)
+      await click('[data-act=mode][data-arg=mol]'); await ev(() => { DE.ui.clearLab(true); DE.ui.Lab.sel = null; });
+      await click('#tray [data-arg=O]'); await ev(() => { DE.ui.Lab.sel = null; }); await click('#tray [data-arg=H]');
+      const dd = await ev(() => { const r = document.getElementById('cv').getBoundingClientRect(), L = DE.ui.Lab, [a, b] = L.atoms; const s = (x, y) => [(x - L.view.x) * L.view.z + r.width / 2 + r.left, (y - L.view.y) * L.view.z + r.height / 2 + r.top]; return [s(b.x, b.y), s(a.x, a.y)]; });
+      await page.mouse.move(...dd[0]); await page.mouse.down(); await page.mouse.move(dd[0][0] + 20, dd[0][1] + 10, { steps: 3 }); await page.mouse.move(...dd[1], { steps: 6 }); await page.mouse.up();
+      ui.push('arrastrar H sobre O une: ' + (await ev(() => DE.ui.Lab.bonds.length === 1)));
+      // destilación con clics: resolver con la solución del motor
+      await ev(() => { const S = DE.ui.state(); for (let i = 3; i < 7; i++) S.prog['1-' + i] = 1; DE.ui.closeModal(); });
+      await ev(() => DE.ui.startProblem(1, 7));
+      const sol = await ev(() => DE.ui.SO().sol);
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-destilacion.png` });
+      for (const [a, b] of sol) { await click(`.tube[data-arg="${a}"]`); await click(`.tube[data-arg="${b}"]`); }
+      ui.push('destilación por clics: ' + (await ev(() => DE.ui.state().prog['1-7'] || 0)) + '★');
+      await ev(() => DE.ui.closeModal());
+      // batalla con clics y anillo crítico
+      await ev(() => { const S = DE.ui.state(); S.prog['1-8'] = 1; S.fr.H2O = { c: 1, t: 1 }; DE.ui.startProblem(1, 9); });
+      await ev(() => DE.ui.startBattle(1, 9, ['el:He', 'H2O']));
+      await click('.dk >> nth=0');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-batalla.png` });
+      await ev(() => DE.ui.flee()); await ev(() => DE.ui.tick(.1)); await ev(() => DE.ui.closeModal());
+      for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#nav [data-arg=${t}]`);
+      await click('[data-act=mode][data-arg=forge]'); await click('#forgePane .nuc >> nth=0'); await click('#forgePane .nuc >> nth=1'); await click('[data-act=fuse]');
+      ui.push('forja p+n: ' + (await ev(() => !!DE.ui.state().nuc.D)));
+      await click('[data-act=mode][data-arg=mol]');
+      for (const a of ['guide', 'credits', 'settings', 'diag']) { await click('[data-act=menu]'); await click(`.sheet [data-act=${a}]`); await page.waitForTimeout(a === 'diag' ? 1500 : 30); await ev(() => DE.ui.closeModal()); }
+      if (shots) { await ev(() => DE.ui.setTab('bt')); await page.waitForTimeout(80); await page.screenshot({ path: `${shots}/${v.name}-mapa.png` }); await ev(() => DE.ui.setTab('lab')); }
+    }
+  } catch (e) { errs.push('UI [' + lastSel + ']: ' + e.message.split('\n')[0]); }
+  if (v.quick) { console.log(`\n== ${v.name} ${v.viewport.width}x${v.viewport.height} ==\nUI: ${ui.join(' · ')}\nConsola/página: ${errs.length}`); errs.forEach(e => console.log('  ✕', e)); fails += errs.length + ui.filter(x => /false|: 0★/.test(x)).length; await ctx.close(); continue; }
   const res = await page.evaluate(n => { const a = DE.test.selfTest(), s = DE.test.solver(), m = DE.test.monkey(n, n * 7 + 1); return { a, s, m }; }, N);
-  const bad = res.a.errors.length + res.s.failed.length + res.m.errors.length + errs.length;
+  const bad = res.a.errors.length + res.s.failed.length + res.m.errors.length + errs.length + ui.filter(x => /false|: 0★/.test(x)).length;
   fails += bad;
   console.log(`\n== ${v.name} ${v.viewport.width}x${v.viewport.height} ==`);
   console.log('UI:', ui.join(' · '));
   console.log('Datos:', res.a.stats, '| errores', res.a.errors.length, '| avisos', res.a.warnings.length);
   res.a.errors.forEach(e => console.log('  ✕', e)); res.a.warnings.slice(0, 8).forEach(w => console.log('  ⚠', w));
-  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · fusiones de recarga ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
+  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · resueltos siguiendo la guía ${res.s.guided} · fusiones de recarga ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
   console.log(`Monkey: ${res.m.games} partidas · ${res.m.actions} acciones · ${res.m.errors.length} errores`); res.m.errors.slice(0, 15).forEach(e => console.log('  ✕', e));
   console.log('Consola/página:', errs.length); errs.slice(0, 10).forEach(e => console.log('  ✕', e));
   await ctx.close();
