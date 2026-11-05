@@ -94,7 +94,7 @@ for (const v of views) {
   console.log('UI:', ui.join(' · '));
   console.log('Datos:', res.a.stats, '| errores', res.a.errors.length, '| avisos', res.a.warnings.length);
   res.a.errors.forEach(e => console.log('  ✕', e)); res.a.warnings.slice(0, 8).forEach(w => console.log('  ⚠', w));
-  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · guía ${res.s.guided} · lanzamientos ${res.s.launches} · reto diario ${res.s.daily} · recargas ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
+  console.log(`Solver: ${res.s.solved}/${res.s.total} resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · guía ${res.s.guided} · lanzamientos ${res.s.launches} · reto diario ${res.s.daily} · recargas ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
   console.log(`Monkey: ${res.m.games} partidas · ${res.m.actions} acciones · ${res.m.errors.length} errores`); res.m.errors.slice(0, 15).forEach(e => console.log('  ✕', e));
   console.log('Consola/página:', errs.length); errs.slice(0, 10).forEach(e => console.log('  ✕', e));
   await ctx.close();

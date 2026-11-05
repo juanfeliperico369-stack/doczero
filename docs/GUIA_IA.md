@@ -112,6 +112,27 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - **Música** procedimental por modo (laboratorio, batalla, destilación, menú) y efectos con ruido para explosiones y forja.
 - **Informe de prueba CSV** (intentos, victorias, fallos, pistas y tiempos por problema, en `S.pt`) y **cartas imprimibles** A4 de 63×88 mm, base para el juego físico.
 
+## 7c. Temporada 2: FÁRMACOS (v2.0, niveles 11–20, `src/season2.js`)
+- Se carga después de `data.js` y amplía COMPOUNDS (+31), POLYMERS (PVP, PMMA, PHEMA), REACTIONS (+8), DIFF, LEVELS, TAGS (`neuro` ψ, `antid` ⚕), ELTAGS (K, Zn, Tc, Co) y STORY (`s2i` entrada, `s2e` final).
+- Niveles:
+  - 11 Dolor (salicílico, aspirina por reacción real, paracetamol, ibuprofeno)
+  - 12 Estimulantes (cafeína, teobromina, taurina, nicotina)
+  - 13 Alcohol y antídotos (metabolismo del etanol, NAC, metanol)
+  - 14 Anestesia (éter, benzocaína, mentol, lidocaína)
+  - 15 Neurotransmisores (GABA, dopamina, serotonina, melatonina, adrenalina, histamina)
+  - 16 Antisépticos (I, Zn, I₂, ZnO, povidona, PMMA)
+  - 17 Vitaminas y sales (K, KCl, KI, vitamina C, metformina)
+  - 18 Medicina nuclear (F-18, FDG, Tc-99, Co-60, P-32)
+  - 19 Antibióticos (sulfanilamida, núcleo de penicilina, PHEMA)
+  - 20 La Nebulina
+- **Regla de seguridad aplicada**:
+  - Solo se construyen medicinas y drogas legales con información real de riesgos.
+  - Las drogas ilegales no se construyen: aparecen como amenazas con información general.
+  - La Nebulina es ficción. Su jefe da ×2 de daño a los HÍBRIDOS (campo `hyb` en el problema): las "drogas/curas nuevas por combinaciones" las inventa el jugador.
+  - La entrada de la temporada incluye el aviso "educativo, no consejo médico".
+- Dificultad de la temporada 2: g 2 → 0, ⚡H de 3 a 8, propagación de 0,5 a 2. La vida de las amenazas se ajustó con el simulador (script de afinado: −8 % por paso, mínimo 55 %).
+- Rangos: Despierto, Aprendiz, Alquimista, Doc Element (240★), Farmacólogo (330★), Maestro de la Mente (420★), Ente de la Creación (540★).
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

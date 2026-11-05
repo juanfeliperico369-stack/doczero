@@ -43,9 +43,9 @@ function selfTest() {
   COMPOUNDS.forEach(r => { const raw = (r[4] || '').split(',').filter(Boolean); if (raw.length !== Object.keys(D.parseTags(r[4])).length) E.push(r[0] + ': etiqueta mal escrita "' + r[4] + '"'); raw.forEach(t => { if (!TAGS[t.replace(/\d$/, '')]) E.push(r[0] + ': etiqueta desconocida ' + t); }); if (!r[5]) E.push(r[0] + ': sin descripción'); });
   POLYMERS.forEach(r => Object.keys(D.parseTags(r[3])).forEach(t => { if (!TAGS[t]) E.push(r[0] + ': etiqueta ' + t); }));
   Object.keys(ELTAGS).forEach(s => Object.keys(D.parseTags(ELTAGS[s])).forEach(t => { if (!TAGS[t]) E.push('ELTAGS ' + s + ': ' + t); }));
-  if (LEVELS.length !== 10 || DIFF.length !== 10) E.push('Se esperaban 10 niveles y 10 dificultades');
+  if (LEVELS.length % 10 || DIFF.length !== LEVELS.length || LEVELS.some((L, i) => L.n !== i + 1)) E.push('Niveles y dificultades no cuadran');
   Object.keys(DIALOG).forEach(k => DIALOG[k].forEach(l => { if (!['doc', 'eter'].includes(l[0]) || !l[2]) E.push('Diálogo ' + k + ' mal formado'); }));
-  [...STORY.intro, ...STORY.ending].forEach(l => { if (l.length !== 4) E.push('Historia mal formada: ' + l[2]); });
+  [...STORY.intro, ...STORY.ending, ...(STORY.s2i || []), ...(STORY.s2e || [])].forEach(l => { if (l.length !== 4) E.push('Historia mal formada: ' + l[2]); });
   const els = new Set(), nucs = new Set(['p', 'n']), made = new Set(); const n = { m: 0, f: 0, b: 0, r: 0, s: 0, p: 0 };
   LEVELS.forEach(L => {
     (L.gift || []).forEach(s => els.add(s));
@@ -174,9 +174,9 @@ function solver() {
         if (S.prog[k]) out.solved++; else if (!out.failed.some(f => f.startsWith(tag))) out.failed.push(tag + 'sin resolver');
         U.closeModal();
       });
-      if (L.n < 10 && U.state().unl !== L.n + 1) out.failed.push('No se abrió el nivel ' + (L.n + 1));
+      if (L.n < LEVELS.length && U.state().unl !== L.n + 1) out.failed.push('No se abrió el nivel ' + (L.n + 1));
     }
-    out.eternio = !!U.state().eternio; out.stars = D.totalStars(U.state());
+    out.eternio = !!U.state().eternio; out.stars = D.totalStars(U.state()); out.total = LEVELS.length * 10;
     // reto diario completo con la UI
     const d = new Date(); U.startChallenge('daily', d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate());
     for (let q = 0; q < 6 && U.CH(); q++) { U.clearLab(true); U.buildSmiles(DB.comp[U.MIS().p.id].smiles[0]); U.synth(); }
@@ -212,7 +212,7 @@ function monkey(n, seed) {
     hint: () => U.useHint(),
     tab: () => U.setTab(pickA(['lab', 'fr', 'bt', 'tx'])), mode: () => U.setMode(pickA(['mol', 'forge', 'react'])),
     detail: () => { const S = U.state(), ids = [...Object.keys(S.fr), ...Object.keys(S.el).map(s => 'el:' + s)]; if (ids.length) U.detail(pickA(ids)); },
-    modal: () => pickA([U.menu, U.guide, U.credits, U.settings, () => U.txLevel(1 + Math.floor(r() * 10))])(),
+    modal: () => pickA([U.menu, U.guide, U.credits, U.settings, () => U.txLevel(1 + Math.floor(r() * LEVELS.length))])(),
     close: () => U.closeModal(), render: () => U.render(), flee: () => U.flee(), side: () => U.renderSide(),
     abandon: () => { if (U.MIS()) U.failMission('bot'); },
     daily: () => { if (!U.CH()) U.startChallenge(r() < .5 ? 'daily' : 'async', Math.floor(r() * 1e6)); else if (r() < .3) U.chalSkip(); else if (r() < .1) U.chalEnd(true); else if (U.MIS()) { U.clearLab(true); U.buildSmiles(DB.comp[U.MIS().p.id].smiles[0]); U.synth(); } else errors.push('reto activo sin objetivo'); }
@@ -221,7 +221,7 @@ function monkey(n, seed) {
   const bag = names.flatMap(k => Array(weights[k] || 1).fill(k));
   try {
     for (let g = 0; g < n; g++) {
-      const S0 = D.newState(); S0.intro = 1; S0.unl = 1 + Math.floor(r() * 10); S0.cur = S0.unl;
+      const S0 = D.newState(); S0.intro = 1; S0.unl = 1 + Math.floor(r() * LEVELS.length); S0.cur = S0.unl;
       for (let L = 1; L < S0.unl; L++) for (let i = 0; i < 10; i++) S0.prog[D.pk(L, i)] = 1 + Math.floor(r() * 3);
       elsAll.forEach(s => { if (r() < .6 || s === 'H' || s === 'O') S0.el[s] = 1; });
       ['D', 'He4', 'C12', 'O16', 'Fe56', 'Ru102', 'Pb204', 'U238'].forEach(k => { if (r() < .5) S0.nuc[k] = 1; });

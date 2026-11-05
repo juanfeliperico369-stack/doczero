@@ -277,7 +277,7 @@ const NUC = {
     const d = 11.18 / Math.sqrt(a); if (z % 2 === 0 && n % 2 === 0) B += d; else if (z % 2 === 1 && n % 2 === 1) B -= d;
     return Math.max(0, B);
   },
-  radio(z, a) { return z >= 84 || z === 43 || z === 61 || (z === 1 && a === 3) || z > 103; },
+  radio(z, a) { return z >= 84 || z === 43 || z === 61 || (z === 1 && a === 3) || z > 103 || ['9-18', '27-60', '53-131', '6-14', '15-32'].includes(z + '-' + a); },
   fuse(ins, flux) {
     flux = flux | 0; const items = ins.filter(Boolean);
     const R = { ok: false, steps: [], cost: 0, gain: 0, net: 0, Z: 0, A: 0, kind: 'fail', prod: null, msg: '' };
@@ -356,7 +356,8 @@ const BAT = {
   },
   launch(b, card) { // sustancia sintetizada en vivo durante la batalla: mucho más fuerte
     if (b.over) return null; const f = BAT.fatigue(b.uses[card.id]); b.uses[card.id] = (b.uses[card.id] || 0) + 1; b.launches++;
-    return BAT.hit(b, Object.assign({}, card, { pow: BAT.cpow(card) }), BAT.SYN, f);
+    const hb = card.kind === 'hyb' && b.p.hyb ? b.p.hyb : 1; // la Nebulina no reconoce lo inexistente
+    return BAT.hit(b, Object.assign({}, card, { pow: BAT.cpow(card) * hb }), BAT.SYN, f);
   }
 };
 function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.kind === 'hyb' ? 0.9 : 1 + Math.min(0.5, (c.atoms || 2) / 40); }
@@ -381,7 +382,7 @@ function levelDone(S, L) { for (let i = 0; i < 10; i++) if (!S.prog[pk(L, i)]) r
 function problemOpen(S, L, i) { return L <= S.unl && (i === 0 || !!S.prog[pk(L, i - 1)]); }
 function starsOf(S, L) { let s = 0; for (let i = 0; i < 10; i++) s += S.prog[pk(L, i)] || 0; return s; }
 function totalStars(S) { let s = 0; for (const k in S.prog) s += S.prog[k]; return s; }
-function rankOf(S) { const s = totalStars(S); return s >= 270 ? 'Ente de la Creación' : s >= 200 ? 'Doc Element' : s >= 120 ? 'Alquimista' : s >= 50 ? 'Aprendiz' : 'Despierto'; }
+function rankOf(S) { const s = totalStars(S); return s >= 540 ? 'Ente de la Creación' : s >= 420 ? 'Maestro de la Mente' : s >= 330 ? 'Farmacólogo' : s >= 240 ? 'Doc Element' : s >= 140 ? 'Alquimista' : s >= 50 ? 'Aprendiz' : 'Despierto'; }
 function labElements(S) {
   if (S.set.sandbox) return ELEMENTS.slice(1).filter(e => e.z <= 30 || ['Ru', 'Ag', 'Au', 'Pb', 'U', 'Br', 'I', 'Sn', 'Pt'].includes(e.sym)).map(e => e.sym);
   return Object.keys(S.el).filter(s => S.el[s] === 1 && SYM[s]).sort((a, b) => SYM[a] - SYM[b]);

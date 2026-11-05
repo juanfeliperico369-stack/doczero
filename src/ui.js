@@ -64,7 +64,8 @@ function closeModal() { const ov = $('#ov'); ov.hidden = true; ov.innerHTML = ''
 const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 
 /* ---------- personajes y comunicaciones ---------- */
-const rankN = () => { const s = D.totalStars(S); return s >= 270 ? 4 : s >= 200 ? 3 : s >= 120 ? 2 : s >= 30 ? 1 : 0; };
+const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
+const SEASON = L => L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
 function showLine(l) {
   const [who, mood, text] = l, el = $('#comms'); if (!el) return;
@@ -593,6 +594,7 @@ function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
   if (CH) chalEnd(true);
+  if (L === 11 && !S.seen.s2i) { S.seen.s2i = 1; save(); if (!QUIET) { slides(STORY.s2i, () => { levelTalk(11); startProblem(L, i); }); return; } }
   { const k = D.pk(L, i), t = S.pt[k] || (S.pt[k] = {}); t.a = (t.a || 0) + 1; PT0[k] = Date.now(); }
   S.cur = L; hud();
   if (p.k === 'b') return openDeck(L, i);
@@ -658,11 +660,11 @@ function win(L, i, stars, bonus) {
   const sc = 100 * stars + bonus; S.sc += sc; S.en = D.clamp(S.en + 20 + 10 * stars, 0, MAXE); S.st.win++;
   let up = false; if (!was && D.levelDone(S, L) && S.unl === L && L < LEVELS.length) { S.unl = L + 1; giftLevel(L + 1); up = true; }
   save(true); hud(); sfx('win'); vib([30, 40, 60]);
-  const lvl = LEVELS[L - 1], done = !was && D.levelDone(S, L), isEnd = L === LEVELS.length && done; if (up) S.cur = L + 1; const nx = nextOpen();
+  const lvl = LEVELS[L - 1], done = !was && D.levelDone(S, L), isEnd = L % 10 === 0 && done; if (up) S.cur = L + 1; const nx = nextOpen();
   say(done ? 'level' : 'win');
   modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${[0, 1, 2].map(k => `<span class="${k < stars ? 'on' : 'off'}" style="animation-delay:${.15 + k * .18}s">★</span>`).join('')}</div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
     (done ? `<div class="film">Nivel ${L} completado: ${esc(lvl.t)}.${up ? ' Se abre el nivel ' + (L + 1) + ': ' + esc(LEVELS[L].t) + '.' : ''}</div>` : '') +
-    `<div class="row" style="margin-top:10px">${isEnd ? '<button class="btn pri" data-act="ending">Final de temporada ▸</button>' : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
+    `<div class="row" style="margin-top:10px">${isEnd ? `<button class="btn pri" data-act="ending" data-arg="${L / 10}">Final de temporada ▸</button>` : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
   renderMap(); renderTray(); renderSide(); if (up) levelTalk(L + 1);
 }
 function lose(L, i, why, hint) {
@@ -856,10 +858,11 @@ function renderMap() {
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
   const pts = lv.P.map((p, i) => [60 + i * 96, 112 + Math.sin(i * 1.3) * 56]);
   const nodes = lv.P.map((p, i) => { const k = D.pk(L, i), st = S.prog[k] || 0, open = D.problemOpen(S, L, i), nx = open && !st; return `<button class="node ${p.boss ? 'boss' : ''} ${st ? 'done' : ''} ${open ? '' : 'lock'} ${nx ? 'next' : ''}" style="left:${pts[i][0]}px;top:${pts[i][1]}px" data-act="open" data-arg="${L},${i}" aria-label="Problema ${i + 1}"><span class="ic">${p.boss ? '✹' : ICON[p.k]}</span><span class="nn">${i + 1}</span><span class="st">${st ? '★'.repeat(st) : ''}</span></button>`; }).join('');
-  const d = dOf(L), lvlTag = ['Guiado', 'Guiado', 'Aprendiz', 'Aprendiz', 'Medio', 'Medio', 'Difícil', 'Difícil', 'Experto', 'Experto'][L - 1];
-  box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada 1 · Núcleo · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
+  const d = dOf(L), lvlTag = d.g === 3 ? 'Guiado' : d.g === 2 ? 'Aprendiz' : d.g === 1 ? (d.rg <= 1 ? 'Medio' : 'Difícil') : 'Experto', se = SEASON(L);
+  box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada ${se[0]} · ${se[1]} · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
   <div class="map"><div class="mapin"><svg viewBox="0 0 1020 230" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#4d1785" stroke-width="3" stroke-dasharray="8 7"/></svg>${nodes}</div></div>
   <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
+  const lc = $('#lvls .on'); if (lc && lc.scrollIntoView) lc.scrollIntoView({ inline: 'center', block: 'nearest' });
   const map = $('.map', box), nx = $('.node.next', box); if (map && nx) map.scrollLeft = Math.max(0, parseFloat(nx.style.left) - map.clientWidth / 2);
 }
 function openProblem(L, i) {
@@ -881,7 +884,7 @@ function txLevel(L) {
    ============================================================ */
 function cover() {
   const c = document.createElement('div'); c.className = 'cover'; c.id = 'cover'; const has = S.intro || Object.keys(S.prog).length;
-  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporada 1 · Núcleo</div></div>
+  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–2 · Núcleo y Fármacos</div></div>
   <div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
   <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button></div></div></div>
   <div class="cfoot"><span class="pag">Por: ${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</span><span class="adv">Lab advisory<b>Verídico</b>Contenido seguro</span><span class="mega">El laboratorio más actual</span></div>`;
@@ -903,7 +906,7 @@ function enterGame() {
 function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
-  modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporada 1: Núcleo</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
+  modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporadas 1–2: Núcleo y Fármacos</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
   <div class="gcols"><div><div class="sec-t">Idea, historia y dirección</div><p>${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</p><div class="sec-t">Personajes</div><p>Doc, el científico despierto · ÉTER, la inteligencia de la Ouroboros.</p></div><div><div class="sec-t">Ciencia</div><p>Datos públicos de química y física nuclear (IUPAC, energías de enlace nuclear de referencia, fórmula semiempírica de Weizsäcker). Los híbridos y la isla de estabilidad son ficción casi real.</p></div><div><div class="sec-t">Tipografías y librerías</div><p>TeX Gyre Heros Condensed (GUST e-foundry, licencia GUST) · Inter (Rasmus Andersson, SIL OFL 1.1) · qrcode-generator (Kazuhiko Arase, MIT) · jsQR (Cosmo Wolfe, Apache-2.0).</p><div class="sec-t">Apoyo</div><p>El juego es gratis. Donación voluntaria en la Página Oficial.</p></div></div><div class="row"><button class="btn pri" data-act="donate">☕ Apoyar</button><button class="btn gh" data-act="close">Cerrar</button></div>`);
 }
 function settings() {
@@ -964,7 +967,7 @@ const ACT = {
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(),
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
-  ending: () => { closeModal(); S.end = 1; save(); slides(STORY.ending, () => credits()); }
+  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('keydown', e => {

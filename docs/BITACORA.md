@@ -1,5 +1,16 @@
 # Bitácora de Doc Element
 
+## v2.0.0 — Temporada 2: FÁRMACOS (2026-11-05)
+1. 10 niveles nuevos (11–20) y 100 problemas: 35 síntesis, 7 reacciones, 7 forjas, 3 polímeros, 8 destilaciones y 40 batallas.
+2. Contenido nuevo: 31 compuestos reales (medicinas, drogas legales, neurotransmisores, antídotos, vitaminas, radiofármacos), 3 polímeros médicos y 8 reacciones reales, entre ellas la síntesis escolar de la aspirina y el metabolismo del alcohol.
+3. Medicina nuclear en la forja: flúor-18 (PET), tecnecio-99, cobalto-60, fósforo-32, yodo, zinc y potasio.
+4. Seguridad: las drogas ilegales no se construyen, aparecen como amenazas con información real. La Nebulina es ficción y se vence con híbridos que el jugador inventa (×2). Hay aviso "educativo, no consejo médico".
+5. Historia: Doc despierta a los siete durmientes, con escenas de entrada y final de temporada y diálogos en cada nivel. Hay 10 guiones de video nuevos (teoría, dato curioso, ficción).
+6. Rangos extendidos hasta 600★. Mapa, portada y créditos con las dos temporadas.
+7. Validación: 0 errores en los 200 problemas. La vida de las amenazas se ajustó automáticamente con el simulador.
+8. Bot: 200/200 problemas resueltos (133 lanzamientos en batalla), reto diario, duelo LAN real, 2×100 partidas sin errores y 0 errores de consola.
+9. Pendiente: Temporada 3 (curas y mejoras), Bluetooth nativo, firma para Play Store y pruebas con jugadores.
+
 ## v1.3.0 — Batalla "síntesis bajo presión" y jugo visual (2026-11-05)
 1. La batalla ahora ocurre dentro del laboratorio: la amenaza va en una franja arriba; construyes moléculas en vivo y pulsas ⚗ LANZAR. La química es el arma, y todo el juego tiene un solo corazón.
 2. Daño ×5 a lo que se sintetiza en vivo, más si es complejo (átomos pesados). Repetir la misma sustancia crea resistencia, así que el jugador debe variar y crear (como la resistencia bacteriana real).
