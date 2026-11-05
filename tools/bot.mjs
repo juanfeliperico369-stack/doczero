@@ -71,7 +71,11 @@ for (const v of views) {
       // batalla con clics y anillo crítico
       await ev(() => { const S = DE.ui.state(); S.prog['1-8'] = 1; S.fr.H2O = { c: 1, t: 1 }; DE.ui.startProblem(1, 9); });
       await ev(() => DE.ui.startBattle(1, 9, ['el:He', 'H2O']));
-      await click('.dk >> nth=0');
+      await click('#mis .dk >> nth=0');
+      ui.push('munición: ' + (await ev(() => DE.ui.BT().b.ammo['el:He'] === DE.BAT.AMMO - 1)));
+      // síntesis bajo presión: seguir el plano sugerido con clics y LANZAR
+      for (let q = 0; q < 25; q++) { const st = await ev(() => { const s = DE.ui.guideStep(); return s ? { k: s.k, el: s.el } : null; }); if (!st) break; if (st.k === 'place') await click(`#tray [data-arg="${st.el}"]`); else if (st.k === 'synth') { await click('#bSyn'); break; } else await ev(() => { const s = DE.ui.guideStep(); if (s.k === 'bond') DE.ui.tapBond(s.bond); else if (s.k === 'autoH') DE.ui.autoH(); else if (s.k === 'link') { DE.ui.Lab.sel = s.a; DE.ui.tapAtom(s.b); } }); }
+      ui.push('lanzar en batalla: ' + (await ev(() => !!DE.ui.BT() && DE.ui.BT().b.launches >= 1)));
       if (shots) await page.screenshot({ path: `${shots}/${v.name}-batalla.png` });
       await ev(() => DE.ui.flee()); await ev(() => DE.ui.tick(.1)); await ev(() => DE.ui.closeModal());
       for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#nav [data-arg=${t}]`);
@@ -90,7 +94,7 @@ for (const v of views) {
   console.log('UI:', ui.join(' · '));
   console.log('Datos:', res.a.stats, '| errores', res.a.errors.length, '| avisos', res.a.warnings.length);
   res.a.errors.forEach(e => console.log('  ✕', e)); res.a.warnings.slice(0, 8).forEach(w => console.log('  ⚠', w));
-  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · guía ${res.s.guided} · reto diario ${res.s.daily} · recargas ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
+  console.log(`Solver: ${res.s.solved}/100 resueltos · ${res.s.stars}★ · Eternio ${res.s.eternio} · guía ${res.s.guided} · lanzamientos ${res.s.launches} · reto diario ${res.s.daily} · recargas ${res.s.farm}`); res.s.failed.forEach(e => console.log('  ✕', e));
   console.log(`Monkey: ${res.m.games} partidas · ${res.m.actions} acciones · ${res.m.errors.length} errores`); res.m.errors.slice(0, 15).forEach(e => console.log('  ✕', e));
   console.log('Consola/página:', errs.length); errs.slice(0, 10).forEach(e => console.log('  ✕', e));
   await ctx.close();

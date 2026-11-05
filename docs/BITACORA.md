@@ -1,5 +1,15 @@
 # Bitácora de Doc Element
 
+## v1.3.0 — Batalla "síntesis bajo presión" y jugo visual (2026-11-05)
+1. La batalla ahora ocurre dentro del laboratorio: la amenaza va en una franja arriba; construyes moléculas en vivo y pulsas ⚗ LANZAR. La química es el arma, y todo el juego tiene un solo corazón.
+2. Daño ×5 a lo que se sintetiza en vivo, más si es complejo (átomos pesados). Repetir la misma sustancia crea resistencia, así que el jugador debe variar y crear (como la resistencia bacteriana real).
+3. Las cartas de los frascos pasan a ser munición preparada: 2 tiros cada una, teclas 1–4. La preparación ayuda, pero no gana sola.
+4. En niveles guiados aparece el plano de la molécula más útil contra la amenaza, para enseñar a un niño a defenderse con química.
+5. Rebalance de las 26 batallas con un nuevo validador voraz que simula construir y el tiempo de armado: vida ×0,6, 60 s o 90 s, drenaje ×0,75.
+6. Jugo visual: átomos que aparecen con rebote, chispas al enlazar, implosión y partículas al sintetizar, etiquetas flotantes ("¡NUEVO! H₂O"), proyectiles hacia la amenaza, estrellas animadas, transiciones de ventanas y pestañas, y el retrato del personaje que salta al hablar.
+7. El bot juega las batallas guiadas siguiendo el plano con clics reales y las difíciles construyendo lo más rentable: 47 lanzamientos, 100/100 problemas resueltos, 2×100 partidas sin errores.
+8. Pendiente: probar con jugadores reales el ritmo de construcción en batalla (sobre todo en teléfonos), Temporada 2 y Bluetooth nativo.
+
 ## v1.2.0 — Publicación, duelos LAN/Bluetooth, reto diario, música y APK (2026-11-04)
 1. Publicado como app web instalable en https://juanfeliperico369-stack.github.io/doczero/ (rama `gh-pages` con `.nojekyll`). Incluye manifest, service worker con caché propia, íconos 192/512/maskable, apple-touch-icon de 180 px, favicon y Open Graph con `compartir.png` 1200×630.
 2. Verificado en el enlace publicado con Chrome: carga, service worker activado, abre sin conexión (recarga y pestaña nueva), 0 errores de instalabilidad y 0 errores de consola.

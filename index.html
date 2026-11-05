@@ -298,6 +298,37 @@ input.inp{width:auto;min-width:140px}
 .scanbox video{width:100%;max-height:40vh;border:2px solid var(--amb);margin-top:6px}
 .native #rotate{display:none!important}
 @media (orientation:portrait){.qrrow{grid-template-columns:1fr}}
+/* ---------- v1.3: síntesis bajo presión + jugo visual ---------- */
+#bstrip{flex:none;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:6px 10px;border-bottom:3px solid var(--mag);background:linear-gradient(90deg,rgba(255,47,179,.14),#000 60%);position:relative;overflow:hidden}
+#bstrip[hidden]{display:none}
+#bstrip .tw{width:68px;height:68px;position:relative;flex:none}
+#bstrip .threat{font-size:34px;border-width:3px}
+#bstrip .bs-c{min-width:0;display:flex;flex-direction:column;gap:4px}
+#bstrip .bs-t{display:flex;align-items:baseline;gap:8px;min-width:0}
+#bstrip .bs-t .mega{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mag);text-shadow:0 0 8px rgba(255,47,179,.5)}
+#bstrip .combo{position:static;font-size:20px}
+#bstrip .phase{margin:0;text-align:left;font-size:11.5px;min-height:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bstrip .bs-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#bstrip .tm{font-size:26px}
+#bstrip .pop{font-size:22px}
+.inbattle .lmode{display:none}
+.inbattle #bSyn{background:var(--mag);border-color:#ff8ad6;box-shadow:0 0 14px rgba(255,47,179,.6)}
+.ars{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ars .dk{min-height:58px;padding:4px}
+.ars .dk .f{font-size:17px}
+.dk .am{font-size:10px;letter-spacing:.15em;color:var(--amb)}
+.shot{position:fixed;z-index:66}
+.stars span{display:inline-block;animation:starPop .5s cubic-bezier(.2,1.6,.4,1) both}
+.stars span.off{opacity:.2}
+@keyframes starPop{0%{transform:scale(0) rotate(-40deg);opacity:0}100%{transform:scale(1) rotate(0)}}
+.sheet{animation:sheetIn .24s cubic-bezier(.2,1.2,.4,1)}
+@keyframes sheetIn{from{transform:translateY(18px) scale(.97);opacity:0}}
+#comms.say .por{animation:bob .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bob{40%{transform:translateY(-5px) scale(1.06)}}
+.tab.on{animation:tabIn .18s ease-out}
+@keyframes tabIn{from{opacity:.4;transform:translateX(6px)}}
+.btn:not([disabled]):hover{filter:brightness(1.15)}
+@media (max-height:520px){#bstrip{padding:4px 8px;gap:8px}#bstrip .tw{width:54px;height:54px}#bstrip .threat{font-size:26px}#bstrip .bs-t .mega{font-size:16px}#bstrip .tm{font-size:20px}#bstrip .phase{display:none}.ars .dk{min-height:46px}}
 
 </style></head><body><noscript>Doc Element necesita JavaScript activado.</noscript>
 <script>
@@ -318,7 +349,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '1.2.0',
+  VERSION: '1.3.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -548,11 +579,11 @@ const LEVELS = [
    {k:'r',id:'R_H2O',t:'La explosión controlada',d:'Abre el REACTOR. Pon H₂ y O₂: ÉTER balancea la ecuación 2H₂ + O₂ → 2H₂O. Pulsa REACCIONAR. Esta vez, a propósito.',T:120},
    {k:'m',id:'H2O',t:'Agua a mano',d:'Ahora construye el agua átomo por átomo: un oxígeno en el centro y un hidrógeno en cada mano.',T:120},
    {k:'f',z:1,a:2,t:'Deuterio',d:'Abre la FORJA. Un protón y un neutrón, unidos por la fuerza nuclear fuerte, forman deuterio: hidrógeno pesado.',r:'p+n',T:120},
-   {k:'b',t:'Sed del invernadero',d:'Las plantas de la bodega 3 se marchitan. La humedad cayó al 4 %. Lanza la carta correcta tocándola.',sc:'Humedad 4 % · tierra agrietada · hojas sin agua',w:'solv3',h:'',hp:70,T:40,dps:1.2},
+   {k:'b',t:'Sed del invernadero',d:'Las plantas de la bodega 3 se marchitan. La humedad cayó al 4 %. Construye agua en el laboratorio y pulsa ⚗ LANZAR.',sc:'Humedad 4 % · tierra agrietada · hojas sin agua',w:'solv3',h:'',hp:40,T:60,dps:0.9},
    {k:'f',z:2,a:4,t:'Helio: el gas del Sol',d:'En el núcleo del Sol el hidrógeno se fusiona en helio. Une dos deuterios en la forja.',r:'D+D',T:120},
    {k:'s',n:2,mix:['H2O','H2O2'],t:'Decantación',d:'Una fuga mezcló agua y agua oxigenada en los tubos. Toca un tubo y luego otro para verter: deja cada líquido solo en su tubo.',T:120},
-   {k:'b',t:'Fuego en el ducto',d:'Una chispa encendió una fuga de hidrógeno. La llama es casi invisible.',sc:'Llama de 2000 °C · combustible H₂ · alimentada por O₂',w:'inert3,cool1',h:'oxi2,fuel2',hp:90,T:40,dps:1.2},
-   {k:'b',boss:1,t:'Fuga del reactor de plasma',d:'El reactor de fusión pierde contención: el plasma se derrama por el pasillo.',sc:'Plasma a un millón de grados · campo magnético inestable',w:'cool2,inert2',h:'fuel2,oxi1',hp:260,T:60,dps:1.5,ph2:{d:'El plasma se condensa en vapor sobrecalentado',w:'cool3',h:'fuel1'}}
+   {k:'b',t:'Fuego en el ducto',d:'Una chispa encendió una fuga de hidrógeno. La llama es casi invisible.',sc:'Llama de 2000 °C · combustible H₂ · alimentada por O₂',w:'inert3,cool1',h:'oxi2,fuel2',hp:50,T:60,dps:0.9},
+   {k:'b',boss:1,t:'Fuga del reactor de plasma',d:'El reactor de fusión pierde contención: el plasma se derrama por el pasillo.',sc:'Plasma a un millón de grados · campo magnético inestable',w:'cool2,inert2',h:'fuel2,oxi1',hp:160,T:90,dps:1.1,ph2:{d:'El plasma se condensa en vapor sobrecalentado',w:'cool3',h:'fuel1'}}
   ]},
 { n:2, t:'AIRE', s:'Litio, carbono y nitrógeno', gift:[],
   talk:[['eter','neutral','El aire de una nave no es gratis. Hay que forjarlo… y respirarlo.'],['doc','loco','¡Forjaré carbono como una estrella! ¿Cómo lo hacen ellas?'],['eter','feliz','Tres helios a la vez. Las estrellas también usan recetas.']],
@@ -566,10 +597,10 @@ const LEVELS = [
    {k:'m',id:'N2',t:'Triple enlace',d:'El nitrógeno tiene tres manos. Une dos y toca el enlace hasta volverlo triple: N≡N.',T:120},
    {k:'m',id:'CO2',t:'Aliento de la nave',d:'Un carbono en el centro y un oxígeno a cada lado, con dobles enlaces: O=C=O.',T:120},
    {k:'r',id:'R_HABER',t:'Pan del aire',d:'Reactor: nitrógeno + hidrógeno → amoníaco (N₂ + 3H₂ → 2NH₃). Lo que alimenta a medio planeta.',T:120},
-   {k:'b',t:'Aire viciado',d:'Los purificadores fallan. El CO₂ de la cabina sube al 5 % y te duele la cabeza.',sc:'CO₂ al 5 % · gas de carácter ácido · el Apolo 13 vivió esto',w:'base3',h:'',hp:130,T:45,dps:1.3},
+   {k:'b',t:'Aire viciado',d:'Los purificadores fallan. El CO₂ de la cabina sube al 5 % y te duele la cabeza.',sc:'CO₂ al 5 % · gas de carácter ácido · el Apolo 13 vivió esto',w:'base3',h:'',hp:80,T:60,dps:1.0},
    {k:'m',id:'CH4',t:'Metano',d:'Un carbono con cuatro manos. Colócalo y usa ⚡H para llenar las manos con hidrógeno.',T:120},
    {k:'s',n:3,mix:['N2','CO2','O2'],t:'Destilación del aire',d:'El aire licuado se separa por temperatura de ebullición. Ordena los tres gases licuados.',T:120},
-   {k:'b',boss:1,t:'Incendio en los cultivos',d:'Las lámparas de cultivo encendieron la paja seca. El fuego se come el oxígeno de la nave.',sc:'Fuego clase A · 900 °C · consume O₂',w:'inert3,cool1',h:'oxi3,fuel2',hp:320,T:60,dps:1.6,ph2:{d:'Brasas: el fuego se esconde bajo la ceniza',w:'cool3,solv1',h:'oxi2'}}
+   {k:'b',boss:1,t:'Incendio en los cultivos',d:'Las lámparas de cultivo encendieron la paja seca. El fuego se come el oxígeno de la nave.',sc:'Fuego clase A · 900 °C · consume O₂',w:'inert3,cool1',h:'oxi3,fuel2',hp:190,T:90,dps:1.2,ph2:{d:'Brasas: el fuego se esconde bajo la ceniza',w:'cool3,solv1',h:'oxi2'}}
   ]},
 { n:3, t:'CARBONO', s:'Cuatro manos para construir la vida', gift:[],
   talk:[['eter','neutral','Desde aquí el plano ya no muestra los hidrógenos. Coloca el esqueleto y completa con ⚡H.'],['doc','feliz','Esqueleto primero, piel después. Como un dinosaurio.'],['eter','enojado','Y desde ahora el tiempo cuenta de verdad.']],
@@ -582,11 +613,11 @@ const LEVELS = [
    {k:'f',z:10,t:'Luces de neón',d:'Carbono-12 más dos helio-4: el neón que iluminará los pasillos.',r:'C12+He4+He4',T:110},
    {k:'r',id:'R_CH4',t:'La llama azul',d:'Quema metano en el reactor: CH₄ + 2O₂ → CO₂ + 2H₂O. Energía para la nave.',T:110},
    {k:'m',id:'C2H5OH',t:'Etanol',d:'Etano con un grupo –OH en un extremo: un alcohol.',T:110},
-   {k:'b',t:'Bacterias en el agua',d:'El tanque de agua potable huele mal: flotan colonias de bacterias.',sc:'Bacterias · 10⁸ por mL · se alimentan de nutrientes',w:'anti3',h:'bio2',hp:170,T:45,dps:1.4},
+   {k:'b',t:'Bacterias en el agua',d:'El tanque de agua potable huele mal: flotan colonias de bacterias.',sc:'Bacterias · 10⁸ por mL · se alimentan de nutrientes',w:'anti3',h:'bio2',hp:100,T:60,dps:1.0},
    {k:'r',id:'R_VIN',t:'Del vino al vinagre',d:'Oxida el etanol en el reactor para obtener ácido acético.',T:110},
    {k:'m',id:'C6H6',t:'El sueño de Kekulé',d:'Seis carbonos en anillo con enlaces simples y dobles alternados. Arrastra el último carbono sobre el primero para cerrar el anillo.',T:150},
-   {k:'b',t:'Grasa en los motores',d:'Los rotores están cubiertos de grasa espesa; el agua resbala sin limpiar.',sc:'Grasa apolar · insoluble en agua',w:'org3',h:'',hx:'H2O',hp:190,T:45,dps:1.4},
-   {k:'b',boss:1,t:'La Mancha',d:'Una biopelícula viscosa crece en los conductos y bloquea el aire.',sc:'Biopelícula · capa grasa protectora · bacterias dentro',w:'org2,anti1',h:'bio2,solv1',hp:380,T:60,dps:1.7,ph2:{d:'Sin la grasa, las bacterias quedan expuestas',w:'anti3',h:'bio2'}}
+   {k:'b',t:'Grasa en los motores',d:'Los rotores están cubiertos de grasa espesa; el agua resbala sin limpiar.',sc:'Grasa apolar · insoluble en agua',w:'org3',h:'',hx:'H2O',hp:110,T:60,dps:1.0},
+   {k:'b',boss:1,t:'La Mancha',d:'Una biopelícula viscosa crece en los conductos y bloquea el aire.',sc:'Biopelícula · capa grasa protectora · bacterias dentro',w:'org2,anti1',h:'bio2,solv1',hp:230,T:90,dps:1.3,ph2:{d:'Sin la grasa, las bacterias quedan expuestas',w:'anti3',h:'bio2'}}
   ]},
 { n:4, t:'SAL Y ÁCIDO', s:'Neutralizar es sobrevivir', gift:[],
   talk:[['doc','sorpresa','Derramé ácido sobre la consola. ¿Eso es malo?'],['eter','enojado','Muy malo. Ácido + base = sal + agua. Aprende a neutralizar antes de que me derritas.']],
@@ -599,11 +630,11 @@ const LEVELS = [
    {k:'f',z:17,t:'Cloro',d:'Neón + nitrógeno + un neutrón: 17 protones, masa 35. Usa el FLUJO DE NEUTRONES (+n).',r:'Ne20+N14+1n',T:120},
    {k:'m',id:'HCl',t:'Ácido clorhídrico',d:'Un hidrógeno y un cloro: el ácido de tu estómago.',T:100},
    {k:'m',id:'NaOH',t:'Soda cáustica',d:'Sodio, oxígeno e hidrógeno en cadena: Na–O–H.',T:100},
-   {k:'b',t:'Derrame de ácido',d:'Un bidón de ácido clorhídrico se rompió en la bodega de carga.',sc:'pH 0,5 · líquido corrosivo · vapores',w:'base3',h:'acid2',hp:210,T:45,dps:1.5},
+   {k:'b',t:'Derrame de ácido',d:'Un bidón de ácido clorhídrico se rompió en la bodega de carga.',sc:'pH 0,5 · líquido corrosivo · vapores',w:'base3',h:'acid2',hp:130,T:60,dps:1.1},
    {k:'r',id:'R_NEUT',t:'Ácido + base = sal',d:'Reactor: HCl + NaOH → NaCl + H₂O. La neutralización perfecta.',T:100},
    {k:'s',n:4,mix:['HCl','NaOH','NaCl','H2O'],t:'Laboratorio desordenado',d:'Cuatro soluciones mezcladas en los tubos. Sepáralas antes de que reaccionen.',T:130},
    {k:'r',id:'R_LEJ',t:'Lejía',d:'Necesitas Cl₂ y NaOH en tus frascos (construye el Cl₂ en el laboratorio). Cl₂ + 2NaOH → NaClO + NaCl + H₂O.',T:130},
-   {k:'b',boss:1,t:'Floración de algas tóxicas',d:'El tanque de reciclaje se volvió verde: las algas liberan toxinas.',sc:'Cianobacterias · fotosíntesis activa · toxinas',w:'anti3,oxi1',h:'bio2,salt1',hp:440,T:60,dps:1.8,ph2:{d:'Las algas muertas consumen el oxígeno del agua',w:'oxi3',h:'bio1'}}
+   {k:'b',boss:1,t:'Floración de algas tóxicas',d:'El tanque de reciclaje se volvió verde: las algas liberan toxinas.',sc:'Cianobacterias · fotosíntesis activa · toxinas',w:'anti3,oxi1',h:'bio2,salt1',hp:260,T:90,dps:1.4,ph2:{d:'Las algas muertas consumen el oxígeno del agua',w:'oxi3',h:'bio1'}}
   ]},
 { n:5, t:'FORJA ESTELAR', s:'La escalera alfa: del magnesio al calcio', gift:[],
   talk:[['eter','neutral','Se acabaron los planos. Solo verás la lista de átomos. Y las ecuaciones… las balanceas tú.'],['doc','loco','¡Por fin sin rueditas!'],['eter','enojado','⚡H ahora cuesta energía. Úsalo con cabeza.']],
@@ -616,11 +647,11 @@ const LEVELS = [
    {k:'f',z:18,t:'Argón',d:'Azufre-32 + helio-4.',r:'S32+He4',T:100},
    {k:'f',z:20,t:'Calcio',d:'Argón-36 + helio-4: el último peldaño fácil de la escalera.',r:'Ar36+He4',T:100},
    {k:'m',id:'SiO2',t:'Vidrio',d:'El silicio tiene cuatro manos: dos dobles enlaces con oxígeno.',T:100},
-   {k:'b',t:'Grieta en la cúpula',d:'Un micrometeorito agrietó la cúpula de observación.',sc:'Fisura de 40 cm · pérdida lenta de presión',w:'struct3,seal1',h:'',hp:250,T:45,dps:1.6},
+   {k:'b',t:'Grieta en la cúpula',d:'Un micrometeorito agrietó la cúpula de observación.',sc:'Fisura de 40 cm · pérdida lenta de presión',w:'struct3,seal1',h:'',hp:150,T:60,dps:1.2},
    {k:'r',id:'R_SO3',t:'Proceso de contacto',d:'Construye SO₂ y quémalo con O₂: 2SO₂ + O₂ → 2SO₃. Balancea tú los coeficientes.',T:130},
    {k:'r',id:'R_H2SO4',t:'Ácido sulfúrico',d:'SO₃ + H₂O → H₂SO₄. El químico más producido del mundo.',T:110},
-   {k:'b',t:'Lluvia ácida en Tessar-4',d:'Aterrizas en un planeta cuyos lagos murieron por la lluvia ácida.',sc:'pH 4,2 · sulfatos · peces muertos',w:'base3',h:'acid2',hp:270,T:45,dps:1.6},
-   {k:'b',boss:1,t:'Incendio de magnesio',d:'Virutas de magnesio de la forja se encendieron: 3000 °C de luz blanca.',sc:'Fuego clase D · reacciona con agua, CO₂ y N₂',w:'inert2,salt2,struct1',h:'solv2,oxi2',hx:'CO2,N2,H2O',hp:500,T:60,dps:1.9,ph2:{d:'El metal fundido se esparce por el suelo',w:'struct2,inert2',h:'solv2',hx:'CO2,N2,H2O'}}
+   {k:'b',t:'Lluvia ácida en Tessar-4',d:'Aterrizas en un planeta cuyos lagos murieron por la lluvia ácida.',sc:'pH 4,2 · sulfatos · peces muertos',w:'base3',h:'acid2',hp:160,T:60,dps:1.2},
+   {k:'b',boss:1,t:'Incendio de magnesio',d:'Virutas de magnesio de la forja se encendieron: 3000 °C de luz blanca.',sc:'Fuego clase D · reacciona con agua, CO₂ y N₂',w:'inert2,salt2,struct1',h:'solv2,oxi2',hx:'CO2,N2,H2O',hp:300,T:90,dps:1.4,ph2:{d:'El metal fundido se esparce por el suelo',w:'struct2,inert2',h:'solv2',hx:'CO2,N2,H2O'}}
   ]},
 { n:6, t:'HIERRO', s:'El final de la estrella', gift:[],
   talk:[['eter','triste','Hasta el hierro, la fusión regala energía. Más allá, la cobra.'],['doc','loco','Entonces robaré energía de otra parte. ¡Termita!'],['eter','sorpresa','Por una vez, una idea química sensata.']],
@@ -632,12 +663,12 @@ const LEVELS = [
    {k:'f',z:29,t:'Cobre',d:'Hierro-56 + litio-7.',r:'Fe56+Li7',T:110},
    {k:'f',z:13,t:'Aluminio',d:'Magnesio-24 + deuterio + neutrón: 12 + 1 = 13 protones, masa 27.',r:'Mg24+D+n',T:110},
    {k:'r',id:'R_FE',t:'Herrumbre',d:'Hierro puro + oxígeno → óxido de hierro. Balancea: ¿cuántos Fe y O₂ por cada Fe₂O₃?',T:120},
-   {k:'b',t:'Cable fundido',d:'Un cortocircuito fundió el cable principal del puente de mando.',sc:'Circuito abierto · 0 amperios · falta un conductor',w:'cond3',h:'solv1',hp:300,T:45,dps:1.7},
+   {k:'b',t:'Cable fundido',d:'Un cortocircuito fundió el cable principal del puente de mando.',sc:'Circuito abierto · 0 amperios · falta un conductor',w:'cond3',h:'solv1',hp:180,T:60,dps:1.3},
    {k:'r',id:'R_TERM',t:'Termita',d:'Óxido de hierro + aluminio → alúmina + hierro fundido. Suelda el casco a 2500 °C.',T:120},
    {k:'m',id:'Fe3O4',t:'Brújula natural',d:'Tres hierros y cuatro oxígenos: el hierro del centro usa valencia 2 y los extremos, 3.',T:130},
    {k:'s',n:5,mix:['Fe2O3','CuSO4','Al2O3','FeCl3','CuO'],t:'Lixiviación',d:'Minerales disueltos en los tanques de la forja. Separa cada metal en su tubo.',T:140},
    {k:'r',id:'R_CUSO4',t:'Cristales azules',d:'Construye CuO y disuélvelo en ácido sulfúrico: CuO + H₂SO₄ → CuSO₄ + H₂O.',T:130},
-   {k:'b',boss:1,t:'Biocorrosión del reactor',d:'Bacterias que comen hierro perforan las tuberías del reactor y se propagan.',sc:'Bacterias reductoras de sulfato · biopelícula sobre metal',w:'anti3',h:'bio2',hp:560,T:60,dps:2,ph2:{d:'Las tuberías se debilitan',w:'struct3,seal1',h:'acid2'}}
+   {k:'b',boss:1,t:'Biocorrosión del reactor',d:'Bacterias que comen hierro perforan las tuberías del reactor y se propagan.',sc:'Bacterias reductoras de sulfato · biopelícula sobre metal',w:'anti3',h:'bio2',hp:340,T:90,dps:1.5,ph2:{d:'Las tuberías se debilitan',w:'struct3,seal1',h:'acid2'}}
   ]},
 { n:7, t:'MONÓMEROS', s:'Moléculas con un doble enlace listo para abrirse', gift:[],
   talk:[['eter','neutral','Un monómero es una promesa: un doble enlace esperando abrirse y unirse al siguiente.'],['doc','feliz','Como yo esperando el almuerzo.'],['eter','enojado','Las amenazas ahora se propagan. No te duermas.']],
@@ -650,11 +681,11 @@ const LEVELS = [
    {k:'r',id:'R_VC',t:'Cloruro de vinilo',d:'Acetileno + ácido clorhídrico: la ruta histórica del PVC.',T:110},
    {k:'m',id:'C3H6',t:'Propileno',d:'Un doble enlace C=C con un metilo (–CH₃) al lado.',T:110},
    {k:'m',id:'C8H8',t:'Estireno',d:'Un vinilo (CH=CH₂) pegado a un anillo de benceno. Será el poliestireno.',T:160},
-   {k:'b',t:'Fuga de refrigerante',d:'El circuito de enfriamiento del reactor gotea. La temperatura sube 2 °C por segundo.',sc:'Reactor a 380 °C · subiendo · hay que extraer calor',w:'cool3',h:'fuel1',hp:340,T:45,dps:1.8},
+   {k:'b',t:'Fuga de refrigerante',d:'El circuito de enfriamiento del reactor gotea. La temperatura sube 2 °C por segundo.',sc:'Reactor a 380 °C · subiendo · hay que extraer calor',w:'cool3',h:'fuel1',hp:200,T:60,dps:1.4},
    {k:'r',id:'R_R22',t:'Freón R-22',d:'Construye cloroformo (CHCl₃) y ácido fluorhídrico (HF). Mézclalos y balancea.',T:150},
    {k:'r',id:'R_TFE',t:'Nace el teflón',d:'Calienta el R-22: 2CHClF₂ → C₂F₄ + 2HCl.',T:120},
    {k:'m',id:'C4H6',t:'Butadieno',d:'Cuatro carbonos con dos dobles enlaces: C=C–C=C.',T:110},
-   {k:'b',boss:1,t:'Ácido fluorhídrico',d:'Un tanque de HF se fisura y empieza a disolver las ventanas.',sc:'HF · disuelve el vidrio · atraviesa la piel',w:'base2,struct1',h:'acid2',hx:'SiO2',hp:600,T:60,dps:2.1,ph2:{d:'El HF se evapora en una nube tóxica',w:'base3',h:'acid1'}}
+   {k:'b',boss:1,t:'Ácido fluorhídrico',d:'Un tanque de HF se fisura y empieza a disolver las ventanas.',sc:'HF · disuelve el vidrio · atraviesa la piel',w:'base2,struct1',h:'acid2',hx:'SiO2',hp:360,T:90,dps:1.6,ph2:{d:'El HF se evapora en una nube tóxica',w:'base3',h:'acid1'}}
   ]},
 { n:8, t:'POLÍMEROS', s:'Cadenas infinitas', gift:[],
   talk:[['eter','feliz','Tus monómeros ya son bloques en la bandeja. Encadena tres o más y abre sus dobles enlaces.'],['doc','loco','¡Collares de moléculas! ¡Tejeré una piel para la nave!']],
@@ -665,13 +696,13 @@ const LEVELS = [
    {k:'p',id:'PE',t:'Polietileno',d:'Toca el bloque de etileno 3 veces: se encadenan solos. [–CH₂–CH₂–]ₙ.',T:110},
    {k:'p',id:'PVC',t:'PVC',d:'Encadena 3 o más cloruros de vinilo.',T:110},
    {k:'p',id:'PS',t:'Poliestireno',d:'Estireno → poliestireno: [–CH₂–CH(C₆H₅)–]ₙ.',T:110},
-   {k:'b',t:'Brecha en el casco',d:'Un fragmento perforó el casco y el aire escapa al vacío.',sc:'Agujero de 15 cm · presión cayendo · −270 °C afuera',w:'seal3,struct2',h:'',hp:380,T:45,dps:1.9},
+   {k:'b',t:'Brecha en el casco',d:'Un fragmento perforó el casco y el aire escapa al vacío.',sc:'Agujero de 15 cm · presión cayendo · −270 °C afuera',w:'seal3,struct2',h:'',hp:230,T:60,dps:1.4},
    {k:'p',id:'PTFE',t:'Teflón',d:'Encadena tetrafluoroetileno.',T:110},
    {k:'p',id:'PP',t:'Polipropileno',d:'Encadena propileno.',T:110},
-   {k:'b',t:'Ácido en las tuberías',d:'El ácido sulfúrico de la planta de baterías corroe las tuberías metálicas.',sc:'H₂SO₄ al 98 % · ataca metales · no ataca a los fluoropolímeros',w:'seal2,inert2',h:'cond1,acid1',hp:400,T:45,dps:1.9},
+   {k:'b',t:'Ácido en las tuberías',d:'El ácido sulfúrico de la planta de baterías corroe las tuberías metálicas.',sc:'H₂SO₄ al 98 % · ataca metales · no ataca a los fluoropolímeros',w:'seal2,inert2',h:'cond1,acid1',hp:240,T:60,dps:1.4},
    {k:'p',id:'SBR',t:'Caucho sintético',d:'Copolímero: alterna estireno y butadieno en la misma cadena.',T:120},
    {k:'s',n:6,mix:['C2H4','C3H6','C8H8','C2F4','C4H6','C2H3Cl'],t:'Craqueo y destilación',d:'El petróleo sintético se separa en fracciones. Ordena seis monómeros.',T:160},
-   {k:'b',boss:1,t:'El Devorador',d:'Un enjambre de micrometeoritos golpea la proa; cada impacto abre un cráter.',sc:'10 000 impactos por minuto · 20 km/s',w:'struct3,seal1',h:'',hp:640,T:60,dps:2.2,ph2:{d:'Los cráteres dejan fugas de aire',w:'seal3',h:''}}
+   {k:'b',boss:1,t:'El Devorador',d:'Un enjambre de micrometeoritos golpea la proa; cada impacto abre un cráter.',sc:'10 000 impactos por minuto · 20 km/s',w:'struct3,seal1',h:'',hp:380,T:90,dps:1.7,ph2:{d:'Los cráteres dejan fugas de aire',w:'seal3',h:''}}
   ]},
 { n:9, t:'VIDA', s:'Aminoácidos, azúcares y la primera medicina', gift:[],
   talk:[['eter','neutral','Nivel experto: solo te diré el NOMBRE de lo que buscas. La fórmula cuesta energía.'],['doc','triste','Me corté con la forja. Por primera vez la química duele.'],['eter','feliz','Entonces fabrica tu propia medicina.']],
@@ -682,13 +713,13 @@ const LEVELS = [
    {k:'m',id:'UREA',t:'Urea',d:'En 1828 Wöhler creó urea en un frasco y derrumbó la idea de que solo los seres vivos fabrican moléculas orgánicas.',T:120},
    {k:'m',id:'GLY',t:'Polvo de cometa',d:'El aminoácido más simple: un grupo amino, un carbono y un ácido.',T:130},
    {k:'r',id:'R_FOTO',t:'Fotosíntesis',d:'Haz lo que hacen las plantas: CO₂ + agua + mucha energía → glucosa + oxígeno. Balancea los seis.',T:150},
-   {k:'b',t:'Hambre',d:'Llevas 30 horas sin comer. Tus reservas de glucógeno se agotaron.',sc:'Glucosa en sangre 50 mg/dL · fatiga · temblor',w:'bio2,nrg2',h:'anti1',hp:440,T:45,dps:2},
+   {k:'b',t:'Hambre',d:'Llevas 30 horas sin comer. Tus reservas de glucógeno se agotaron.',sc:'Glucosa en sangre 50 mg/dL · fatiga · temblor',w:'bio2,nrg2',h:'anti1',hp:260,T:60,dps:1.5},
    {k:'r',id:'R_FERM',t:'Fermentación',d:'Las levaduras convierten la glucosa en alcohol y gas. Balancea.',T:120},
    {k:'m',id:'ALA',t:'Alanina',d:'Como la glicina, pero con un metilo en el carbono central.',T:140},
-   {k:'b',t:'Infección en la herida',d:'Te cortaste con una lámina de la forja y la herida se inflama.',sc:'Bacterias · pus · enrojecimiento',w:'anti3',h:'bio2',hp:460,T:45,dps:2},
+   {k:'b',t:'Infección en la herida',d:'Te cortaste con una lámina de la forja y la herida se inflama.',sc:'Bacterias · pus · enrojecimiento',w:'anti3',h:'bio2',hp:280,T:60,dps:1.5},
    {k:'m',id:'ASP',t:'Aspirina',d:'Ácido acetilsalicílico, la medicina del sauce. Sin plano: arma el anillo y sus dos grupos vecinos.',T:240},
-   {k:'b',t:'Fiebre',d:'La infección te dejó 39,8 °C de fiebre y dolor de cabeza.',sc:'Prostaglandinas altas · inflamación · 39,8 °C',w:'med3,cool1',h:'',hp:480,T:45,dps:2},
-   {k:'b',boss:1,t:'La célula se apaga',d:'Tu primera célula sintética se desintegra: le faltan los ladrillos de la vida.',sc:'Membrana rota · sin energía · sin proteínas',w:'bio3,solv1',h:'anti2',hp:700,T:60,dps:2.3,ph2:{d:'La célula necesita energía para dividirse',w:'nrg3,bio1',h:'anti2'}}
+   {k:'b',t:'Fiebre',d:'La infección te dejó 39,8 °C de fiebre y dolor de cabeza.',sc:'Prostaglandinas altas · inflamación · 39,8 °C',w:'med3,cool1',h:'',hp:290,T:60,dps:1.5},
+   {k:'b',boss:1,t:'La célula se apaga',d:'Tu primera célula sintética se desintegra: le faltan los ladrillos de la vida.',sc:'Membrana rota · sin energía · sin proteínas',w:'bio3,solv1',h:'anti2',hp:380,T:90,dps:1.5,ph2:{d:'La célula necesita energía para dividirse',w:'nrg3,bio1',h:'anti2'}}
   ]},
 { n:10, t:'ETERNIO', s:'La isla de estabilidad', gift:[],
   talk:[['eter','neutral','Ya no te enseño. Te observo.'],['doc','loco','Oro, uranio, superpesados… ¡y después el 126! ¡El elemento que me hará eterno!'],['eter','triste','Ten cuidado con lo que deseas, Doc.']],
@@ -698,13 +729,13 @@ const LEVELS = [
   P:[
    {k:'f',z:44,t:'Rutenio',d:'Más allá del hierro solo se avanza capturando neutrones, como en una supernova: hierro + argón + 10 neutrones.',r:'Fe56+Ar36+10n',T:120},
    {k:'f',z:82,t:'Plomo',d:'Dos rutenios chocan: 88 protones que decaen por β⁺ hasta llegar al plomo.',r:'Ru102+Ru102',T:120},
-   {k:'b',t:'Tormenta de rayos gamma',d:'Una estrella cercana colapsa y la radiación gamma golpea la nave.',sc:'Rayos γ · 50 Sv/h · hace falta masa densa',w:'shield3',h:'',hp:500,T:45,dps:2.1},
+   {k:'b',t:'Tormenta de rayos gamma',d:'Una estrella cercana colapsa y la radiación gamma golpea la nave.',sc:'Rayos γ · 50 Sv/h · hace falta masa densa',w:'shield3',h:'',hp:300,T:60,dps:1.6},
    {k:'f',z:79,t:'El sueño del alquimista',d:'Los alquimistas soñaron convertir metales en oro. Tú lo forjas núcleo a núcleo: rutenio + cloro + argón + 24 neutrones.',r:'Ru102+Cl35+Ar36+24n',T:140},
    {k:'f',z:92,t:'Uranio',d:'Plomo-204 + neón-20 + 14 neutrones.',r:'Pb204+Ne20+14n',T:130},
    {k:'m',id:'UO2',t:'Combustible nuclear',d:'Uranio con valencia 4 y dos dobles enlaces con oxígeno.',T:110},
    {k:'s',n:7,mix:['UO2','H2O','Fe2O3','SiO2','CuSO4','NaCl','CaCO3'],t:'Centrifugadoras',d:'Separar isótopos exige miles de pasos. Aquí, siete sustancias y poco espacio.',T:180},
    {k:'f',z:114,det:1,t:'Isla a la vista',d:'Detecta un superpesado: uranio + calcio + helio = 114 protones. Vivirá milisegundos, pero quedará registrado.',r:'U238+Ca40+He4',T:130},
-   {k:'b',boss:1,t:'La Entropía',d:'El universo se enfría. ÉTER detecta que la nave pierde orden, molécula a molécula.',sc:'Entropía máxima · todo tiende al desorden',w:'nrg2,shield2,struct1,bio1',h:'',hp:800,T:60,dps:2.4,ph2:{d:'La Entropía ataca la vida misma',w:'bio3,nrg1',h:'anti1'}},
+   {k:'b',boss:1,t:'La Entropía',d:'El universo se enfría. ÉTER detecta que la nave pierde orden, molécula a molécula.',sc:'Entropía máxima · todo tiende al desorden',w:'nrg2,shield2,struct1,bio1',h:'',hp:400,T:90,dps:1.5,ph2:{d:'La Entropía ataca la vida misma',w:'bio3,nrg1',h:'anti1'}},
    {k:'f',z:126,isl:1,t:'ETERNIO',d:'Plomo-204 + rutenio-102 + 4 neutrones: 126 protones. Tras evaporar dos neutrones quedan 182: dentro de la isla de estabilidad.',r:'Pb204+Ru102+4n',T:150}
   ]}
 ];
@@ -717,7 +748,7 @@ const GUIDE = [
  ['REACTOR','Mezcla sustancias de tus frascos. Si ÉTER conoce la reacción, muestra los productos: ajusta los números (coeficientes) hasta que cada lado tenga los mismos átomos (ley de Lavoisier) y pulsa REACCIONAR. En los niveles 1–4 ÉTER balancea por ti.'],
  ['FORJA NUCLEAR','Pon hasta 3 núcleos y un flujo de neutrones. Z (protones) y A (masa) se suman. Si el núcleo tiene demasiados protones o neutrones, decae (β⁺ o β⁻) hacia el valle de estabilidad. A = 5 y A = 8 no existen. Desde Z = 104 el núcleo pierde 2 neutrones y solo sobrevive en la isla de estabilidad (Z 114–126, N 176–190). Fusionar hasta el hierro DA energía; más allá la CUESTA.'],
  ['DESTILACIÓN','Toca un tubo y luego otro para verter la capa de arriba. Solo puedes verter sobre el mismo líquido o en un tubo vacío. Gana cuando cada tubo tenga una sola sustancia.'],
- ['BATALLA','Elige hasta 4 cartas. Lee el escáner y deduce la debilidad de la amenaza. Toca una carta para lanzarla; si la lanzas cuando el anillo dorado coincide con la amenaza (punto débil), haces CRÍTICO ×1,5. Acertar seguido sube el combo hasta ×2. Desde el nivel 6 las amenazas se propagan (recuperan vida). Daño = Σ(propiedad × debilidad − propiedad × lo que la alimenta) × 2 × potencia × combo.'],
+ ['BATALLA','Síntesis bajo presión: la amenaza aparece sobre el laboratorio. Construye moléculas con la propiedad que pide el escáner y pulsa ⚗ LANZAR: lo que sintetizas en vivo pega 5 veces más fuerte, y lo complejo pega más. Tus cartas de los frascos son munición preparada (2 tiros cada una, teclas 1–4). Si repites la misma sustancia, la amenaza se vuelve resistente: varía. Lanzar cuando el anillo dorado toca la amenaza = CRÍTICO ×1,5. Desde el nivel 6 las amenazas se propagan.'],
  ['ESTRELLAS','Síntesis, forja, reactor y destilación: ★★★ si usas menos del 40 % del tiempo, ★★ menos del 70 %. Batalla: ★★★ con 70 % de integridad o más. En los niveles 1–2 el tiempo no hace perder.'],
  ['CIENCIA REAL','Compuestos, reacciones, energías de enlace (fórmula semiempírica de Weizsäcker) y datos curiosos son reales. Simplificaciones honestas: los sólidos iónicos se muestran como una sola unidad (NaCl) y el valle de estabilidad es una aproximación. Los híbridos y el Eternio son ficción casi real.'],
  ['RETO DIARIO','Desde el nivel 1: cinco moléculas nuevas cada día, iguales para todo el mundo, con todos los elementos comunes. Mantén tu racha 🔥 y comparte tu tiempo.'],
@@ -1046,18 +1077,21 @@ const NUC = {
 
 /* ---------- batalla ---------- */
 const BAT = {
-  CD: 1.2, COMBO_T: 2.5,
+  CD: 1.2, COMBO_T: 6, AMMO: 2, AMMO_MUL: 1.5, SYN: 5,
   eff(card, ph) {
     if (ph.hx && ph.hx.includes(card.id.replace(/^el:/, ''))) return -6;
     let e = 0; for (const t in card.tags) e += card.tags[t] * ((ph.w[t] || 0) - (ph.h[t] || 0)); return e;
   },
   mult: combo => Math.min(2, 1 + 0.2 * Math.max(0, combo - 1)),
+  fatigue: n => Math.max(0.35, 1 - 0.15 * (n || 0)),          // la amenaza se vuelve resistente a lo que repites
+  build: (heavy, h) => 1.2 + 0.5 * heavy + (h ? 0.8 : 0),      // segundos estimados para construir (validador y bot)
+  cpow: c => (1 + Math.min(1.5, (c.heavy || 1) / 8)) * (c.kind === 'hyb' ? 0.85 : 1), // complejidad: lo difícil de armar pega más
   phaseOf(p, n) { const q = n === 2 && p.ph2 ? p.ph2 : p; return { d: q.d, w: parseTags(q.w), h: parseTags(q.h), hx: (q.hx || '').split(',').filter(Boolean) }; },
   WIN: 1.6, WIN_ON: .34,
   inWin: b => !!b.crit && (b.cyc % BAT.WIN) < BAT.WIN_ON,
   create(p, deck, diff) {
-    diff = diff || {};
-    return { p, deck, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
+    diff = diff || {}; const ammo = {}; deck.forEach(c => ammo[c.id] = BAT.AMMO);
+    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
   },
   step(b, dt) {
     if (b.over) return;
@@ -1067,17 +1101,22 @@ const BAT = {
     b.spikeT -= dt; if (b.spikeT <= 0) { b.spikeT = 5; b.integ -= b.p.dps * 2; b.ev.push({ k: 'spike' }); }
     if (b.integ <= 0 || b.t <= 0) { b.integ = Math.max(0, b.integ); b.over = true; b.win = false; b.why = b.integ <= 0 ? 'La integridad de la nave llegó a 0 %.' : 'Se acabó el tiempo.'; }
   },
-  throw(b, card) {
-    if (b.over || (b.cd[card.id] || 0) > 0) return null;
-    b.cd[card.id] = BAT.CD;
-    const e = BAT.eff(card, b.ph); let dmg, kind;
-    const crit = e > 0 && BAT.inWin(b);
-    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * 2 * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1)); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
-    else if (e < 0) { b.combo = 0; dmg = Math.round(-e * 2 * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
+  hit(b, card, mul, f) {
+    const e = BAT.eff(card, b.ph), crit = e > 0 && BAT.inWin(b); let dmg, kind; f = f == null ? 1 : f;
+    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * mul * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1) * f); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
+    else if (e < 0) { b.combo = 0; dmg = Math.round(-e * mul * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
     else { b.combo = 0; dmg = 1; b.hp -= 1; kind = 'none'; }
     if (b.phase === 1 && b.p.ph2 && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
     if (b.hp <= 0) { b.hp = 0; b.over = true; b.win = true; b.stars = b.integ >= 70 ? 3 : b.integ >= 40 ? 2 : 1; }
-    return { e, dmg, kind, crit };
+    return { e, dmg, kind, crit, f };
+  },
+  throw(b, card) { // munición preparada (cartas de los frascos): 3 tiros por carta
+    if (b.over || (b.cd[card.id] || 0) > 0 || !(b.ammo[card.id] > 0)) return null;
+    b.cd[card.id] = BAT.CD; b.ammo[card.id]--; return BAT.hit(b, card, BAT.AMMO_MUL);
+  },
+  launch(b, card) { // sustancia sintetizada en vivo durante la batalla: mucho más fuerte
+    if (b.over) return null; const f = BAT.fatigue(b.uses[card.id]); b.uses[card.id] = (b.uses[card.id] || 0) + 1; b.launches++;
+    return BAT.hit(b, Object.assign({}, card, { pow: BAT.cpow(card) }), BAT.SYN, f);
   }
 };
 function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.kind === 'hyb' ? 0.9 : 1 + Math.min(0.5, (c.atoms || 2) / 40); }
@@ -1109,9 +1148,9 @@ function labElements(S) {
 }
 function cardFromId(S, id) {
   if (id.startsWith('el:')) { const s = id.slice(3), z = SYM[s] || 126, e = elem(z); const tg = parseTags(ELTAGS[s === 'Ubh' ? 'Ubh' : s] || ''); return { id, kind: 'el', name: z === 126 && S.eternio ? 'Eternio' : e.name, f: s, tags: tg, pow: 1 }; }
-  if (DB.poly[id]) { const p = DB.poly[id]; return { id, kind: 'poly', name: p.name, f: '(' + p.ms.map(m => DB.comp[m].f).join('/') + ')n', tags: p.tags, pow: 1.6 }; }
-  if (DB.comp[id]) { const c = DB.comp[id]; const k = { id, kind: 'mol', name: c.name, f: c.f, tags: c.tags, atoms: c.atoms }; k.pow = cardPow(k); return k; }
-  if (S.hyb[id]) { const h = S.hyb[id]; return { id, kind: 'hyb', name: h.name, f: h.f, tags: h.tags, pow: 0.9 }; }
+  if (DB.poly[id]) { const p = DB.poly[id]; return { id, kind: 'poly', name: p.name, f: '(' + p.ms.map(m => DB.comp[m].f).join('/') + ')n', tags: p.tags, pow: 1.6, heavy: 6, blocks: 3 }; }
+  if (DB.comp[id]) { const c = DB.comp[id]; const k = { id, kind: 'mol', name: c.name, f: c.f, tags: c.tags, atoms: c.atoms, heavy: c.atoms - (c.cnt.H || 0), hasH: !!c.cnt.H }; k.pow = cardPow(k); return k; }
+  if (S.hyb[id]) { const h = S.hyb[id]; const cn = h.cnt || {}; return { id, kind: 'hyb', name: h.name, f: h.f, tags: h.tags, pow: 0.9, heavy: Math.max(1, Object.keys(cn).reduce((s, e) => s + (e === 'H' ? 0 : cn[e]), 0)), hasH: !!cn.H }; }
   return null;
 }
 function allCards(S) {
@@ -1558,12 +1597,13 @@ function synth() {
     r.first = store(r.id, 1, list.length <= 70 ? layoutOf(list) : null); made.push(r); list.forEach(a => gone.add(a.id));
   }
   if (made.length) {
-    S.st.synth += made.length; const cvr = $('#cv').getBoundingClientRect();
-    Lab.atoms.filter(a => gone.has(a.id)).slice(0, 4).forEach(a => { const [x, y] = w2s(a.x, a.y); boom(cvr.left + x, cvr.top + y); });
+    S.st.synth += made.length; const cvr = $('#cv').getBoundingClientRect(), goneA = Lab.atoms.filter(a => gone.has(a.id));
+    goneA.slice(0, 3).forEach(a => { const [x, y] = w2s(a.x, a.y); boom(cvr.left + x, cvr.top + y); });
+    if (goneA.length) { const cx = goneA.reduce((q, a) => q + a.x, 0) / goneA.length, cy = goneA.reduce((q, a) => q + a.y, 0) / goneA.length, t = performance.now() / 1000; goneA.forEach(a => { Lab.vanish.push({ x: a.x, y: a.y, el: a.el, mono: a.mono, cx, cy, t0: t }); fxBurst(a.x, a.y, [a.mono ? '#2dffb3' : colOf(a.el), '#ffc23a'], 5); }); made.forEach((m, k) => Lab.labels.push({ x: cx, y: cy - 20 - k * 22, text: (m.first ? '¡NUEVO! ' : '') + D.fUni(nameOf(m.id).f), c: m.kind === 'hyb' ? '#ff2fb3' : m.first ? '#ffc23a' : '#2dffb3', t0: t })); }
     Lab.atoms = Lab.atoms.filter(a => !gone.has(a.id)); Lab.bonds = Lab.bonds.filter(b => !gone.has(b.a) && !gone.has(b.b)); Lab.sel = null; Lab.hist = []; syncGhost();
     made.forEach(r => toast((r.first ? '¡NUEVO! ' : '') + (r.kind === 'hyb' ? '⚠ HÍBRIDO · ' : r.kind === 'el' ? 'Elemento puro · ' : '') + nameOf(r.id).html, r.first ? 'ok' : ''));
     if (made.some(r => r.kind === 'hyb' && r.first)) say('hybrid'); else if (!S.st.firstSay) { S.st.firstSay = 1; talk(DIALOG.first); }
-    sfx('ok'); vib(20); missionCheck(made); save(); renderTray();
+    sfx('ok'); vib(20); if (BT) launch(made); else missionCheck(made); save(); renderTray();
   }
   if (fails.length) { fails.forEach(f => toast(esc(f.msg), 'bad')); if (!made.length) { sfx('bad'); shake($('#cvWrap')); S.en = Math.max(0, S.en - 2); Lab.flash = 1; say('unstable'); } }
   redraw(); hud(); return made;
@@ -1586,8 +1626,8 @@ const BPC = {};
 const bpOf = (id, h) => BPC[id + h] || (BPC[id + h] = D.blueprint(DB.comp[id].smiles[0], h));
 /* ---------- guía paso a paso ---------- */
 function guideStep() {
-  if (!MIS || MIS.p.k !== 'm') return null;
-  const g = Lab.ghost, cnt = D.countOf(toGraph()), tg = DB.comp[MIS.p.id].cnt;
+  const tid = MIS && MIS.p.k === 'm' ? MIS.p.id : BT && Lab.ghost ? Lab.ghost.id : null; if (!tid) return null;
+  const g = Lab.ghost, cnt = D.countOf(toGraph()), tg = DB.comp[tid].cnt;
   if (g) {
     const filled = new Set(g.atoms.map((s, i) => s.f ? i : -1).filter(i => i >= 0));
     if (filled.size < g.atoms.length) {
@@ -1608,14 +1648,27 @@ function guideStep() {
 function stepText(st) {
   if (!st) return '';
   const nm = el => '<b class="hl">' + esc(el) + '</b>';
-  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => '¡Completo! Pulsa <b class="hl">⚗ SINTETIZAR</b>.' }[st.k]();
+  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => BT ? '¡Listo! Pulsa <b class="hl">⚗ LANZAR</b> contra la amenaza.' : '¡Completo! Pulsa <b class="hl">⚗ SINTETIZAR</b>.' }[st.k]();
+}
+/* ---------- efectos visuales del laboratorio ---------- */
+Lab.fx = []; Lab.vanish = []; Lab.labels = []; Lab.animT = 0;
+function fxBurst(x, y, cols, n) { if (QUIET) return; const t = performance.now() / 1000; for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 40 + Math.random() * 140; Lab.fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t0: t, life: .45 + Math.random() * .4, c: cols[i % cols.length], r: 1.5 + Math.random() * 2.5 }); } if (Lab.fx.length > 400) Lab.fx.splice(0, Lab.fx.length - 400); Lab.animT = t + 1; }
+function drawFx(now, z) {
+  Lab.vanish = Lab.vanish.filter(v => now - v.t0 < .38);
+  Lab.vanish.forEach(v => { const k = (now - v.t0) / .38, x = v.x + (v.cx - v.x) * k * k, y = v.y + (v.cy - v.y) * k * k, [sx, sy] = w2s(x, y), r = (v.el === 'H' ? 13 : 19) * z * (1 - k); ctx.globalAlpha = 1 - k; ctx.strokeStyle = v.mono ? '#2dffb3' : colOf(v.el); ctx.lineWidth = 3 * z; ctx.beginPath(); ctx.arc(sx, sy, Math.max(1, r), 0, 7); ctx.stroke(); });
+  Lab.fx = Lab.fx.filter(p => now - p.t0 < p.life);
+  Lab.fx.forEach(p => { const k = (now - p.t0) / p.life, d = now - p.t0, [sx, sy] = w2s(p.x + p.vx * d, p.y + p.vy * d + 60 * d * d); ctx.globalAlpha = 1 - k; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(sx, sy, p.r * z, 0, 7); ctx.fill(); });
+  Lab.labels = Lab.labels.filter(l => now - l.t0 < 1.3);
+  Lab.labels.forEach(l => { const k = (now - l.t0) / 1.3, [sx, sy] = w2s(l.x, l.y - 50 * k); ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3; ctx.fillStyle = l.c; ctx.font = (20 * Math.max(.8, z)) + 'px Titulos,Arial Narrow,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = l.c; ctx.shadowBlur = 10; ctx.fillText(l.text, sx, sy); ctx.shadowBlur = 0; });
+  ctx.globalAlpha = 1;
+  if (Lab.fx.length || Lab.vanish.length || Lab.labels.length) Lab.animT = now + .1;
 }
 /* ---------- dibujo ---------- */
 function draw() {
   if (!ctx) return; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, CW, CHh);
   const z = Lab.view.z, gs = 32 * z, now = performance.now() / 1000, pulse = .5 + .5 * Math.sin(now * 5);
   if (gs > 10) { ctx.fillStyle = 'rgba(164,44,255,.2)'; const [ox, oy] = w2s(0, 0); for (let x = ((ox % gs) + gs) % gs; x < CW; x += gs) for (let y = ((oy % gs) + gs) % gs; y < CHh; y += gs) ctx.fillRect(x - .75, y - .75, 1.5, 1.5); }
-  const st = MIS && MIS.p.k === 'm' ? guideStep() : null, F = w => (w * z) + 'px Titulos,Arial Narrow,sans-serif';
+  const st = guideStep(), F = w => (w * z) + 'px Titulos,Arial Narrow,sans-serif';
   if (Lab.ghost) { // plano punteado
     const g = Lab.ghost; ctx.setLineDash([4 * z, 4 * z]); ctx.lineWidth = 1.5 * z;
     g.bonds.forEach(b => { const p = g.atoms[b.a], q = g.atoms[b.b]; if (p.f && q.f) return; const [x1, y1] = w2s(p.x, p.y), [x2, y2] = w2s(q.x, q.y); ctx.strokeStyle = 'rgba(143,179,255,.45)'; const L = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / L, ny = (x2 - x1) / L; (b.o === 1 ? [0] : b.o === 2 ? [-3, 3] : [-5, 0, 5]).forEach(o => { ctx.beginPath(); ctx.moveTo(x1 + nx * o * z, y1 + ny * o * z); ctx.lineTo(x2 + nx * o * z, y2 + ny * o * z); ctx.stroke(); }); });
@@ -1626,7 +1679,9 @@ function draw() {
     const x = A(b.a), y = A(b.b); if (!x || !y) continue;
     const [x1, y1] = w2s(x.x, x.y), [x2, y2] = w2s(y.x, y.y);
     if (x.mono) { ctx.strokeStyle = '#2dffb3'; ctx.lineWidth = 4 * z; ctx.setLineDash([8 * z, 6 * z]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]); continue; }
-    const t = D.bondType(x.el, y.el), hot = st && st.k === 'bond' && st.bond === b;
+    if (!b.t0) { b.t0 = now; if (!QUIET && Lab.atoms.length < 60) fxBurst((x.x + y.x) / 2, (x.y + y.y) / 2, ['#ffc23a', '#e9f6ff'], 4); }
+    const young = now - b.t0 < .3; if (young) Lab.animT = now + .1;
+    const t = D.bondType(x.el, y.el), hot = (st && st.k === 'bond' && st.bond === b) || young;
     ctx.strokeStyle = hot ? `rgba(255,194,58,${.4 + .6 * pulse})` : t === 'iónico' ? '#ff2fb3' : t === 'covalente polar' ? '#39c8ff' : '#c9a2ff';
     ctx.lineWidth = (hot ? 4 : 2.4) * z; if (t === 'iónico' && !hot) ctx.setLineDash([5 * z, 4 * z]);
     const L = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / L, ny = (x2 - x1) / L, off = b.o === 1 ? [0] : b.o === 2 ? [-3.4, 3.4] : [-5.5, 0, 5.5];
@@ -1642,7 +1697,8 @@ function draw() {
       ctx.fillStyle = '#e9f6ff'; ctx.font = F(15); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(D.fUni(DB.comp[a.mono].f), x, y + 1);
       continue;
     }
-    const r = rad(a) * z, c = colOf(a.el), nd = need(a);
+    if (!a.t0) a.t0 = now; const ag = now - a.t0, pop = ag < .32 ? (Lab.animT = now + .1, 1 + Math.sin(Math.min(1, ag / .32) * Math.PI) * .35 - (1 - Math.min(1, ag / .12)) * .6) : 1;
+    const r = rad(a) * z * Math.max(.3, pop), c = colOf(a.el), nd = need(a);
     if (hv) { ctx.strokeStyle = Lab.hover.ok ? '#2dffb3' : '#ff2fb3'; ctx.lineWidth = 3 * z; ctx.beginPath(); ctx.arc(x, y, r + 9 * z, 0, 7); ctx.stroke(); }
     ctx.fillStyle = '#05010c'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
     ctx.strokeStyle = c; ctx.globalAlpha = .25; ctx.lineWidth = 7 * z; ctx.stroke(); ctx.globalAlpha = 1; ctx.lineWidth = 2 * z; ctx.stroke();
@@ -1657,7 +1713,8 @@ function draw() {
   Lab.flash = 0;
   $$('#tray .hint, .tools-v .hint, #bSyn.hint').forEach(e => e.classList.remove('hint'));
   if (st) { if (st.k === 'place') { const b = $(`#tray [data-arg="${st.el}"]`); b && b.classList.add('hint'); } if (st.k === 'autoH') $('#bAH').classList.add('hint'); if (st.k === 'synth') $('#bSyn').classList.add('hint'); }
-  const co = $('#coach'); if (co) co.innerHTML = st ? stepText(st) : (!Lab.atoms.length && !MIS ? 'Toca un átomo de la bandeja para empezar · ▶ en el panel sigue la historia' : '');
+  const co = $('#coach'); if (co) co.innerHTML = st ? stepText(st) : BT ? '☣ Construye algo con la propiedad que pide el escáner y pulsa <b class="hl">⚗ LANZAR</b>' : (!Lab.atoms.length && !MIS ? 'Toca un átomo de la bandeja para empezar · ▶ en el panel sigue la historia' : '');
+  drawFx(now, z);
 }
 function analysis() {
   const el = $('#ana'); if (!el) return;
@@ -1895,7 +1952,7 @@ function chalList(seed) {
   return out;
 }
 function startChallenge(kind, seed, opt) {
-  closeModal(); if (BT) { BT = null; $('#battle').hidden = true; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
+  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; $('#bSyn').textContent = '⚗ Sintetizar'; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
   CH = Object.assign({ kind, seed, list: chalList(seed), idx: 0, el: 0, skips: 0, rival: null }, opt || {});
   setTab('lab'); setMode('mol'); chalTarget();
   showLine(['eter', 'feliz', kind === 'daily' ? 'Reto diario: cinco moléculas, todos los elementos comunes. El reloj corre.' : 'Duelo: las mismas cinco moléculas para los dos. Que gane la mejor química.']);
@@ -1926,7 +1983,7 @@ function win(L, i, stars, bonus) {
   save(true); hud(); sfx('win'); vib([30, 40, 60]);
   const lvl = LEVELS[L - 1], done = !was && D.levelDone(S, L), isEnd = L === LEVELS.length && done; if (up) S.cur = L + 1; const nx = nextOpen();
   say(done ? 'level' : 'win');
-  modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${'★'.repeat(stars)}<span style="opacity:.25">${'★'.repeat(3 - stars)}</span></div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
+  modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${[0, 1, 2].map(k => `<span class="${k < stars ? 'on' : 'off'}" style="animation-delay:${.15 + k * .18}s">★</span>`).join('')}</div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
     (done ? `<div class="film">Nivel ${L} completado: ${esc(lvl.t)}.${up ? ' Se abre el nivel ' + (L + 1) + ': ' + esc(LEVELS[L].t) + '.' : ''}</div>` : '') +
     `<div class="row" style="margin-top:10px">${isEnd ? '<button class="btn pri" data-act="ending">Final de temporada ▸</button>' : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
   renderMap(); renderTray(); renderSide(); if (up) levelTalk(L + 1);
@@ -1943,54 +2000,93 @@ let BT = null, DECK = new Set();
 function openDeck(L, i) {
   const p = LEVELS[L - 1].P[i], cards = D.allCards(S); DECK = new Set((S.deck || []).filter(id => cards.some(c => c.id === id)).slice(0, 4));
   const list = cards.map(c => `<button class="card ${c.kind === 'el' ? 'el' : c.kind}${DECK.has(c.id) ? ' sel' : ''}" style="--c:${c.kind === 'el' ? colOf(c.f) : ''}" data-act="pick" data-arg="${esc(c.id)}"><span class="k">${{ el: 'ELEM', mol: 'MOL', poly: 'POLI', hyb: 'HÍBR' }[c.kind]}</span><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="tg">${tagChips(c.tags, 3)}</span></button>`).join('');
-  const kid = L <= 2 ? '<p class="ok sm">Consejo: busca la carta cuya propiedad combate lo que dice el escáner (si falta agua → algo que hidrate).</p>' : '';
+  const kid = L <= 2 ? '<p class="ok sm">Consejo: en la batalla aparecerá el plano de una molécula útil. Constrúyela y pulsa ⚗ LANZAR.</p>' : '';
   const rg = dOf(L).rg * (p.boss ? 1.5 : 1);
-  modal(`<div class="pag">Nivel ${L} · Problema ${i + 1} / 10 · ${p.boss ? 'Jefe' : 'Batalla'}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp} · ${p.T} s · drena ${p.dps} %/s${rg ? ' · se propaga +' + rg + '/s' : ''}</div>${kid}<div class="sec-t">Elige hasta 4 cartas (<span id="dkn">${DECK.size}</span>/4)</div>` +
-    (cards.length ? `<div class="grid">${list}</div>` : '<p class="bad">No tienes cartas. Crea compuestos en el laboratorio.</p>') +
-    `<div class="row sticky"><button class="btn pri" data-act="fight" data-arg="${L},${i}" ${cards.length ? '' : 'disabled'}>☣ ¡A la batalla!</button><button class="btn gh" data-act="close">Volver</button></div>`);
+  modal(`<div class="pag">Nivel ${L} · Problema ${i + 1} / 10 · ${p.boss ? 'Jefe' : 'Batalla'} · síntesis bajo presión</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp} · ${p.T} s · drena ${p.dps} %/s${rg ? ' · se propaga +' + rg + '/s' : ''}</div>${kid}<p class="m sm">Durante la batalla construyes moléculas en vivo y las LANZAS (×5 de daño, más si son complejas). Repetir la misma sustancia crea resistencia. Estas cartas son munición preparada: 2 tiros cada una.</p><div class="sec-t">Munición: elige hasta 4 cartas (<span id="dkn">${DECK.size}</span>/4) · opcional</div>` +
+    (cards.length ? `<div class="grid">${list}</div>` : '<p class="m">Aún no tienes cartas: no importa, construirás en vivo.</p>') +
+    `<div class="row sticky"><button class="btn pri" data-act="fight" data-arg="${L},${i}">☣ ¡A la batalla!</button><button class="btn gh" data-act="close">Volver</button></div>`);
 }
 function pick(id, el) { if (DECK.has(id)) DECK.delete(id); else { if (DECK.size >= 4) return toast('Máximo 4 cartas'); DECK.add(id); } el.classList.toggle('sel', DECK.has(id)); const n = $('#dkn'); if (n) n.textContent = DECK.size; sfx('tap'); }
 const GLYPH = ['☣', '✹', '☢', '⚠', '❂', '✺', '⌬', '☄', '✷', '⚛'];
+function recommend(b) { // la molécula más rentable que puedes armar ahora (para el plano en niveles guiados)
+  const els = new Set(labEls()); let best = null, bv = 0;
+  for (const id in DB.comp) {
+    const c = DB.comp[id]; if (c.s2 || !Object.keys(c.cnt).every(e => els.has(e))) continue;
+    const card = D.cardFromId(S, id), e = BAT.eff(card, b.ph); if (e <= 0) continue;
+    const v = e * BAT.cpow(card) * BAT.fatigue(b.uses[id]) / BAT.build(card.heavy, card.hasH) / (1 + c.atoms / 30);
+    if (v > bv) { bv = v; best = id; }
+  }
+  return best;
+}
+function battleGhost() {
+  Lab.ghost = null; if (!BT) return; const g = dOf(BT.L).g; if (g < 2) return redraw();
+  const id = recommend(BT.b); if (!id) return redraw();
+  const bp = bpOf(id, g === 3); Lab.ghost = { id, atoms: bp.atoms.map(a => ({ ...a, f: null })), bonds: bp.bonds, withH: g === 3 };
+  const gh = Lab.ghost; requestAnimationFrame(() => { resize(); if (gh && Lab.ghost === gh) fit(gh.atoms); });
+}
 function startBattle(L, i, ids) {
-  ids = ids || [...DECK]; if (!ids.length) return toast('Elige al menos una carta', 'bad');
-  const cards = ids.map(id => D.cardFromId(S, id)).filter(Boolean).slice(0, 4); S.deck = ids.slice(0, 4);
-  closeModal(); if (CH) chalEnd(true); endMission(); const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
-  const el = $('#battle');
-  el.innerHTML = `<div class="bt-top"><span class="mega">${esc(p.t)}</span><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>
-  <div class="bt-main"><div class="bt-left"><div class="bars"><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div>${b.rg ? `<div class="m sm">☣ Se propaga +${b.rg}/s: ataca rápido</div>` : ''}</div>
-  <div class="arena" id="arena"><div class="combo" id="btC"></div><div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div><div class="phase" id="btPh">${esc(p.sc)}</div></div></div>
-  <div class="deck">${cards.map((c, k) => `<button class="dk" data-act="throw" data-arg="${k}"><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="tg">${tagChips(c.tags, 2)}</span><i class="cd" id="cd${k}" style="height:0"></i></button>`).join('')}${b.crit ? '<p class="m sm tipc">Lanza cuando el anillo dorado toque la amenaza: CRÍTICO ×1,5</p>' : ''}</div></div>`;
-  el.hidden = false; sfx('tap');
+  ids = (ids || [...DECK]).slice(0, 4); const cards = ids.map(id => D.cardFromId(S, id)).filter(Boolean); S.deck = ids;
+  closeModal(); if (CH) chalEnd(true); endMission(); if (SO) { SO = null; $('#sortOv').hidden = true; }
+  const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
+  document.body.classList.add('inbattle'); setTab('lab'); setMode('mol'); clearLab(true); Lab.view = { x: 0, y: 0, z: 1 };
+  const st = $('#bstrip');
+  st.innerHTML = `<div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div>
+  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}</div></div>
+  <div class="bs-r"><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>`;
+  st.hidden = false; $('#bSyn').textContent = '⚗ Lanzar';
+  battleGhost(); renderSide(); renderTray(); sfx('tap'); vib(40);
+  showLine(['eter', L <= 2 ? 'neutral' : 'enojado', L <= 2 ? 'Construye la molécula del plano y pulsa LANZAR. Lo que fabricas en vivo pega cinco veces más.' : 'Lee el escáner, construye y lanza. Si repites la misma sustancia, se vuelve resistente.']);
+}
+function shotFx(fromEl, r, label) {
+  if (QUIET || TEST) return; const thr = $('#thr'); if (!thr) return;
+  const a = (fromEl || $('#bSyn')).getBoundingClientRect(), t = thr.getBoundingClientRect();
+  const s = document.createElement('div'); s.className = 'shot'; s.style.left = (a.left + a.width / 2 - 8) + 'px'; s.style.top = (a.top + a.height / 2 - 8) + 'px';
+  s.style.background = r.kind === 'hit' ? (r.crit ? 'var(--amb)' : 'var(--ink)') : r.kind === 'heal' ? 'var(--mag)' : '#777'; s.style.color = s.style.background; document.body.appendChild(s);
+  requestAnimationFrame(() => { s.style.transform = `translate(${t.left + t.width / 2 - a.left - a.width / 2}px,${t.top + t.height / 2 - a.top - a.height / 2}px)`; s.style.opacity = '.3'; });
+  setTimeout(() => s.remove(), 340);
+  setTimeout(() => {
+    const st = $('#bstrip'); if (!st) return; const pp = document.createElement('div'); pp.className = 'pop';
+    pp.style.left = (12 + Math.random() * 40) + '%'; pp.style.top = '42%'; pp.style.color = r.kind === 'hit' ? 'var(--amb)' : r.kind === 'heal' ? 'var(--mag)' : '#999';
+    pp.textContent = r.kind === 'hit' ? (r.crit ? '¡CRÍTICO! ' : '') + '−' + r.dmg + (r.f < 1 ? ' · resistencia ×' + r.f.toFixed(2) : '') + (BT && BT.b.combo > 1 ? ' · combo ×' + BAT.mult(BT.b.combo).toFixed(1) : '') : r.kind === 'heal' ? '¡EMPEORA! +' + Math.round(r.dmg / 2) : 'SIN EFECTO';
+    if (label) pp.textContent = label + ' ' + pp.textContent;
+    st.appendChild(pp); setTimeout(() => pp.remove(), 1000); thr.classList.remove('hit'); void thr.offsetWidth; thr.classList.add('hit');
+  }, 300);
 }
 function throwCard(k) {
   if (!BT || BT.b.over) return null; const b = BT.b, c = b.deck[k]; if (!c) return null;
-  const r = BAT.throw(b, c); if (!r) return null;
-  const ar = $('#arena'), thr = $('#thr');
-  if (ar && thr && !TEST && !QUIET) {
-    const cb = $$('.dk')[k].getBoundingClientRect(), ab = ar.getBoundingClientRect(), tb = thr.getBoundingClientRect();
-    const s = document.createElement('div'); s.className = 'shot'; s.style.left = (cb.left - ab.left + cb.width / 2 - 8) + 'px'; s.style.top = (cb.top - ab.top + cb.height / 2 - 8) + 'px'; s.style.background = r.kind === 'hit' ? (r.crit ? 'var(--amb)' : 'var(--ink)') : r.kind === 'heal' ? 'var(--mag)' : '#777'; ar.appendChild(s);
-    requestAnimationFrame(() => { s.style.transform = `translate(${tb.left + tb.width / 2 - cb.left - cb.width / 2}px,${tb.top + tb.height / 2 - cb.top - cb.height / 2}px)`; s.style.opacity = '.2'; });
-    setTimeout(() => s.remove(), 320);
-    setTimeout(() => { const pp = document.createElement('div'); pp.className = 'pop'; pp.style.left = (40 + Math.random() * 20) + '%'; pp.style.top = '30%'; pp.style.color = r.kind === 'hit' ? 'var(--amb)' : r.kind === 'heal' ? 'var(--mag)' : '#999'; pp.textContent = r.kind === 'hit' ? (r.crit ? '¡CRÍTICO! ' : '') + '−' + r.dmg + (b.combo > 1 ? ' ×' + BAT.mult(b.combo).toFixed(1) : '') : r.kind === 'heal' ? '¡EMPEORA! +' + Math.round(r.dmg / 2) : 'SIN EFECTO'; ar.appendChild(pp); setTimeout(() => pp.remove(), 900); thr.classList.remove('hit'); void thr.offsetWidth; thr.classList.add('hit'); }, 260);
-  }
+  const r = BAT.throw(b, c); if (!r) { if (!(b.ammo[c.id] > 0)) toast('Sin munición de ' + esc(c.name) + ': constrúyela'); return null; }
+  shotFx($$('#mis .dk')[k], r); renderSide();
   sfx(r.crit ? 'crit' : r.kind === 'hit' ? 'hit' : r.kind === 'heal' ? 'heal' : 'tap'); vib(r.kind === 'hit' ? (r.crit ? 30 : 15) : 60);
   return r;
 }
+function launch(made) { // lo sintetizado en batalla se lanza contra la amenaza
+  if (!BT) return []; const out = [];
+  made.forEach(m => {
+    if (!BT || BT.b.over) return; const card = D.cardFromId(S, m.id); if (!card) return;
+    const r = BAT.launch(BT.b, card); if (!r) return; out.push(r);
+    shotFx($('#bSyn'), r, D.fUni(nameOf(m.id).f));
+    sfx(r.crit ? 'crit' : r.kind === 'hit' ? 'boom' : 'bad'); vib(r.kind === 'hit' ? 40 : 80);
+  });
+  if (out.some(r => r.kind === 'heal')) say('lose');
+  battleUI(); if (BT) { battleGhost(); renderSide(); }
+  return out;
+}
 function battleUI() {
   if (!BT) return; const b = BT.b, set = (id, f) => { const e = document.getElementById(id); if (e) f(e); };
-  set('btT', e => e.textContent = Math.max(0, Math.ceil(b.t)));
-  set('btHp', e => e.style.width = (100 * Math.max(0, b.hp) / b.max) + '%'); set('btHpN', e => e.textContent = Math.max(0, Math.round(b.hp)));
+  set('btT', e => { e.textContent = Math.max(0, Math.ceil(b.t)); e.classList.toggle('low', b.t < 12); });
+  set('btHp', e => e.style.width = (100 * Math.max(0, b.hp) / b.max) + '%'); set('btHpN', e => e.textContent = Math.max(0, Math.round(b.hp)) + ' / ' + b.max);
   set('btIn', e => e.style.width = Math.max(0, b.integ) + '%'); set('btInN', e => e.textContent = 'Nave ' + Math.max(0, Math.round(b.integ)) + ' %');
   set('btC', e => e.textContent = b.combo > 1 ? 'COMBO ×' + b.combo : '');
   if (b.crit) set('ring', e => { const f = (b.cyc % BAT.WIN) / BAT.WIN, w = BAT.WIN_ON / BAT.WIN, on = f < w; e.style.transform = 'scale(' + (on ? 1 : 1 + .9 * (1 - (f - w) / (1 - w))) + ')'; e.classList.toggle('on', on); });
   b.deck.forEach((c, k) => set('cd' + k, e => e.style.height = (100 * (b.cd[c.id] || 0) / BAT.CD) + '%'));
-  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#battle')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); } }
+  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); battleGhost(); } }
   if (b.over) endBattle();
 }
 function endBattle() {
-  const { b, L, i } = BT; BT = null; $('#battle').hidden = true; $('#battle').innerHTML = '';
-  if (b.win) win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15);
-  else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Crea compuestos con esas propiedades.'); }
+  const { b, L, i } = BT; BT = null; document.body.classList.remove('inbattle'); const st = $('#bstrip'); st.hidden = true; st.innerHTML = '';
+  $('#bSyn').textContent = '⚗ Sintetizar'; Lab.ghost = null; clearLab(true); renderSide(); renderTray();
+  if (b.win) { fxBurst(0, 0, ['#2dffb3', '#ffc23a', '#39c8ff'], 40); win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15 + b.launches * 5); }
+  else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Construye en vivo sustancias con esas propiedades y alterna para evitar la resistencia.'); }
 }
 function flee() { if (!BT) return; BT.b.over = true; BT.b.win = false; BT.b.why = 'Huiste de la batalla.'; battleUI(); }
 
@@ -1999,6 +2095,11 @@ function flee() { if (!BT) return; BT.b.over = true; BT.b.win = false; BT.b.why 
    ============================================================ */
 function renderSide() {
   const box = $('#mis'); if (!box) return;
+  if (BT) {
+    const b = BT.b;
+    box.innerHTML = `<div class="pag">☣ Batalla · N${BT.L}·${BT.i + 1} · lanzadas ${b.launches}</div><div class="m sm">Construye y pulsa <b class="hl">⚗ LANZAR</b>. Lo que repites pierde fuerza (resistencia).</div>` + (b.deck.length ? `<div class="sec-t">Munición preparada · teclas 1–4</div><div class="ars">${b.deck.map((c, k) => `<button class="dk" data-act="throw" data-arg="${k}"><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="am">${'●'.repeat(b.ammo[c.id] || 0)}${'○'.repeat(BAT.AMMO - (b.ammo[c.id] || 0))}</span><i class="cd" id="cd${k}" style="height:0"></i></button>`).join('')}</div>` : '<p class="m sm">Sin munición preparada: todo depende de lo que construyas.</p>') + (b.crit ? '<p class="m sm">Lanza cuando el anillo dorado toca la amenaza: CRÍTICO ×1,5.</p>' : '');
+    analysis(); return;
+  }
   if (MIS && MIS.ch) {
     const c = DB.comp[MIS.p.id], cnt = D.countOf(toGraph()), rv = CH.rival;
     box.innerHTML = `<div class="pag">${{ daily: '🔥 Reto diario', duel: '⚔ Duelo LAN', async: '⚔ Duelo Bluetooth' }[CH.kind]} · ${CH.idx + 1}/${CH.list.length}</div><div class="mt">${esc(c.name)}</div><div class="obj"><b>${fHTML(c.f)}</b></div><div class="chk">${Object.keys(c.cnt).map(e => `<span class="${(cnt[e] || 0) === c.cnt[e] ? 'ok' : (cnt[e] || 0) > c.cnt[e] ? 'bad' : ''}">${e} ${cnt[e] || 0}/${c.cnt[e]}</span>`).join('')}</div><div class="tbar"><i style="width:${CH.idx * 20}%;background:var(--grn)"></i></div>${rv ? `<div class="m sm">Rival ${esc(rv.name || '')}: ${rv.done ? '✓ ' + fmtT(rv.el) : (rv.idx || 0) + '/5'}</div><div class="tbar"><i style="width:${(rv.done ? 5 : rv.idx || 0) * 20}%;background:var(--mag)"></i></div>` : ''}<div class="row"><span class="tm" id="mT">${fmtT(CH.el + CH.skips * 30)}</span><button class="btn gh sm" data-act="chskip">Saltar +30 s</button><button class="btn gh sm" data-act="chquit">Rendirse</button></div>`;
@@ -2193,7 +2294,7 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
   if (BT && /^[1-4]$/.test(e.key)) { throwCard(+e.key - 1); return; }
-  if (TAB !== 'lab' || Lab.mode !== 'mol' || !$('#ov').hidden || BT) return;
+  if (TAB !== 'lab' || Lab.mode !== 'mol' || !$('#ov').hidden) return;
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); }
   else if (e.key === 'Enter') synth();
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
@@ -2214,7 +2315,7 @@ function frame(t) {
   const dt = Math.min(.1, (t - (last || t)) / 1000); last = t;
   if (!TEST) tick(dt);
   if (MUS.ctx) { const mm = BT ? 'battle' : SO ? 'sort' : document.getElementById('cover') || document.getElementById('story') ? 'menu' : 'lab'; if (mm !== MUS.mode) MUS.mode = mm; }
-  if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
+  if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null || t / 1000 < Lab.animT || BT)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
   requestAnimationFrame(frame);
 }
 
@@ -2226,14 +2327,14 @@ function boot() {
   <nav id="nav"><button data-act="tab" data-arg="lab"><i>⚗</i>Lab</button><button data-act="tab" data-arg="fr"><i>⚱</i>Frascos</button><button data-act="tab" data-arg="bt"><i>☣</i>Batalla</button><button data-act="tab" data-arg="tx"><i>▶</i>Videos</button></nav>
   <main id="stage">
    <div class="tab" id="t-lab"><div class="lmode"><button data-act="mode" data-arg="mol" class="on">⚛ Moléculas</button><button data-act="mode" data-arg="react">⇄ Reactor</button><button data-act="mode" data-arg="forge">☢ Forja</button></div>
-    <div class="pane" id="molPane"><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Sintetizar</button></div><div id="tray"></div></div>
+    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Sintetizar</button></div><div id="tray"></div></div>
     <div class="pane" id="reactPane" hidden></div><div class="pane" id="forgePane" hidden></div></div>
    <div class="tab" id="t-fr"><div class="filt">${[['all', 'Todos'], ['el', 'Elementos'], ['mol', 'Compuestos'], ['med', 'Bio y fármacos'], ['poly', 'Polímeros'], ['hyb', 'Híbridos'], ['org', 'Organismos'], ['tab', 'Tabla periódica']].map(([k, t]) => `<button data-act="filt" data-arg="${k}">${t}</button>`).join('')}</div><div class="scroll" id="frBody"></div></div>
    <div class="tab" id="t-bt"><div class="lvls" id="lvls"></div><div class="scroll" id="mapBody"></div></div>
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="battle" hidden></div><div id="sortOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
@@ -2429,18 +2530,25 @@ function pool(els, L, made) {
   if (L >= 8) for (const id in DB.poly) if (DB.poly[id].ms.every(m => S.fr[m])) S.fr[id] = 1;
   return D.allCards(S);
 }
+const launchable = c => c.kind === 'mol' || c.kind === 'poly' || (c.kind === 'el' && !['nonm', 'hal'].includes(D.catOf(D.SYM[c.f] || 1)));
+const buildT = c => c.kind === 'el' ? BAT.build(1, 0) : c.kind === 'poly' ? BAT.build(3, 0) : BAT.build(c.heavy || 1, c.hasH);
+/* simulación voraz de la batalla "síntesis bajo presión": munición primero, luego construir lo más rentable */
 function simBattle(p, cards, L) {
-  const ph = [BAT.phaseOf(p, 1), p.ph2 ? BAT.phaseOf(p, 2) : null], rg = (DIFF[L - 1].rg || 0) * (p.boss ? 1.5 : 1);
-  let t = 0;
-  for (let k = 0; k < (p.ph2 ? 2 : 1); k++) {
-    const hp = p.ph2 ? p.hp / 2 : p.hp;
-    const best = cards.map(c => ({ c, d: BAT.eff(c, ph[k]) * 2 * c.pow })).filter(x => x.d > 0).sort((a, b) => b.d - a.d).slice(0, 2);
-    if (!best.length) return { ok: false, why: 'sin cartas efectivas en fase ' + (k + 1) };
-    const dps = best.reduce((s, x) => s + x.d, 0) / BAT.CD - rg; if (dps <= 0) return { ok: false, why: 'la propagación supera al daño' };
-    t += hp / dps;
+  const ph = [BAT.phaseOf(p, 1), p.ph2 ? BAT.phaseOf(p, 2) : null], rg = (DIFF[L - 1].rg || 0) * (p.boss ? 1.5 : 1), uses = {};
+  let t = 0, hp = p.hp, k = 0;
+  const ammo = cards.map(c => ({ c, e: BAT.eff(c, ph[0]) })).filter(x => x.e > 0).sort((a, b) => b.e * b.c.pow - a.e * a.c.pow).slice(0, 2);
+  if (ammo.length) { hp -= ammo.reduce((s, x) => s + BAT.AMMO * x.e * BAT.AMMO_MUL * x.c.pow, 0); t += BAT.AMMO * BAT.CD; hp += rg * t; }
+  if (p.ph2 && hp <= p.hp / 2) k = 1;
+  const syn = cards.filter(launchable);
+  for (let g = 0; hp > 0 && t < p.T * 2 && g < 400; g++) {
+    let best = null, bv = 0;
+    for (const c of syn) { const e = BAT.eff(c, ph[k]); if (e <= 0) continue; const bt = buildT(c), f = BAT.fatigue(uses[c.id]), v = e * BAT.SYN * BAT.cpow(c) * f / bt; if (v > bv) { bv = v; best = { c, e, bt, f }; } }
+    if (!best) return { ok: false, why: 'nada que construir sirve en la fase ' + (k + 1), t, loss: 0 };
+    t += best.bt; hp += rg * best.bt; hp -= best.e * BAT.SYN * BAT.cpow(best.c) * best.f; uses[best.c.id] = (uses[best.c.id] || 0) + 1;
+    if (p.ph2 && k === 0 && hp <= p.hp / 2) k = 1;
   }
   const loss = p.dps * t + Math.floor(t / 5) * p.dps * 2;
-  return { ok: t <= p.T * 0.75 && loss <= 85, t, loss };
+  return { ok: hp <= 0 && t <= p.T * 0.85 && loss <= 85, t, loss };
 }
 function selfTest() {
   const E = [], W = [];
@@ -2522,8 +2630,30 @@ function guided(U, out) { // sigue la guía de la UI sin conocer la molécula
     else return;
   }
 }
+function fight(U, S, out) { // batalla: munición primero; luego construir y lanzar (guía en niveles guiados)
+  for (let s = 0; s < 500 && U.BT(); s++) {
+    const b = U.BT().b;
+    b.deck.forEach((c, q) => { if (U.BT() && BAT.eff(c, b.ph) > 0 && b.ammo[c.id] > 0) U.throwCard(q); });
+    if (!U.BT()) break;
+    if (U.Lab.ghost) { // sigue el plano sugerido, como un niño
+      const st = U.guideStep(); if (!st) { U.tick(.3); continue; }
+      if (st.k === 'place') U.spawn(st.el); else if (st.k === 'bond') U.tapBond(st.bond); else if (st.k === 'link') { U.Lab.sel = st.a; U.tapAtom(st.b); } else if (st.k === 'autoH') U.autoH(); else if (st.k === 'synth') { U.synth(); out.launches++; }
+      U.tick(.35); continue;
+    }
+    const els = new Set(U.labEls()), cand = [];
+    for (const id in DB.comp) if (!DB.comp[id].s2 && Object.keys(DB.comp[id].cnt).every(e => els.has(e))) cand.push(D.cardFromId(S, id));
+    Object.keys(S.el).forEach(x => { if (S.el[x] === 1 && els.has(x)) { const c = D.cardFromId(S, 'el:' + x); if (launchable(c) && Object.keys(c.tags).length) cand.push(c); } });
+    if (S.unl >= 8) for (const id in DB.poly) if (DB.poly[id].ms.every(m => S.fr[m])) cand.push(D.cardFromId(S, id));
+    let best = null, bv = 0;
+    cand.forEach(c => { const e = BAT.eff(c, b.ph); if (e <= 0) return; const v = e * BAT.cpow(c) * BAT.fatigue(b.uses[c.id]) / buildT(c); if (v > bv) { bv = v; best = c; } });
+    if (!best) { U.tick(1); continue; }
+    U.clearLab(true);
+    if (best.kind === 'el') U.spawn(best.f); else if (best.kind === 'poly') { U.Lab.sel = null; const ms = DB.poly[best.id].ms; for (let q = 0; q < Math.max(3, ms.length * 2); q++) U.spawnMono(ms[q % ms.length]); } else U.buildSmiles(DB.comp[best.id].smiles[0]);
+    U.synth(); out.launches++; U.tick(buildT(best));
+  }
+}
 function solver() {
-  const U = D.ui, keep = JSON.stringify(U.state()), out = { solved: 0, failed: [], farm: 0, guided: 0 };
+  const U = D.ui, keep = JSON.stringify(U.state()), out = { solved: 0, failed: [], farm: 0, guided: 0, launches: 0 };
   U.quiet(true);
   try {
     const S0 = D.newState(); S0.intro = 1; U.setState(S0); U.clearLab(true);
@@ -2536,7 +2666,7 @@ function solver() {
             prep(U, S, p); U.startProblem(L.n, i); const cards = D.allCards(S);
             const score = c => Math.max(BAT.eff(c, BAT.phaseOf(p, 1)), p.ph2 ? BAT.eff(c, BAT.phaseOf(p, 2)) : 0) * c.pow;
             U.startBattle(L.n, i, cards.sort((a, b) => score(b) - score(a)).slice(0, 4).map(c => c.id));
-            for (let s = 0; s < 3000 && U.BT(); s++) { const b = U.BT().b; b.deck.forEach((c, q) => { if (U.BT() && BAT.eff(c, b.ph) > 0) U.throwCard(q); }); U.tick(0.1); }
+            fight(U, S, out);
           } else if (p.k === 's') {
             U.startProblem(L.n, i); const so = U.SO(); if (!so) throw new Error('no abrió la destilación');
             so.sol.forEach(([a, b]) => { U.sortTap(a); U.sortTap(b); });
@@ -2636,7 +2766,7 @@ function monkey(n, seed) {
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }
   return { games: n, actions, errors };
 }
-DE.test = { selfTest, solver, monkey, simBattle };
+DE.test = { selfTest, solver, monkey, simBattle, launchable, buildT };
 })();
 
 </script>

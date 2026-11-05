@@ -317,18 +317,21 @@ const NUC = {
 
 /* ---------- batalla ---------- */
 const BAT = {
-  CD: 1.2, COMBO_T: 2.5,
+  CD: 1.2, COMBO_T: 6, AMMO: 2, AMMO_MUL: 1.5, SYN: 5,
   eff(card, ph) {
     if (ph.hx && ph.hx.includes(card.id.replace(/^el:/, ''))) return -6;
     let e = 0; for (const t in card.tags) e += card.tags[t] * ((ph.w[t] || 0) - (ph.h[t] || 0)); return e;
   },
   mult: combo => Math.min(2, 1 + 0.2 * Math.max(0, combo - 1)),
+  fatigue: n => Math.max(0.35, 1 - 0.15 * (n || 0)),          // la amenaza se vuelve resistente a lo que repites
+  build: (heavy, h) => 1.2 + 0.5 * heavy + (h ? 0.8 : 0),      // segundos estimados para construir (validador y bot)
+  cpow: c => (1 + Math.min(1.5, (c.heavy || 1) / 8)) * (c.kind === 'hyb' ? 0.85 : 1), // complejidad: lo difícil de armar pega más
   phaseOf(p, n) { const q = n === 2 && p.ph2 ? p.ph2 : p; return { d: q.d, w: parseTags(q.w), h: parseTags(q.h), hx: (q.hx || '').split(',').filter(Boolean) }; },
   WIN: 1.6, WIN_ON: .34,
   inWin: b => !!b.crit && (b.cyc % BAT.WIN) < BAT.WIN_ON,
   create(p, deck, diff) {
-    diff = diff || {};
-    return { p, deck, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
+    diff = diff || {}; const ammo = {}; deck.forEach(c => ammo[c.id] = BAT.AMMO);
+    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
   },
   step(b, dt) {
     if (b.over) return;
@@ -338,17 +341,22 @@ const BAT = {
     b.spikeT -= dt; if (b.spikeT <= 0) { b.spikeT = 5; b.integ -= b.p.dps * 2; b.ev.push({ k: 'spike' }); }
     if (b.integ <= 0 || b.t <= 0) { b.integ = Math.max(0, b.integ); b.over = true; b.win = false; b.why = b.integ <= 0 ? 'La integridad de la nave llegó a 0 %.' : 'Se acabó el tiempo.'; }
   },
-  throw(b, card) {
-    if (b.over || (b.cd[card.id] || 0) > 0) return null;
-    b.cd[card.id] = BAT.CD;
-    const e = BAT.eff(card, b.ph); let dmg, kind;
-    const crit = e > 0 && BAT.inWin(b);
-    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * 2 * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1)); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
-    else if (e < 0) { b.combo = 0; dmg = Math.round(-e * 2 * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
+  hit(b, card, mul, f) {
+    const e = BAT.eff(card, b.ph), crit = e > 0 && BAT.inWin(b); let dmg, kind; f = f == null ? 1 : f;
+    if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * mul * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1) * f); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
+    else if (e < 0) { b.combo = 0; dmg = Math.round(-e * mul * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
     else { b.combo = 0; dmg = 1; b.hp -= 1; kind = 'none'; }
     if (b.phase === 1 && b.p.ph2 && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
     if (b.hp <= 0) { b.hp = 0; b.over = true; b.win = true; b.stars = b.integ >= 70 ? 3 : b.integ >= 40 ? 2 : 1; }
-    return { e, dmg, kind, crit };
+    return { e, dmg, kind, crit, f };
+  },
+  throw(b, card) { // munición preparada (cartas de los frascos): 3 tiros por carta
+    if (b.over || (b.cd[card.id] || 0) > 0 || !(b.ammo[card.id] > 0)) return null;
+    b.cd[card.id] = BAT.CD; b.ammo[card.id]--; return BAT.hit(b, card, BAT.AMMO_MUL);
+  },
+  launch(b, card) { // sustancia sintetizada en vivo durante la batalla: mucho más fuerte
+    if (b.over) return null; const f = BAT.fatigue(b.uses[card.id]); b.uses[card.id] = (b.uses[card.id] || 0) + 1; b.launches++;
+    return BAT.hit(b, Object.assign({}, card, { pow: BAT.cpow(card) }), BAT.SYN, f);
   }
 };
 function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.kind === 'hyb' ? 0.9 : 1 + Math.min(0.5, (c.atoms || 2) / 40); }
@@ -380,9 +388,9 @@ function labElements(S) {
 }
 function cardFromId(S, id) {
   if (id.startsWith('el:')) { const s = id.slice(3), z = SYM[s] || 126, e = elem(z); const tg = parseTags(ELTAGS[s === 'Ubh' ? 'Ubh' : s] || ''); return { id, kind: 'el', name: z === 126 && S.eternio ? 'Eternio' : e.name, f: s, tags: tg, pow: 1 }; }
-  if (DB.poly[id]) { const p = DB.poly[id]; return { id, kind: 'poly', name: p.name, f: '(' + p.ms.map(m => DB.comp[m].f).join('/') + ')n', tags: p.tags, pow: 1.6 }; }
-  if (DB.comp[id]) { const c = DB.comp[id]; const k = { id, kind: 'mol', name: c.name, f: c.f, tags: c.tags, atoms: c.atoms }; k.pow = cardPow(k); return k; }
-  if (S.hyb[id]) { const h = S.hyb[id]; return { id, kind: 'hyb', name: h.name, f: h.f, tags: h.tags, pow: 0.9 }; }
+  if (DB.poly[id]) { const p = DB.poly[id]; return { id, kind: 'poly', name: p.name, f: '(' + p.ms.map(m => DB.comp[m].f).join('/') + ')n', tags: p.tags, pow: 1.6, heavy: 6, blocks: 3 }; }
+  if (DB.comp[id]) { const c = DB.comp[id]; const k = { id, kind: 'mol', name: c.name, f: c.f, tags: c.tags, atoms: c.atoms, heavy: c.atoms - (c.cnt.H || 0), hasH: !!c.cnt.H }; k.pow = cardPow(k); return k; }
+  if (S.hyb[id]) { const h = S.hyb[id]; const cn = h.cnt || {}; return { id, kind: 'hyb', name: h.name, f: h.f, tags: h.tags, pow: 0.9, heavy: Math.max(1, Object.keys(cn).reduce((s, e) => s + (e === 'H' ? 0 : cn[e]), 0)), hasH: !!cn.H }; }
   return null;
 }
 function allCards(S) {

@@ -4,7 +4,7 @@
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '1.2.0',
+  VERSION: '1.3.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -234,11 +234,11 @@ const LEVELS = [
    {k:'r',id:'R_H2O',t:'La explosión controlada',d:'Abre el REACTOR. Pon H₂ y O₂: ÉTER balancea la ecuación 2H₂ + O₂ → 2H₂O. Pulsa REACCIONAR. Esta vez, a propósito.',T:120},
    {k:'m',id:'H2O',t:'Agua a mano',d:'Ahora construye el agua átomo por átomo: un oxígeno en el centro y un hidrógeno en cada mano.',T:120},
    {k:'f',z:1,a:2,t:'Deuterio',d:'Abre la FORJA. Un protón y un neutrón, unidos por la fuerza nuclear fuerte, forman deuterio: hidrógeno pesado.',r:'p+n',T:120},
-   {k:'b',t:'Sed del invernadero',d:'Las plantas de la bodega 3 se marchitan. La humedad cayó al 4 %. Lanza la carta correcta tocándola.',sc:'Humedad 4 % · tierra agrietada · hojas sin agua',w:'solv3',h:'',hp:70,T:40,dps:1.2},
+   {k:'b',t:'Sed del invernadero',d:'Las plantas de la bodega 3 se marchitan. La humedad cayó al 4 %. Construye agua en el laboratorio y pulsa ⚗ LANZAR.',sc:'Humedad 4 % · tierra agrietada · hojas sin agua',w:'solv3',h:'',hp:40,T:60,dps:0.9},
    {k:'f',z:2,a:4,t:'Helio: el gas del Sol',d:'En el núcleo del Sol el hidrógeno se fusiona en helio. Une dos deuterios en la forja.',r:'D+D',T:120},
    {k:'s',n:2,mix:['H2O','H2O2'],t:'Decantación',d:'Una fuga mezcló agua y agua oxigenada en los tubos. Toca un tubo y luego otro para verter: deja cada líquido solo en su tubo.',T:120},
-   {k:'b',t:'Fuego en el ducto',d:'Una chispa encendió una fuga de hidrógeno. La llama es casi invisible.',sc:'Llama de 2000 °C · combustible H₂ · alimentada por O₂',w:'inert3,cool1',h:'oxi2,fuel2',hp:90,T:40,dps:1.2},
-   {k:'b',boss:1,t:'Fuga del reactor de plasma',d:'El reactor de fusión pierde contención: el plasma se derrama por el pasillo.',sc:'Plasma a un millón de grados · campo magnético inestable',w:'cool2,inert2',h:'fuel2,oxi1',hp:260,T:60,dps:1.5,ph2:{d:'El plasma se condensa en vapor sobrecalentado',w:'cool3',h:'fuel1'}}
+   {k:'b',t:'Fuego en el ducto',d:'Una chispa encendió una fuga de hidrógeno. La llama es casi invisible.',sc:'Llama de 2000 °C · combustible H₂ · alimentada por O₂',w:'inert3,cool1',h:'oxi2,fuel2',hp:50,T:60,dps:0.9},
+   {k:'b',boss:1,t:'Fuga del reactor de plasma',d:'El reactor de fusión pierde contención: el plasma se derrama por el pasillo.',sc:'Plasma a un millón de grados · campo magnético inestable',w:'cool2,inert2',h:'fuel2,oxi1',hp:160,T:90,dps:1.1,ph2:{d:'El plasma se condensa en vapor sobrecalentado',w:'cool3',h:'fuel1'}}
   ]},
 { n:2, t:'AIRE', s:'Litio, carbono y nitrógeno', gift:[],
   talk:[['eter','neutral','El aire de una nave no es gratis. Hay que forjarlo… y respirarlo.'],['doc','loco','¡Forjaré carbono como una estrella! ¿Cómo lo hacen ellas?'],['eter','feliz','Tres helios a la vez. Las estrellas también usan recetas.']],
@@ -252,10 +252,10 @@ const LEVELS = [
    {k:'m',id:'N2',t:'Triple enlace',d:'El nitrógeno tiene tres manos. Une dos y toca el enlace hasta volverlo triple: N≡N.',T:120},
    {k:'m',id:'CO2',t:'Aliento de la nave',d:'Un carbono en el centro y un oxígeno a cada lado, con dobles enlaces: O=C=O.',T:120},
    {k:'r',id:'R_HABER',t:'Pan del aire',d:'Reactor: nitrógeno + hidrógeno → amoníaco (N₂ + 3H₂ → 2NH₃). Lo que alimenta a medio planeta.',T:120},
-   {k:'b',t:'Aire viciado',d:'Los purificadores fallan. El CO₂ de la cabina sube al 5 % y te duele la cabeza.',sc:'CO₂ al 5 % · gas de carácter ácido · el Apolo 13 vivió esto',w:'base3',h:'',hp:130,T:45,dps:1.3},
+   {k:'b',t:'Aire viciado',d:'Los purificadores fallan. El CO₂ de la cabina sube al 5 % y te duele la cabeza.',sc:'CO₂ al 5 % · gas de carácter ácido · el Apolo 13 vivió esto',w:'base3',h:'',hp:80,T:60,dps:1.0},
    {k:'m',id:'CH4',t:'Metano',d:'Un carbono con cuatro manos. Colócalo y usa ⚡H para llenar las manos con hidrógeno.',T:120},
    {k:'s',n:3,mix:['N2','CO2','O2'],t:'Destilación del aire',d:'El aire licuado se separa por temperatura de ebullición. Ordena los tres gases licuados.',T:120},
-   {k:'b',boss:1,t:'Incendio en los cultivos',d:'Las lámparas de cultivo encendieron la paja seca. El fuego se come el oxígeno de la nave.',sc:'Fuego clase A · 900 °C · consume O₂',w:'inert3,cool1',h:'oxi3,fuel2',hp:320,T:60,dps:1.6,ph2:{d:'Brasas: el fuego se esconde bajo la ceniza',w:'cool3,solv1',h:'oxi2'}}
+   {k:'b',boss:1,t:'Incendio en los cultivos',d:'Las lámparas de cultivo encendieron la paja seca. El fuego se come el oxígeno de la nave.',sc:'Fuego clase A · 900 °C · consume O₂',w:'inert3,cool1',h:'oxi3,fuel2',hp:190,T:90,dps:1.2,ph2:{d:'Brasas: el fuego se esconde bajo la ceniza',w:'cool3,solv1',h:'oxi2'}}
   ]},
 { n:3, t:'CARBONO', s:'Cuatro manos para construir la vida', gift:[],
   talk:[['eter','neutral','Desde aquí el plano ya no muestra los hidrógenos. Coloca el esqueleto y completa con ⚡H.'],['doc','feliz','Esqueleto primero, piel después. Como un dinosaurio.'],['eter','enojado','Y desde ahora el tiempo cuenta de verdad.']],
@@ -268,11 +268,11 @@ const LEVELS = [
    {k:'f',z:10,t:'Luces de neón',d:'Carbono-12 más dos helio-4: el neón que iluminará los pasillos.',r:'C12+He4+He4',T:110},
    {k:'r',id:'R_CH4',t:'La llama azul',d:'Quema metano en el reactor: CH₄ + 2O₂ → CO₂ + 2H₂O. Energía para la nave.',T:110},
    {k:'m',id:'C2H5OH',t:'Etanol',d:'Etano con un grupo –OH en un extremo: un alcohol.',T:110},
-   {k:'b',t:'Bacterias en el agua',d:'El tanque de agua potable huele mal: flotan colonias de bacterias.',sc:'Bacterias · 10⁸ por mL · se alimentan de nutrientes',w:'anti3',h:'bio2',hp:170,T:45,dps:1.4},
+   {k:'b',t:'Bacterias en el agua',d:'El tanque de agua potable huele mal: flotan colonias de bacterias.',sc:'Bacterias · 10⁸ por mL · se alimentan de nutrientes',w:'anti3',h:'bio2',hp:100,T:60,dps:1.0},
    {k:'r',id:'R_VIN',t:'Del vino al vinagre',d:'Oxida el etanol en el reactor para obtener ácido acético.',T:110},
    {k:'m',id:'C6H6',t:'El sueño de Kekulé',d:'Seis carbonos en anillo con enlaces simples y dobles alternados. Arrastra el último carbono sobre el primero para cerrar el anillo.',T:150},
-   {k:'b',t:'Grasa en los motores',d:'Los rotores están cubiertos de grasa espesa; el agua resbala sin limpiar.',sc:'Grasa apolar · insoluble en agua',w:'org3',h:'',hx:'H2O',hp:190,T:45,dps:1.4},
-   {k:'b',boss:1,t:'La Mancha',d:'Una biopelícula viscosa crece en los conductos y bloquea el aire.',sc:'Biopelícula · capa grasa protectora · bacterias dentro',w:'org2,anti1',h:'bio2,solv1',hp:380,T:60,dps:1.7,ph2:{d:'Sin la grasa, las bacterias quedan expuestas',w:'anti3',h:'bio2'}}
+   {k:'b',t:'Grasa en los motores',d:'Los rotores están cubiertos de grasa espesa; el agua resbala sin limpiar.',sc:'Grasa apolar · insoluble en agua',w:'org3',h:'',hx:'H2O',hp:110,T:60,dps:1.0},
+   {k:'b',boss:1,t:'La Mancha',d:'Una biopelícula viscosa crece en los conductos y bloquea el aire.',sc:'Biopelícula · capa grasa protectora · bacterias dentro',w:'org2,anti1',h:'bio2,solv1',hp:230,T:90,dps:1.3,ph2:{d:'Sin la grasa, las bacterias quedan expuestas',w:'anti3',h:'bio2'}}
   ]},
 { n:4, t:'SAL Y ÁCIDO', s:'Neutralizar es sobrevivir', gift:[],
   talk:[['doc','sorpresa','Derramé ácido sobre la consola. ¿Eso es malo?'],['eter','enojado','Muy malo. Ácido + base = sal + agua. Aprende a neutralizar antes de que me derritas.']],
@@ -285,11 +285,11 @@ const LEVELS = [
    {k:'f',z:17,t:'Cloro',d:'Neón + nitrógeno + un neutrón: 17 protones, masa 35. Usa el FLUJO DE NEUTRONES (+n).',r:'Ne20+N14+1n',T:120},
    {k:'m',id:'HCl',t:'Ácido clorhídrico',d:'Un hidrógeno y un cloro: el ácido de tu estómago.',T:100},
    {k:'m',id:'NaOH',t:'Soda cáustica',d:'Sodio, oxígeno e hidrógeno en cadena: Na–O–H.',T:100},
-   {k:'b',t:'Derrame de ácido',d:'Un bidón de ácido clorhídrico se rompió en la bodega de carga.',sc:'pH 0,5 · líquido corrosivo · vapores',w:'base3',h:'acid2',hp:210,T:45,dps:1.5},
+   {k:'b',t:'Derrame de ácido',d:'Un bidón de ácido clorhídrico se rompió en la bodega de carga.',sc:'pH 0,5 · líquido corrosivo · vapores',w:'base3',h:'acid2',hp:130,T:60,dps:1.1},
    {k:'r',id:'R_NEUT',t:'Ácido + base = sal',d:'Reactor: HCl + NaOH → NaCl + H₂O. La neutralización perfecta.',T:100},
    {k:'s',n:4,mix:['HCl','NaOH','NaCl','H2O'],t:'Laboratorio desordenado',d:'Cuatro soluciones mezcladas en los tubos. Sepáralas antes de que reaccionen.',T:130},
    {k:'r',id:'R_LEJ',t:'Lejía',d:'Necesitas Cl₂ y NaOH en tus frascos (construye el Cl₂ en el laboratorio). Cl₂ + 2NaOH → NaClO + NaCl + H₂O.',T:130},
-   {k:'b',boss:1,t:'Floración de algas tóxicas',d:'El tanque de reciclaje se volvió verde: las algas liberan toxinas.',sc:'Cianobacterias · fotosíntesis activa · toxinas',w:'anti3,oxi1',h:'bio2,salt1',hp:440,T:60,dps:1.8,ph2:{d:'Las algas muertas consumen el oxígeno del agua',w:'oxi3',h:'bio1'}}
+   {k:'b',boss:1,t:'Floración de algas tóxicas',d:'El tanque de reciclaje se volvió verde: las algas liberan toxinas.',sc:'Cianobacterias · fotosíntesis activa · toxinas',w:'anti3,oxi1',h:'bio2,salt1',hp:260,T:90,dps:1.4,ph2:{d:'Las algas muertas consumen el oxígeno del agua',w:'oxi3',h:'bio1'}}
   ]},
 { n:5, t:'FORJA ESTELAR', s:'La escalera alfa: del magnesio al calcio', gift:[],
   talk:[['eter','neutral','Se acabaron los planos. Solo verás la lista de átomos. Y las ecuaciones… las balanceas tú.'],['doc','loco','¡Por fin sin rueditas!'],['eter','enojado','⚡H ahora cuesta energía. Úsalo con cabeza.']],
@@ -302,11 +302,11 @@ const LEVELS = [
    {k:'f',z:18,t:'Argón',d:'Azufre-32 + helio-4.',r:'S32+He4',T:100},
    {k:'f',z:20,t:'Calcio',d:'Argón-36 + helio-4: el último peldaño fácil de la escalera.',r:'Ar36+He4',T:100},
    {k:'m',id:'SiO2',t:'Vidrio',d:'El silicio tiene cuatro manos: dos dobles enlaces con oxígeno.',T:100},
-   {k:'b',t:'Grieta en la cúpula',d:'Un micrometeorito agrietó la cúpula de observación.',sc:'Fisura de 40 cm · pérdida lenta de presión',w:'struct3,seal1',h:'',hp:250,T:45,dps:1.6},
+   {k:'b',t:'Grieta en la cúpula',d:'Un micrometeorito agrietó la cúpula de observación.',sc:'Fisura de 40 cm · pérdida lenta de presión',w:'struct3,seal1',h:'',hp:150,T:60,dps:1.2},
    {k:'r',id:'R_SO3',t:'Proceso de contacto',d:'Construye SO₂ y quémalo con O₂: 2SO₂ + O₂ → 2SO₃. Balancea tú los coeficientes.',T:130},
    {k:'r',id:'R_H2SO4',t:'Ácido sulfúrico',d:'SO₃ + H₂O → H₂SO₄. El químico más producido del mundo.',T:110},
-   {k:'b',t:'Lluvia ácida en Tessar-4',d:'Aterrizas en un planeta cuyos lagos murieron por la lluvia ácida.',sc:'pH 4,2 · sulfatos · peces muertos',w:'base3',h:'acid2',hp:270,T:45,dps:1.6},
-   {k:'b',boss:1,t:'Incendio de magnesio',d:'Virutas de magnesio de la forja se encendieron: 3000 °C de luz blanca.',sc:'Fuego clase D · reacciona con agua, CO₂ y N₂',w:'inert2,salt2,struct1',h:'solv2,oxi2',hx:'CO2,N2,H2O',hp:500,T:60,dps:1.9,ph2:{d:'El metal fundido se esparce por el suelo',w:'struct2,inert2',h:'solv2',hx:'CO2,N2,H2O'}}
+   {k:'b',t:'Lluvia ácida en Tessar-4',d:'Aterrizas en un planeta cuyos lagos murieron por la lluvia ácida.',sc:'pH 4,2 · sulfatos · peces muertos',w:'base3',h:'acid2',hp:160,T:60,dps:1.2},
+   {k:'b',boss:1,t:'Incendio de magnesio',d:'Virutas de magnesio de la forja se encendieron: 3000 °C de luz blanca.',sc:'Fuego clase D · reacciona con agua, CO₂ y N₂',w:'inert2,salt2,struct1',h:'solv2,oxi2',hx:'CO2,N2,H2O',hp:300,T:90,dps:1.4,ph2:{d:'El metal fundido se esparce por el suelo',w:'struct2,inert2',h:'solv2',hx:'CO2,N2,H2O'}}
   ]},
 { n:6, t:'HIERRO', s:'El final de la estrella', gift:[],
   talk:[['eter','triste','Hasta el hierro, la fusión regala energía. Más allá, la cobra.'],['doc','loco','Entonces robaré energía de otra parte. ¡Termita!'],['eter','sorpresa','Por una vez, una idea química sensata.']],
@@ -318,12 +318,12 @@ const LEVELS = [
    {k:'f',z:29,t:'Cobre',d:'Hierro-56 + litio-7.',r:'Fe56+Li7',T:110},
    {k:'f',z:13,t:'Aluminio',d:'Magnesio-24 + deuterio + neutrón: 12 + 1 = 13 protones, masa 27.',r:'Mg24+D+n',T:110},
    {k:'r',id:'R_FE',t:'Herrumbre',d:'Hierro puro + oxígeno → óxido de hierro. Balancea: ¿cuántos Fe y O₂ por cada Fe₂O₃?',T:120},
-   {k:'b',t:'Cable fundido',d:'Un cortocircuito fundió el cable principal del puente de mando.',sc:'Circuito abierto · 0 amperios · falta un conductor',w:'cond3',h:'solv1',hp:300,T:45,dps:1.7},
+   {k:'b',t:'Cable fundido',d:'Un cortocircuito fundió el cable principal del puente de mando.',sc:'Circuito abierto · 0 amperios · falta un conductor',w:'cond3',h:'solv1',hp:180,T:60,dps:1.3},
    {k:'r',id:'R_TERM',t:'Termita',d:'Óxido de hierro + aluminio → alúmina + hierro fundido. Suelda el casco a 2500 °C.',T:120},
    {k:'m',id:'Fe3O4',t:'Brújula natural',d:'Tres hierros y cuatro oxígenos: el hierro del centro usa valencia 2 y los extremos, 3.',T:130},
    {k:'s',n:5,mix:['Fe2O3','CuSO4','Al2O3','FeCl3','CuO'],t:'Lixiviación',d:'Minerales disueltos en los tanques de la forja. Separa cada metal en su tubo.',T:140},
    {k:'r',id:'R_CUSO4',t:'Cristales azules',d:'Construye CuO y disuélvelo en ácido sulfúrico: CuO + H₂SO₄ → CuSO₄ + H₂O.',T:130},
-   {k:'b',boss:1,t:'Biocorrosión del reactor',d:'Bacterias que comen hierro perforan las tuberías del reactor y se propagan.',sc:'Bacterias reductoras de sulfato · biopelícula sobre metal',w:'anti3',h:'bio2',hp:560,T:60,dps:2,ph2:{d:'Las tuberías se debilitan',w:'struct3,seal1',h:'acid2'}}
+   {k:'b',boss:1,t:'Biocorrosión del reactor',d:'Bacterias que comen hierro perforan las tuberías del reactor y se propagan.',sc:'Bacterias reductoras de sulfato · biopelícula sobre metal',w:'anti3',h:'bio2',hp:340,T:90,dps:1.5,ph2:{d:'Las tuberías se debilitan',w:'struct3,seal1',h:'acid2'}}
   ]},
 { n:7, t:'MONÓMEROS', s:'Moléculas con un doble enlace listo para abrirse', gift:[],
   talk:[['eter','neutral','Un monómero es una promesa: un doble enlace esperando abrirse y unirse al siguiente.'],['doc','feliz','Como yo esperando el almuerzo.'],['eter','enojado','Las amenazas ahora se propagan. No te duermas.']],
@@ -336,11 +336,11 @@ const LEVELS = [
    {k:'r',id:'R_VC',t:'Cloruro de vinilo',d:'Acetileno + ácido clorhídrico: la ruta histórica del PVC.',T:110},
    {k:'m',id:'C3H6',t:'Propileno',d:'Un doble enlace C=C con un metilo (–CH₃) al lado.',T:110},
    {k:'m',id:'C8H8',t:'Estireno',d:'Un vinilo (CH=CH₂) pegado a un anillo de benceno. Será el poliestireno.',T:160},
-   {k:'b',t:'Fuga de refrigerante',d:'El circuito de enfriamiento del reactor gotea. La temperatura sube 2 °C por segundo.',sc:'Reactor a 380 °C · subiendo · hay que extraer calor',w:'cool3',h:'fuel1',hp:340,T:45,dps:1.8},
+   {k:'b',t:'Fuga de refrigerante',d:'El circuito de enfriamiento del reactor gotea. La temperatura sube 2 °C por segundo.',sc:'Reactor a 380 °C · subiendo · hay que extraer calor',w:'cool3',h:'fuel1',hp:200,T:60,dps:1.4},
    {k:'r',id:'R_R22',t:'Freón R-22',d:'Construye cloroformo (CHCl₃) y ácido fluorhídrico (HF). Mézclalos y balancea.',T:150},
    {k:'r',id:'R_TFE',t:'Nace el teflón',d:'Calienta el R-22: 2CHClF₂ → C₂F₄ + 2HCl.',T:120},
    {k:'m',id:'C4H6',t:'Butadieno',d:'Cuatro carbonos con dos dobles enlaces: C=C–C=C.',T:110},
-   {k:'b',boss:1,t:'Ácido fluorhídrico',d:'Un tanque de HF se fisura y empieza a disolver las ventanas.',sc:'HF · disuelve el vidrio · atraviesa la piel',w:'base2,struct1',h:'acid2',hx:'SiO2',hp:600,T:60,dps:2.1,ph2:{d:'El HF se evapora en una nube tóxica',w:'base3',h:'acid1'}}
+   {k:'b',boss:1,t:'Ácido fluorhídrico',d:'Un tanque de HF se fisura y empieza a disolver las ventanas.',sc:'HF · disuelve el vidrio · atraviesa la piel',w:'base2,struct1',h:'acid2',hx:'SiO2',hp:360,T:90,dps:1.6,ph2:{d:'El HF se evapora en una nube tóxica',w:'base3',h:'acid1'}}
   ]},
 { n:8, t:'POLÍMEROS', s:'Cadenas infinitas', gift:[],
   talk:[['eter','feliz','Tus monómeros ya son bloques en la bandeja. Encadena tres o más y abre sus dobles enlaces.'],['doc','loco','¡Collares de moléculas! ¡Tejeré una piel para la nave!']],
@@ -351,13 +351,13 @@ const LEVELS = [
    {k:'p',id:'PE',t:'Polietileno',d:'Toca el bloque de etileno 3 veces: se encadenan solos. [–CH₂–CH₂–]ₙ.',T:110},
    {k:'p',id:'PVC',t:'PVC',d:'Encadena 3 o más cloruros de vinilo.',T:110},
    {k:'p',id:'PS',t:'Poliestireno',d:'Estireno → poliestireno: [–CH₂–CH(C₆H₅)–]ₙ.',T:110},
-   {k:'b',t:'Brecha en el casco',d:'Un fragmento perforó el casco y el aire escapa al vacío.',sc:'Agujero de 15 cm · presión cayendo · −270 °C afuera',w:'seal3,struct2',h:'',hp:380,T:45,dps:1.9},
+   {k:'b',t:'Brecha en el casco',d:'Un fragmento perforó el casco y el aire escapa al vacío.',sc:'Agujero de 15 cm · presión cayendo · −270 °C afuera',w:'seal3,struct2',h:'',hp:230,T:60,dps:1.4},
    {k:'p',id:'PTFE',t:'Teflón',d:'Encadena tetrafluoroetileno.',T:110},
    {k:'p',id:'PP',t:'Polipropileno',d:'Encadena propileno.',T:110},
-   {k:'b',t:'Ácido en las tuberías',d:'El ácido sulfúrico de la planta de baterías corroe las tuberías metálicas.',sc:'H₂SO₄ al 98 % · ataca metales · no ataca a los fluoropolímeros',w:'seal2,inert2',h:'cond1,acid1',hp:400,T:45,dps:1.9},
+   {k:'b',t:'Ácido en las tuberías',d:'El ácido sulfúrico de la planta de baterías corroe las tuberías metálicas.',sc:'H₂SO₄ al 98 % · ataca metales · no ataca a los fluoropolímeros',w:'seal2,inert2',h:'cond1,acid1',hp:240,T:60,dps:1.4},
    {k:'p',id:'SBR',t:'Caucho sintético',d:'Copolímero: alterna estireno y butadieno en la misma cadena.',T:120},
    {k:'s',n:6,mix:['C2H4','C3H6','C8H8','C2F4','C4H6','C2H3Cl'],t:'Craqueo y destilación',d:'El petróleo sintético se separa en fracciones. Ordena seis monómeros.',T:160},
-   {k:'b',boss:1,t:'El Devorador',d:'Un enjambre de micrometeoritos golpea la proa; cada impacto abre un cráter.',sc:'10 000 impactos por minuto · 20 km/s',w:'struct3,seal1',h:'',hp:640,T:60,dps:2.2,ph2:{d:'Los cráteres dejan fugas de aire',w:'seal3',h:''}}
+   {k:'b',boss:1,t:'El Devorador',d:'Un enjambre de micrometeoritos golpea la proa; cada impacto abre un cráter.',sc:'10 000 impactos por minuto · 20 km/s',w:'struct3,seal1',h:'',hp:380,T:90,dps:1.7,ph2:{d:'Los cráteres dejan fugas de aire',w:'seal3',h:''}}
   ]},
 { n:9, t:'VIDA', s:'Aminoácidos, azúcares y la primera medicina', gift:[],
   talk:[['eter','neutral','Nivel experto: solo te diré el NOMBRE de lo que buscas. La fórmula cuesta energía.'],['doc','triste','Me corté con la forja. Por primera vez la química duele.'],['eter','feliz','Entonces fabrica tu propia medicina.']],
@@ -368,13 +368,13 @@ const LEVELS = [
    {k:'m',id:'UREA',t:'Urea',d:'En 1828 Wöhler creó urea en un frasco y derrumbó la idea de que solo los seres vivos fabrican moléculas orgánicas.',T:120},
    {k:'m',id:'GLY',t:'Polvo de cometa',d:'El aminoácido más simple: un grupo amino, un carbono y un ácido.',T:130},
    {k:'r',id:'R_FOTO',t:'Fotosíntesis',d:'Haz lo que hacen las plantas: CO₂ + agua + mucha energía → glucosa + oxígeno. Balancea los seis.',T:150},
-   {k:'b',t:'Hambre',d:'Llevas 30 horas sin comer. Tus reservas de glucógeno se agotaron.',sc:'Glucosa en sangre 50 mg/dL · fatiga · temblor',w:'bio2,nrg2',h:'anti1',hp:440,T:45,dps:2},
+   {k:'b',t:'Hambre',d:'Llevas 30 horas sin comer. Tus reservas de glucógeno se agotaron.',sc:'Glucosa en sangre 50 mg/dL · fatiga · temblor',w:'bio2,nrg2',h:'anti1',hp:260,T:60,dps:1.5},
    {k:'r',id:'R_FERM',t:'Fermentación',d:'Las levaduras convierten la glucosa en alcohol y gas. Balancea.',T:120},
    {k:'m',id:'ALA',t:'Alanina',d:'Como la glicina, pero con un metilo en el carbono central.',T:140},
-   {k:'b',t:'Infección en la herida',d:'Te cortaste con una lámina de la forja y la herida se inflama.',sc:'Bacterias · pus · enrojecimiento',w:'anti3',h:'bio2',hp:460,T:45,dps:2},
+   {k:'b',t:'Infección en la herida',d:'Te cortaste con una lámina de la forja y la herida se inflama.',sc:'Bacterias · pus · enrojecimiento',w:'anti3',h:'bio2',hp:280,T:60,dps:1.5},
    {k:'m',id:'ASP',t:'Aspirina',d:'Ácido acetilsalicílico, la medicina del sauce. Sin plano: arma el anillo y sus dos grupos vecinos.',T:240},
-   {k:'b',t:'Fiebre',d:'La infección te dejó 39,8 °C de fiebre y dolor de cabeza.',sc:'Prostaglandinas altas · inflamación · 39,8 °C',w:'med3,cool1',h:'',hp:480,T:45,dps:2},
-   {k:'b',boss:1,t:'La célula se apaga',d:'Tu primera célula sintética se desintegra: le faltan los ladrillos de la vida.',sc:'Membrana rota · sin energía · sin proteínas',w:'bio3,solv1',h:'anti2',hp:700,T:60,dps:2.3,ph2:{d:'La célula necesita energía para dividirse',w:'nrg3,bio1',h:'anti2'}}
+   {k:'b',t:'Fiebre',d:'La infección te dejó 39,8 °C de fiebre y dolor de cabeza.',sc:'Prostaglandinas altas · inflamación · 39,8 °C',w:'med3,cool1',h:'',hp:290,T:60,dps:1.5},
+   {k:'b',boss:1,t:'La célula se apaga',d:'Tu primera célula sintética se desintegra: le faltan los ladrillos de la vida.',sc:'Membrana rota · sin energía · sin proteínas',w:'bio3,solv1',h:'anti2',hp:380,T:90,dps:1.5,ph2:{d:'La célula necesita energía para dividirse',w:'nrg3,bio1',h:'anti2'}}
   ]},
 { n:10, t:'ETERNIO', s:'La isla de estabilidad', gift:[],
   talk:[['eter','neutral','Ya no te enseño. Te observo.'],['doc','loco','Oro, uranio, superpesados… ¡y después el 126! ¡El elemento que me hará eterno!'],['eter','triste','Ten cuidado con lo que deseas, Doc.']],
@@ -384,13 +384,13 @@ const LEVELS = [
   P:[
    {k:'f',z:44,t:'Rutenio',d:'Más allá del hierro solo se avanza capturando neutrones, como en una supernova: hierro + argón + 10 neutrones.',r:'Fe56+Ar36+10n',T:120},
    {k:'f',z:82,t:'Plomo',d:'Dos rutenios chocan: 88 protones que decaen por β⁺ hasta llegar al plomo.',r:'Ru102+Ru102',T:120},
-   {k:'b',t:'Tormenta de rayos gamma',d:'Una estrella cercana colapsa y la radiación gamma golpea la nave.',sc:'Rayos γ · 50 Sv/h · hace falta masa densa',w:'shield3',h:'',hp:500,T:45,dps:2.1},
+   {k:'b',t:'Tormenta de rayos gamma',d:'Una estrella cercana colapsa y la radiación gamma golpea la nave.',sc:'Rayos γ · 50 Sv/h · hace falta masa densa',w:'shield3',h:'',hp:300,T:60,dps:1.6},
    {k:'f',z:79,t:'El sueño del alquimista',d:'Los alquimistas soñaron convertir metales en oro. Tú lo forjas núcleo a núcleo: rutenio + cloro + argón + 24 neutrones.',r:'Ru102+Cl35+Ar36+24n',T:140},
    {k:'f',z:92,t:'Uranio',d:'Plomo-204 + neón-20 + 14 neutrones.',r:'Pb204+Ne20+14n',T:130},
    {k:'m',id:'UO2',t:'Combustible nuclear',d:'Uranio con valencia 4 y dos dobles enlaces con oxígeno.',T:110},
    {k:'s',n:7,mix:['UO2','H2O','Fe2O3','SiO2','CuSO4','NaCl','CaCO3'],t:'Centrifugadoras',d:'Separar isótopos exige miles de pasos. Aquí, siete sustancias y poco espacio.',T:180},
    {k:'f',z:114,det:1,t:'Isla a la vista',d:'Detecta un superpesado: uranio + calcio + helio = 114 protones. Vivirá milisegundos, pero quedará registrado.',r:'U238+Ca40+He4',T:130},
-   {k:'b',boss:1,t:'La Entropía',d:'El universo se enfría. ÉTER detecta que la nave pierde orden, molécula a molécula.',sc:'Entropía máxima · todo tiende al desorden',w:'nrg2,shield2,struct1,bio1',h:'',hp:800,T:60,dps:2.4,ph2:{d:'La Entropía ataca la vida misma',w:'bio3,nrg1',h:'anti1'}},
+   {k:'b',boss:1,t:'La Entropía',d:'El universo se enfría. ÉTER detecta que la nave pierde orden, molécula a molécula.',sc:'Entropía máxima · todo tiende al desorden',w:'nrg2,shield2,struct1,bio1',h:'',hp:400,T:90,dps:1.5,ph2:{d:'La Entropía ataca la vida misma',w:'bio3,nrg1',h:'anti1'}},
    {k:'f',z:126,isl:1,t:'ETERNIO',d:'Plomo-204 + rutenio-102 + 4 neutrones: 126 protones. Tras evaporar dos neutrones quedan 182: dentro de la isla de estabilidad.',r:'Pb204+Ru102+4n',T:150}
   ]}
 ];
@@ -403,7 +403,7 @@ const GUIDE = [
  ['REACTOR','Mezcla sustancias de tus frascos. Si ÉTER conoce la reacción, muestra los productos: ajusta los números (coeficientes) hasta que cada lado tenga los mismos átomos (ley de Lavoisier) y pulsa REACCIONAR. En los niveles 1–4 ÉTER balancea por ti.'],
  ['FORJA NUCLEAR','Pon hasta 3 núcleos y un flujo de neutrones. Z (protones) y A (masa) se suman. Si el núcleo tiene demasiados protones o neutrones, decae (β⁺ o β⁻) hacia el valle de estabilidad. A = 5 y A = 8 no existen. Desde Z = 104 el núcleo pierde 2 neutrones y solo sobrevive en la isla de estabilidad (Z 114–126, N 176–190). Fusionar hasta el hierro DA energía; más allá la CUESTA.'],
  ['DESTILACIÓN','Toca un tubo y luego otro para verter la capa de arriba. Solo puedes verter sobre el mismo líquido o en un tubo vacío. Gana cuando cada tubo tenga una sola sustancia.'],
- ['BATALLA','Elige hasta 4 cartas. Lee el escáner y deduce la debilidad de la amenaza. Toca una carta para lanzarla; si la lanzas cuando el anillo dorado coincide con la amenaza (punto débil), haces CRÍTICO ×1,5. Acertar seguido sube el combo hasta ×2. Desde el nivel 6 las amenazas se propagan (recuperan vida). Daño = Σ(propiedad × debilidad − propiedad × lo que la alimenta) × 2 × potencia × combo.'],
+ ['BATALLA','Síntesis bajo presión: la amenaza aparece sobre el laboratorio. Construye moléculas con la propiedad que pide el escáner y pulsa ⚗ LANZAR: lo que sintetizas en vivo pega 5 veces más fuerte, y lo complejo pega más. Tus cartas de los frascos son munición preparada (2 tiros cada una, teclas 1–4). Si repites la misma sustancia, la amenaza se vuelve resistente: varía. Lanzar cuando el anillo dorado toca la amenaza = CRÍTICO ×1,5. Desde el nivel 6 las amenazas se propagan.'],
  ['ESTRELLAS','Síntesis, forja, reactor y destilación: ★★★ si usas menos del 40 % del tiempo, ★★ menos del 70 %. Batalla: ★★★ con 70 % de integridad o más. En los niveles 1–2 el tiempo no hace perder.'],
  ['CIENCIA REAL','Compuestos, reacciones, energías de enlace (fórmula semiempírica de Weizsäcker) y datos curiosos son reales. Simplificaciones honestas: los sólidos iónicos se muestran como una sola unidad (NaCl) y el valle de estabilidad es una aproximación. Los híbridos y el Eternio son ficción casi real.'],
  ['RETO DIARIO','Desde el nivel 1: cinco moléculas nuevas cada día, iguales para todo el mundo, con todos los elementos comunes. Mantén tu racha 🔥 y comparte tu tiempo.'],

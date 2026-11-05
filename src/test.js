@@ -16,18 +16,25 @@ function pool(els, L, made) {
   if (L >= 8) for (const id in DB.poly) if (DB.poly[id].ms.every(m => S.fr[m])) S.fr[id] = 1;
   return D.allCards(S);
 }
+const launchable = c => c.kind === 'mol' || c.kind === 'poly' || (c.kind === 'el' && !['nonm', 'hal'].includes(D.catOf(D.SYM[c.f] || 1)));
+const buildT = c => c.kind === 'el' ? BAT.build(1, 0) : c.kind === 'poly' ? BAT.build(3, 0) : BAT.build(c.heavy || 1, c.hasH);
+/* simulación voraz de la batalla "síntesis bajo presión": munición primero, luego construir lo más rentable */
 function simBattle(p, cards, L) {
-  const ph = [BAT.phaseOf(p, 1), p.ph2 ? BAT.phaseOf(p, 2) : null], rg = (DIFF[L - 1].rg || 0) * (p.boss ? 1.5 : 1);
-  let t = 0;
-  for (let k = 0; k < (p.ph2 ? 2 : 1); k++) {
-    const hp = p.ph2 ? p.hp / 2 : p.hp;
-    const best = cards.map(c => ({ c, d: BAT.eff(c, ph[k]) * 2 * c.pow })).filter(x => x.d > 0).sort((a, b) => b.d - a.d).slice(0, 2);
-    if (!best.length) return { ok: false, why: 'sin cartas efectivas en fase ' + (k + 1) };
-    const dps = best.reduce((s, x) => s + x.d, 0) / BAT.CD - rg; if (dps <= 0) return { ok: false, why: 'la propagación supera al daño' };
-    t += hp / dps;
+  const ph = [BAT.phaseOf(p, 1), p.ph2 ? BAT.phaseOf(p, 2) : null], rg = (DIFF[L - 1].rg || 0) * (p.boss ? 1.5 : 1), uses = {};
+  let t = 0, hp = p.hp, k = 0;
+  const ammo = cards.map(c => ({ c, e: BAT.eff(c, ph[0]) })).filter(x => x.e > 0).sort((a, b) => b.e * b.c.pow - a.e * a.c.pow).slice(0, 2);
+  if (ammo.length) { hp -= ammo.reduce((s, x) => s + BAT.AMMO * x.e * BAT.AMMO_MUL * x.c.pow, 0); t += BAT.AMMO * BAT.CD; hp += rg * t; }
+  if (p.ph2 && hp <= p.hp / 2) k = 1;
+  const syn = cards.filter(launchable);
+  for (let g = 0; hp > 0 && t < p.T * 2 && g < 400; g++) {
+    let best = null, bv = 0;
+    for (const c of syn) { const e = BAT.eff(c, ph[k]); if (e <= 0) continue; const bt = buildT(c), f = BAT.fatigue(uses[c.id]), v = e * BAT.SYN * BAT.cpow(c) * f / bt; if (v > bv) { bv = v; best = { c, e, bt, f }; } }
+    if (!best) return { ok: false, why: 'nada que construir sirve en la fase ' + (k + 1), t, loss: 0 };
+    t += best.bt; hp += rg * best.bt; hp -= best.e * BAT.SYN * BAT.cpow(best.c) * best.f; uses[best.c.id] = (uses[best.c.id] || 0) + 1;
+    if (p.ph2 && k === 0 && hp <= p.hp / 2) k = 1;
   }
   const loss = p.dps * t + Math.floor(t / 5) * p.dps * 2;
-  return { ok: t <= p.T * 0.75 && loss <= 85, t, loss };
+  return { ok: hp <= 0 && t <= p.T * 0.85 && loss <= 85, t, loss };
 }
 function selfTest() {
   const E = [], W = [];
@@ -109,8 +116,30 @@ function guided(U, out) { // sigue la guía de la UI sin conocer la molécula
     else return;
   }
 }
+function fight(U, S, out) { // batalla: munición primero; luego construir y lanzar (guía en niveles guiados)
+  for (let s = 0; s < 500 && U.BT(); s++) {
+    const b = U.BT().b;
+    b.deck.forEach((c, q) => { if (U.BT() && BAT.eff(c, b.ph) > 0 && b.ammo[c.id] > 0) U.throwCard(q); });
+    if (!U.BT()) break;
+    if (U.Lab.ghost) { // sigue el plano sugerido, como un niño
+      const st = U.guideStep(); if (!st) { U.tick(.3); continue; }
+      if (st.k === 'place') U.spawn(st.el); else if (st.k === 'bond') U.tapBond(st.bond); else if (st.k === 'link') { U.Lab.sel = st.a; U.tapAtom(st.b); } else if (st.k === 'autoH') U.autoH(); else if (st.k === 'synth') { U.synth(); out.launches++; }
+      U.tick(.35); continue;
+    }
+    const els = new Set(U.labEls()), cand = [];
+    for (const id in DB.comp) if (!DB.comp[id].s2 && Object.keys(DB.comp[id].cnt).every(e => els.has(e))) cand.push(D.cardFromId(S, id));
+    Object.keys(S.el).forEach(x => { if (S.el[x] === 1 && els.has(x)) { const c = D.cardFromId(S, 'el:' + x); if (launchable(c) && Object.keys(c.tags).length) cand.push(c); } });
+    if (S.unl >= 8) for (const id in DB.poly) if (DB.poly[id].ms.every(m => S.fr[m])) cand.push(D.cardFromId(S, id));
+    let best = null, bv = 0;
+    cand.forEach(c => { const e = BAT.eff(c, b.ph); if (e <= 0) return; const v = e * BAT.cpow(c) * BAT.fatigue(b.uses[c.id]) / buildT(c); if (v > bv) { bv = v; best = c; } });
+    if (!best) { U.tick(1); continue; }
+    U.clearLab(true);
+    if (best.kind === 'el') U.spawn(best.f); else if (best.kind === 'poly') { U.Lab.sel = null; const ms = DB.poly[best.id].ms; for (let q = 0; q < Math.max(3, ms.length * 2); q++) U.spawnMono(ms[q % ms.length]); } else U.buildSmiles(DB.comp[best.id].smiles[0]);
+    U.synth(); out.launches++; U.tick(buildT(best));
+  }
+}
 function solver() {
-  const U = D.ui, keep = JSON.stringify(U.state()), out = { solved: 0, failed: [], farm: 0, guided: 0 };
+  const U = D.ui, keep = JSON.stringify(U.state()), out = { solved: 0, failed: [], farm: 0, guided: 0, launches: 0 };
   U.quiet(true);
   try {
     const S0 = D.newState(); S0.intro = 1; U.setState(S0); U.clearLab(true);
@@ -123,7 +152,7 @@ function solver() {
             prep(U, S, p); U.startProblem(L.n, i); const cards = D.allCards(S);
             const score = c => Math.max(BAT.eff(c, BAT.phaseOf(p, 1)), p.ph2 ? BAT.eff(c, BAT.phaseOf(p, 2)) : 0) * c.pow;
             U.startBattle(L.n, i, cards.sort((a, b) => score(b) - score(a)).slice(0, 4).map(c => c.id));
-            for (let s = 0; s < 3000 && U.BT(); s++) { const b = U.BT().b; b.deck.forEach((c, q) => { if (U.BT() && BAT.eff(c, b.ph) > 0) U.throwCard(q); }); U.tick(0.1); }
+            fight(U, S, out);
           } else if (p.k === 's') {
             U.startProblem(L.n, i); const so = U.SO(); if (!so) throw new Error('no abrió la destilación');
             so.sol.forEach(([a, b]) => { U.sortTap(a); U.sortTap(b); });
@@ -223,5 +252,5 @@ function monkey(n, seed) {
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }
   return { games: n, actions, errors };
 }
-DE.test = { selfTest, solver, monkey, simBattle };
+DE.test = { selfTest, solver, monkey, simBattle, launchable, buildT };
 })();

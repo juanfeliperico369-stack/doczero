@@ -274,12 +274,13 @@ function synth() {
     r.first = store(r.id, 1, list.length <= 70 ? layoutOf(list) : null); made.push(r); list.forEach(a => gone.add(a.id));
   }
   if (made.length) {
-    S.st.synth += made.length; const cvr = $('#cv').getBoundingClientRect();
-    Lab.atoms.filter(a => gone.has(a.id)).slice(0, 4).forEach(a => { const [x, y] = w2s(a.x, a.y); boom(cvr.left + x, cvr.top + y); });
+    S.st.synth += made.length; const cvr = $('#cv').getBoundingClientRect(), goneA = Lab.atoms.filter(a => gone.has(a.id));
+    goneA.slice(0, 3).forEach(a => { const [x, y] = w2s(a.x, a.y); boom(cvr.left + x, cvr.top + y); });
+    if (goneA.length) { const cx = goneA.reduce((q, a) => q + a.x, 0) / goneA.length, cy = goneA.reduce((q, a) => q + a.y, 0) / goneA.length, t = performance.now() / 1000; goneA.forEach(a => { Lab.vanish.push({ x: a.x, y: a.y, el: a.el, mono: a.mono, cx, cy, t0: t }); fxBurst(a.x, a.y, [a.mono ? '#2dffb3' : colOf(a.el), '#ffc23a'], 5); }); made.forEach((m, k) => Lab.labels.push({ x: cx, y: cy - 20 - k * 22, text: (m.first ? '¡NUEVO! ' : '') + D.fUni(nameOf(m.id).f), c: m.kind === 'hyb' ? '#ff2fb3' : m.first ? '#ffc23a' : '#2dffb3', t0: t })); }
     Lab.atoms = Lab.atoms.filter(a => !gone.has(a.id)); Lab.bonds = Lab.bonds.filter(b => !gone.has(b.a) && !gone.has(b.b)); Lab.sel = null; Lab.hist = []; syncGhost();
     made.forEach(r => toast((r.first ? '¡NUEVO! ' : '') + (r.kind === 'hyb' ? '⚠ HÍBRIDO · ' : r.kind === 'el' ? 'Elemento puro · ' : '') + nameOf(r.id).html, r.first ? 'ok' : ''));
     if (made.some(r => r.kind === 'hyb' && r.first)) say('hybrid'); else if (!S.st.firstSay) { S.st.firstSay = 1; talk(DIALOG.first); }
-    sfx('ok'); vib(20); missionCheck(made); save(); renderTray();
+    sfx('ok'); vib(20); if (BT) launch(made); else missionCheck(made); save(); renderTray();
   }
   if (fails.length) { fails.forEach(f => toast(esc(f.msg), 'bad')); if (!made.length) { sfx('bad'); shake($('#cvWrap')); S.en = Math.max(0, S.en - 2); Lab.flash = 1; say('unstable'); } }
   redraw(); hud(); return made;
@@ -302,8 +303,8 @@ const BPC = {};
 const bpOf = (id, h) => BPC[id + h] || (BPC[id + h] = D.blueprint(DB.comp[id].smiles[0], h));
 /* ---------- guía paso a paso ---------- */
 function guideStep() {
-  if (!MIS || MIS.p.k !== 'm') return null;
-  const g = Lab.ghost, cnt = D.countOf(toGraph()), tg = DB.comp[MIS.p.id].cnt;
+  const tid = MIS && MIS.p.k === 'm' ? MIS.p.id : BT && Lab.ghost ? Lab.ghost.id : null; if (!tid) return null;
+  const g = Lab.ghost, cnt = D.countOf(toGraph()), tg = DB.comp[tid].cnt;
   if (g) {
     const filled = new Set(g.atoms.map((s, i) => s.f ? i : -1).filter(i => i >= 0));
     if (filled.size < g.atoms.length) {
@@ -324,14 +325,27 @@ function guideStep() {
 function stepText(st) {
   if (!st) return '';
   const nm = el => '<b class="hl">' + esc(el) + '</b>';
-  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => '¡Completo! Pulsa <b class="hl">⚗ SINTETIZAR</b>.' }[st.k]();
+  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => BT ? '¡Listo! Pulsa <b class="hl">⚗ LANZAR</b> contra la amenaza.' : '¡Completo! Pulsa <b class="hl">⚗ SINTETIZAR</b>.' }[st.k]();
+}
+/* ---------- efectos visuales del laboratorio ---------- */
+Lab.fx = []; Lab.vanish = []; Lab.labels = []; Lab.animT = 0;
+function fxBurst(x, y, cols, n) { if (QUIET) return; const t = performance.now() / 1000; for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 40 + Math.random() * 140; Lab.fx.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t0: t, life: .45 + Math.random() * .4, c: cols[i % cols.length], r: 1.5 + Math.random() * 2.5 }); } if (Lab.fx.length > 400) Lab.fx.splice(0, Lab.fx.length - 400); Lab.animT = t + 1; }
+function drawFx(now, z) {
+  Lab.vanish = Lab.vanish.filter(v => now - v.t0 < .38);
+  Lab.vanish.forEach(v => { const k = (now - v.t0) / .38, x = v.x + (v.cx - v.x) * k * k, y = v.y + (v.cy - v.y) * k * k, [sx, sy] = w2s(x, y), r = (v.el === 'H' ? 13 : 19) * z * (1 - k); ctx.globalAlpha = 1 - k; ctx.strokeStyle = v.mono ? '#2dffb3' : colOf(v.el); ctx.lineWidth = 3 * z; ctx.beginPath(); ctx.arc(sx, sy, Math.max(1, r), 0, 7); ctx.stroke(); });
+  Lab.fx = Lab.fx.filter(p => now - p.t0 < p.life);
+  Lab.fx.forEach(p => { const k = (now - p.t0) / p.life, d = now - p.t0, [sx, sy] = w2s(p.x + p.vx * d, p.y + p.vy * d + 60 * d * d); ctx.globalAlpha = 1 - k; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(sx, sy, p.r * z, 0, 7); ctx.fill(); });
+  Lab.labels = Lab.labels.filter(l => now - l.t0 < 1.3);
+  Lab.labels.forEach(l => { const k = (now - l.t0) / 1.3, [sx, sy] = w2s(l.x, l.y - 50 * k); ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3; ctx.fillStyle = l.c; ctx.font = (20 * Math.max(.8, z)) + 'px Titulos,Arial Narrow,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = l.c; ctx.shadowBlur = 10; ctx.fillText(l.text, sx, sy); ctx.shadowBlur = 0; });
+  ctx.globalAlpha = 1;
+  if (Lab.fx.length || Lab.vanish.length || Lab.labels.length) Lab.animT = now + .1;
 }
 /* ---------- dibujo ---------- */
 function draw() {
   if (!ctx) return; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, CW, CHh);
   const z = Lab.view.z, gs = 32 * z, now = performance.now() / 1000, pulse = .5 + .5 * Math.sin(now * 5);
   if (gs > 10) { ctx.fillStyle = 'rgba(164,44,255,.2)'; const [ox, oy] = w2s(0, 0); for (let x = ((ox % gs) + gs) % gs; x < CW; x += gs) for (let y = ((oy % gs) + gs) % gs; y < CHh; y += gs) ctx.fillRect(x - .75, y - .75, 1.5, 1.5); }
-  const st = MIS && MIS.p.k === 'm' ? guideStep() : null, F = w => (w * z) + 'px Titulos,Arial Narrow,sans-serif';
+  const st = guideStep(), F = w => (w * z) + 'px Titulos,Arial Narrow,sans-serif';
   if (Lab.ghost) { // plano punteado
     const g = Lab.ghost; ctx.setLineDash([4 * z, 4 * z]); ctx.lineWidth = 1.5 * z;
     g.bonds.forEach(b => { const p = g.atoms[b.a], q = g.atoms[b.b]; if (p.f && q.f) return; const [x1, y1] = w2s(p.x, p.y), [x2, y2] = w2s(q.x, q.y); ctx.strokeStyle = 'rgba(143,179,255,.45)'; const L = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / L, ny = (x2 - x1) / L; (b.o === 1 ? [0] : b.o === 2 ? [-3, 3] : [-5, 0, 5]).forEach(o => { ctx.beginPath(); ctx.moveTo(x1 + nx * o * z, y1 + ny * o * z); ctx.lineTo(x2 + nx * o * z, y2 + ny * o * z); ctx.stroke(); }); });
@@ -342,7 +356,9 @@ function draw() {
     const x = A(b.a), y = A(b.b); if (!x || !y) continue;
     const [x1, y1] = w2s(x.x, x.y), [x2, y2] = w2s(y.x, y.y);
     if (x.mono) { ctx.strokeStyle = '#2dffb3'; ctx.lineWidth = 4 * z; ctx.setLineDash([8 * z, 6 * z]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]); continue; }
-    const t = D.bondType(x.el, y.el), hot = st && st.k === 'bond' && st.bond === b;
+    if (!b.t0) { b.t0 = now; if (!QUIET && Lab.atoms.length < 60) fxBurst((x.x + y.x) / 2, (x.y + y.y) / 2, ['#ffc23a', '#e9f6ff'], 4); }
+    const young = now - b.t0 < .3; if (young) Lab.animT = now + .1;
+    const t = D.bondType(x.el, y.el), hot = (st && st.k === 'bond' && st.bond === b) || young;
     ctx.strokeStyle = hot ? `rgba(255,194,58,${.4 + .6 * pulse})` : t === 'iónico' ? '#ff2fb3' : t === 'covalente polar' ? '#39c8ff' : '#c9a2ff';
     ctx.lineWidth = (hot ? 4 : 2.4) * z; if (t === 'iónico' && !hot) ctx.setLineDash([5 * z, 4 * z]);
     const L = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / L, ny = (x2 - x1) / L, off = b.o === 1 ? [0] : b.o === 2 ? [-3.4, 3.4] : [-5.5, 0, 5.5];
@@ -358,7 +374,8 @@ function draw() {
       ctx.fillStyle = '#e9f6ff'; ctx.font = F(15); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(D.fUni(DB.comp[a.mono].f), x, y + 1);
       continue;
     }
-    const r = rad(a) * z, c = colOf(a.el), nd = need(a);
+    if (!a.t0) a.t0 = now; const ag = now - a.t0, pop = ag < .32 ? (Lab.animT = now + .1, 1 + Math.sin(Math.min(1, ag / .32) * Math.PI) * .35 - (1 - Math.min(1, ag / .12)) * .6) : 1;
+    const r = rad(a) * z * Math.max(.3, pop), c = colOf(a.el), nd = need(a);
     if (hv) { ctx.strokeStyle = Lab.hover.ok ? '#2dffb3' : '#ff2fb3'; ctx.lineWidth = 3 * z; ctx.beginPath(); ctx.arc(x, y, r + 9 * z, 0, 7); ctx.stroke(); }
     ctx.fillStyle = '#05010c'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
     ctx.strokeStyle = c; ctx.globalAlpha = .25; ctx.lineWidth = 7 * z; ctx.stroke(); ctx.globalAlpha = 1; ctx.lineWidth = 2 * z; ctx.stroke();
@@ -373,7 +390,8 @@ function draw() {
   Lab.flash = 0;
   $$('#tray .hint, .tools-v .hint, #bSyn.hint').forEach(e => e.classList.remove('hint'));
   if (st) { if (st.k === 'place') { const b = $(`#tray [data-arg="${st.el}"]`); b && b.classList.add('hint'); } if (st.k === 'autoH') $('#bAH').classList.add('hint'); if (st.k === 'synth') $('#bSyn').classList.add('hint'); }
-  const co = $('#coach'); if (co) co.innerHTML = st ? stepText(st) : (!Lab.atoms.length && !MIS ? 'Toca un átomo de la bandeja para empezar · ▶ en el panel sigue la historia' : '');
+  const co = $('#coach'); if (co) co.innerHTML = st ? stepText(st) : BT ? '☣ Construye algo con la propiedad que pide el escáner y pulsa <b class="hl">⚗ LANZAR</b>' : (!Lab.atoms.length && !MIS ? 'Toca un átomo de la bandeja para empezar · ▶ en el panel sigue la historia' : '');
+  drawFx(now, z);
 }
 function analysis() {
   const el = $('#ana'); if (!el) return;
@@ -611,7 +629,7 @@ function chalList(seed) {
   return out;
 }
 function startChallenge(kind, seed, opt) {
-  closeModal(); if (BT) { BT = null; $('#battle').hidden = true; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
+  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; $('#bSyn').textContent = '⚗ Sintetizar'; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
   CH = Object.assign({ kind, seed, list: chalList(seed), idx: 0, el: 0, skips: 0, rival: null }, opt || {});
   setTab('lab'); setMode('mol'); chalTarget();
   showLine(['eter', 'feliz', kind === 'daily' ? 'Reto diario: cinco moléculas, todos los elementos comunes. El reloj corre.' : 'Duelo: las mismas cinco moléculas para los dos. Que gane la mejor química.']);
@@ -642,7 +660,7 @@ function win(L, i, stars, bonus) {
   save(true); hud(); sfx('win'); vib([30, 40, 60]);
   const lvl = LEVELS[L - 1], done = !was && D.levelDone(S, L), isEnd = L === LEVELS.length && done; if (up) S.cur = L + 1; const nx = nextOpen();
   say(done ? 'level' : 'win');
-  modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${'★'.repeat(stars)}<span style="opacity:.25">${'★'.repeat(3 - stars)}</span></div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
+  modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${[0, 1, 2].map(k => `<span class="${k < stars ? 'on' : 'off'}" style="animation-delay:${.15 + k * .18}s">★</span>`).join('')}</div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
     (done ? `<div class="film">Nivel ${L} completado: ${esc(lvl.t)}.${up ? ' Se abre el nivel ' + (L + 1) + ': ' + esc(LEVELS[L].t) + '.' : ''}</div>` : '') +
     `<div class="row" style="margin-top:10px">${isEnd ? '<button class="btn pri" data-act="ending">Final de temporada ▸</button>' : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
   renderMap(); renderTray(); renderSide(); if (up) levelTalk(L + 1);
@@ -659,54 +677,93 @@ let BT = null, DECK = new Set();
 function openDeck(L, i) {
   const p = LEVELS[L - 1].P[i], cards = D.allCards(S); DECK = new Set((S.deck || []).filter(id => cards.some(c => c.id === id)).slice(0, 4));
   const list = cards.map(c => `<button class="card ${c.kind === 'el' ? 'el' : c.kind}${DECK.has(c.id) ? ' sel' : ''}" style="--c:${c.kind === 'el' ? colOf(c.f) : ''}" data-act="pick" data-arg="${esc(c.id)}"><span class="k">${{ el: 'ELEM', mol: 'MOL', poly: 'POLI', hyb: 'HÍBR' }[c.kind]}</span><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="tg">${tagChips(c.tags, 3)}</span></button>`).join('');
-  const kid = L <= 2 ? '<p class="ok sm">Consejo: busca la carta cuya propiedad combate lo que dice el escáner (si falta agua → algo que hidrate).</p>' : '';
+  const kid = L <= 2 ? '<p class="ok sm">Consejo: en la batalla aparecerá el plano de una molécula útil. Constrúyela y pulsa ⚗ LANZAR.</p>' : '';
   const rg = dOf(L).rg * (p.boss ? 1.5 : 1);
-  modal(`<div class="pag">Nivel ${L} · Problema ${i + 1} / 10 · ${p.boss ? 'Jefe' : 'Batalla'}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp} · ${p.T} s · drena ${p.dps} %/s${rg ? ' · se propaga +' + rg + '/s' : ''}</div>${kid}<div class="sec-t">Elige hasta 4 cartas (<span id="dkn">${DECK.size}</span>/4)</div>` +
-    (cards.length ? `<div class="grid">${list}</div>` : '<p class="bad">No tienes cartas. Crea compuestos en el laboratorio.</p>') +
-    `<div class="row sticky"><button class="btn pri" data-act="fight" data-arg="${L},${i}" ${cards.length ? '' : 'disabled'}>☣ ¡A la batalla!</button><button class="btn gh" data-act="close">Volver</button></div>`);
+  modal(`<div class="pag">Nivel ${L} · Problema ${i + 1} / 10 · ${p.boss ? 'Jefe' : 'Batalla'} · síntesis bajo presión</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp} · ${p.T} s · drena ${p.dps} %/s${rg ? ' · se propaga +' + rg + '/s' : ''}</div>${kid}<p class="m sm">Durante la batalla construyes moléculas en vivo y las LANZAS (×5 de daño, más si son complejas). Repetir la misma sustancia crea resistencia. Estas cartas son munición preparada: 2 tiros cada una.</p><div class="sec-t">Munición: elige hasta 4 cartas (<span id="dkn">${DECK.size}</span>/4) · opcional</div>` +
+    (cards.length ? `<div class="grid">${list}</div>` : '<p class="m">Aún no tienes cartas: no importa, construirás en vivo.</p>') +
+    `<div class="row sticky"><button class="btn pri" data-act="fight" data-arg="${L},${i}">☣ ¡A la batalla!</button><button class="btn gh" data-act="close">Volver</button></div>`);
 }
 function pick(id, el) { if (DECK.has(id)) DECK.delete(id); else { if (DECK.size >= 4) return toast('Máximo 4 cartas'); DECK.add(id); } el.classList.toggle('sel', DECK.has(id)); const n = $('#dkn'); if (n) n.textContent = DECK.size; sfx('tap'); }
 const GLYPH = ['☣', '✹', '☢', '⚠', '❂', '✺', '⌬', '☄', '✷', '⚛'];
+function recommend(b) { // la molécula más rentable que puedes armar ahora (para el plano en niveles guiados)
+  const els = new Set(labEls()); let best = null, bv = 0;
+  for (const id in DB.comp) {
+    const c = DB.comp[id]; if (c.s2 || !Object.keys(c.cnt).every(e => els.has(e))) continue;
+    const card = D.cardFromId(S, id), e = BAT.eff(card, b.ph); if (e <= 0) continue;
+    const v = e * BAT.cpow(card) * BAT.fatigue(b.uses[id]) / BAT.build(card.heavy, card.hasH) / (1 + c.atoms / 30);
+    if (v > bv) { bv = v; best = id; }
+  }
+  return best;
+}
+function battleGhost() {
+  Lab.ghost = null; if (!BT) return; const g = dOf(BT.L).g; if (g < 2) return redraw();
+  const id = recommend(BT.b); if (!id) return redraw();
+  const bp = bpOf(id, g === 3); Lab.ghost = { id, atoms: bp.atoms.map(a => ({ ...a, f: null })), bonds: bp.bonds, withH: g === 3 };
+  const gh = Lab.ghost; requestAnimationFrame(() => { resize(); if (gh && Lab.ghost === gh) fit(gh.atoms); });
+}
 function startBattle(L, i, ids) {
-  ids = ids || [...DECK]; if (!ids.length) return toast('Elige al menos una carta', 'bad');
-  const cards = ids.map(id => D.cardFromId(S, id)).filter(Boolean).slice(0, 4); S.deck = ids.slice(0, 4);
-  closeModal(); if (CH) chalEnd(true); endMission(); const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
-  const el = $('#battle');
-  el.innerHTML = `<div class="bt-top"><span class="mega">${esc(p.t)}</span><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>
-  <div class="bt-main"><div class="bt-left"><div class="bars"><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div>${b.rg ? `<div class="m sm">☣ Se propaga +${b.rg}/s: ataca rápido</div>` : ''}</div>
-  <div class="arena" id="arena"><div class="combo" id="btC"></div><div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div><div class="phase" id="btPh">${esc(p.sc)}</div></div></div>
-  <div class="deck">${cards.map((c, k) => `<button class="dk" data-act="throw" data-arg="${k}"><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="tg">${tagChips(c.tags, 2)}</span><i class="cd" id="cd${k}" style="height:0"></i></button>`).join('')}${b.crit ? '<p class="m sm tipc">Lanza cuando el anillo dorado toque la amenaza: CRÍTICO ×1,5</p>' : ''}</div></div>`;
-  el.hidden = false; sfx('tap');
+  ids = (ids || [...DECK]).slice(0, 4); const cards = ids.map(id => D.cardFromId(S, id)).filter(Boolean); S.deck = ids;
+  closeModal(); if (CH) chalEnd(true); endMission(); if (SO) { SO = null; $('#sortOv').hidden = true; }
+  const p = LEVELS[L - 1].P[i], b = BAT.create(p, cards, dOf(L)); BT = { b, L, i };
+  document.body.classList.add('inbattle'); setTab('lab'); setMode('mol'); clearLab(true); Lab.view = { x: 0, y: 0, z: 1 };
+  const st = $('#bstrip');
+  st.innerHTML = `<div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div>
+  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}</div></div>
+  <div class="bs-r"><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>`;
+  st.hidden = false; $('#bSyn').textContent = '⚗ Lanzar';
+  battleGhost(); renderSide(); renderTray(); sfx('tap'); vib(40);
+  showLine(['eter', L <= 2 ? 'neutral' : 'enojado', L <= 2 ? 'Construye la molécula del plano y pulsa LANZAR. Lo que fabricas en vivo pega cinco veces más.' : 'Lee el escáner, construye y lanza. Si repites la misma sustancia, se vuelve resistente.']);
+}
+function shotFx(fromEl, r, label) {
+  if (QUIET || TEST) return; const thr = $('#thr'); if (!thr) return;
+  const a = (fromEl || $('#bSyn')).getBoundingClientRect(), t = thr.getBoundingClientRect();
+  const s = document.createElement('div'); s.className = 'shot'; s.style.left = (a.left + a.width / 2 - 8) + 'px'; s.style.top = (a.top + a.height / 2 - 8) + 'px';
+  s.style.background = r.kind === 'hit' ? (r.crit ? 'var(--amb)' : 'var(--ink)') : r.kind === 'heal' ? 'var(--mag)' : '#777'; s.style.color = s.style.background; document.body.appendChild(s);
+  requestAnimationFrame(() => { s.style.transform = `translate(${t.left + t.width / 2 - a.left - a.width / 2}px,${t.top + t.height / 2 - a.top - a.height / 2}px)`; s.style.opacity = '.3'; });
+  setTimeout(() => s.remove(), 340);
+  setTimeout(() => {
+    const st = $('#bstrip'); if (!st) return; const pp = document.createElement('div'); pp.className = 'pop';
+    pp.style.left = (12 + Math.random() * 40) + '%'; pp.style.top = '42%'; pp.style.color = r.kind === 'hit' ? 'var(--amb)' : r.kind === 'heal' ? 'var(--mag)' : '#999';
+    pp.textContent = r.kind === 'hit' ? (r.crit ? '¡CRÍTICO! ' : '') + '−' + r.dmg + (r.f < 1 ? ' · resistencia ×' + r.f.toFixed(2) : '') + (BT && BT.b.combo > 1 ? ' · combo ×' + BAT.mult(BT.b.combo).toFixed(1) : '') : r.kind === 'heal' ? '¡EMPEORA! +' + Math.round(r.dmg / 2) : 'SIN EFECTO';
+    if (label) pp.textContent = label + ' ' + pp.textContent;
+    st.appendChild(pp); setTimeout(() => pp.remove(), 1000); thr.classList.remove('hit'); void thr.offsetWidth; thr.classList.add('hit');
+  }, 300);
 }
 function throwCard(k) {
   if (!BT || BT.b.over) return null; const b = BT.b, c = b.deck[k]; if (!c) return null;
-  const r = BAT.throw(b, c); if (!r) return null;
-  const ar = $('#arena'), thr = $('#thr');
-  if (ar && thr && !TEST && !QUIET) {
-    const cb = $$('.dk')[k].getBoundingClientRect(), ab = ar.getBoundingClientRect(), tb = thr.getBoundingClientRect();
-    const s = document.createElement('div'); s.className = 'shot'; s.style.left = (cb.left - ab.left + cb.width / 2 - 8) + 'px'; s.style.top = (cb.top - ab.top + cb.height / 2 - 8) + 'px'; s.style.background = r.kind === 'hit' ? (r.crit ? 'var(--amb)' : 'var(--ink)') : r.kind === 'heal' ? 'var(--mag)' : '#777'; ar.appendChild(s);
-    requestAnimationFrame(() => { s.style.transform = `translate(${tb.left + tb.width / 2 - cb.left - cb.width / 2}px,${tb.top + tb.height / 2 - cb.top - cb.height / 2}px)`; s.style.opacity = '.2'; });
-    setTimeout(() => s.remove(), 320);
-    setTimeout(() => { const pp = document.createElement('div'); pp.className = 'pop'; pp.style.left = (40 + Math.random() * 20) + '%'; pp.style.top = '30%'; pp.style.color = r.kind === 'hit' ? 'var(--amb)' : r.kind === 'heal' ? 'var(--mag)' : '#999'; pp.textContent = r.kind === 'hit' ? (r.crit ? '¡CRÍTICO! ' : '') + '−' + r.dmg + (b.combo > 1 ? ' ×' + BAT.mult(b.combo).toFixed(1) : '') : r.kind === 'heal' ? '¡EMPEORA! +' + Math.round(r.dmg / 2) : 'SIN EFECTO'; ar.appendChild(pp); setTimeout(() => pp.remove(), 900); thr.classList.remove('hit'); void thr.offsetWidth; thr.classList.add('hit'); }, 260);
-  }
+  const r = BAT.throw(b, c); if (!r) { if (!(b.ammo[c.id] > 0)) toast('Sin munición de ' + esc(c.name) + ': constrúyela'); return null; }
+  shotFx($$('#mis .dk')[k], r); renderSide();
   sfx(r.crit ? 'crit' : r.kind === 'hit' ? 'hit' : r.kind === 'heal' ? 'heal' : 'tap'); vib(r.kind === 'hit' ? (r.crit ? 30 : 15) : 60);
   return r;
 }
+function launch(made) { // lo sintetizado en batalla se lanza contra la amenaza
+  if (!BT) return []; const out = [];
+  made.forEach(m => {
+    if (!BT || BT.b.over) return; const card = D.cardFromId(S, m.id); if (!card) return;
+    const r = BAT.launch(BT.b, card); if (!r) return; out.push(r);
+    shotFx($('#bSyn'), r, D.fUni(nameOf(m.id).f));
+    sfx(r.crit ? 'crit' : r.kind === 'hit' ? 'boom' : 'bad'); vib(r.kind === 'hit' ? 40 : 80);
+  });
+  if (out.some(r => r.kind === 'heal')) say('lose');
+  battleUI(); if (BT) { battleGhost(); renderSide(); }
+  return out;
+}
 function battleUI() {
   if (!BT) return; const b = BT.b, set = (id, f) => { const e = document.getElementById(id); if (e) f(e); };
-  set('btT', e => e.textContent = Math.max(0, Math.ceil(b.t)));
-  set('btHp', e => e.style.width = (100 * Math.max(0, b.hp) / b.max) + '%'); set('btHpN', e => e.textContent = Math.max(0, Math.round(b.hp)));
+  set('btT', e => { e.textContent = Math.max(0, Math.ceil(b.t)); e.classList.toggle('low', b.t < 12); });
+  set('btHp', e => e.style.width = (100 * Math.max(0, b.hp) / b.max) + '%'); set('btHpN', e => e.textContent = Math.max(0, Math.round(b.hp)) + ' / ' + b.max);
   set('btIn', e => e.style.width = Math.max(0, b.integ) + '%'); set('btInN', e => e.textContent = 'Nave ' + Math.max(0, Math.round(b.integ)) + ' %');
   set('btC', e => e.textContent = b.combo > 1 ? 'COMBO ×' + b.combo : '');
   if (b.crit) set('ring', e => { const f = (b.cyc % BAT.WIN) / BAT.WIN, w = BAT.WIN_ON / BAT.WIN, on = f < w; e.style.transform = 'scale(' + (on ? 1 : 1 + .9 * (1 - (f - w) / (1 - w))) + ')'; e.classList.toggle('on', on); });
   b.deck.forEach((c, k) => set('cd' + k, e => e.style.height = (100 * (b.cd[c.id] || 0) / BAT.CD) + '%'));
-  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#battle')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); } }
+  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); battleGhost(); } }
   if (b.over) endBattle();
 }
 function endBattle() {
-  const { b, L, i } = BT; BT = null; $('#battle').hidden = true; $('#battle').innerHTML = '';
-  if (b.win) win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15);
-  else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Crea compuestos con esas propiedades.'); }
+  const { b, L, i } = BT; BT = null; document.body.classList.remove('inbattle'); const st = $('#bstrip'); st.hidden = true; st.innerHTML = '';
+  $('#bSyn').textContent = '⚗ Sintetizar'; Lab.ghost = null; clearLab(true); renderSide(); renderTray();
+  if (b.win) { fxBurst(0, 0, ['#2dffb3', '#ffc23a', '#39c8ff'], 40); win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15 + b.launches * 5); }
+  else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Construye en vivo sustancias con esas propiedades y alterna para evitar la resistencia.'); }
 }
 function flee() { if (!BT) return; BT.b.over = true; BT.b.win = false; BT.b.why = 'Huiste de la batalla.'; battleUI(); }
 
@@ -715,6 +772,11 @@ function flee() { if (!BT) return; BT.b.over = true; BT.b.win = false; BT.b.why 
    ============================================================ */
 function renderSide() {
   const box = $('#mis'); if (!box) return;
+  if (BT) {
+    const b = BT.b;
+    box.innerHTML = `<div class="pag">☣ Batalla · N${BT.L}·${BT.i + 1} · lanzadas ${b.launches}</div><div class="m sm">Construye y pulsa <b class="hl">⚗ LANZAR</b>. Lo que repites pierde fuerza (resistencia).</div>` + (b.deck.length ? `<div class="sec-t">Munición preparada · teclas 1–4</div><div class="ars">${b.deck.map((c, k) => `<button class="dk" data-act="throw" data-arg="${k}"><span class="f">${fHTML(c.f)}</span><span class="nm">${esc(c.name)}</span><span class="am">${'●'.repeat(b.ammo[c.id] || 0)}${'○'.repeat(BAT.AMMO - (b.ammo[c.id] || 0))}</span><i class="cd" id="cd${k}" style="height:0"></i></button>`).join('')}</div>` : '<p class="m sm">Sin munición preparada: todo depende de lo que construyas.</p>') + (b.crit ? '<p class="m sm">Lanza cuando el anillo dorado toca la amenaza: CRÍTICO ×1,5.</p>' : '');
+    analysis(); return;
+  }
   if (MIS && MIS.ch) {
     const c = DB.comp[MIS.p.id], cnt = D.countOf(toGraph()), rv = CH.rival;
     box.innerHTML = `<div class="pag">${{ daily: '🔥 Reto diario', duel: '⚔ Duelo LAN', async: '⚔ Duelo Bluetooth' }[CH.kind]} · ${CH.idx + 1}/${CH.list.length}</div><div class="mt">${esc(c.name)}</div><div class="obj"><b>${fHTML(c.f)}</b></div><div class="chk">${Object.keys(c.cnt).map(e => `<span class="${(cnt[e] || 0) === c.cnt[e] ? 'ok' : (cnt[e] || 0) > c.cnt[e] ? 'bad' : ''}">${e} ${cnt[e] || 0}/${c.cnt[e]}</span>`).join('')}</div><div class="tbar"><i style="width:${CH.idx * 20}%;background:var(--grn)"></i></div>${rv ? `<div class="m sm">Rival ${esc(rv.name || '')}: ${rv.done ? '✓ ' + fmtT(rv.el) : (rv.idx || 0) + '/5'}</div><div class="tbar"><i style="width:${(rv.done ? 5 : rv.idx || 0) * 20}%;background:var(--mag)"></i></div>` : ''}<div class="row"><span class="tm" id="mT">${fmtT(CH.el + CH.skips * 30)}</span><button class="btn gh sm" data-act="chskip">Saltar +30 s</button><button class="btn gh sm" data-act="chquit">Rendirse</button></div>`;
@@ -909,7 +971,7 @@ document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
   if (BT && /^[1-4]$/.test(e.key)) { throwCard(+e.key - 1); return; }
-  if (TAB !== 'lab' || Lab.mode !== 'mol' || !$('#ov').hidden || BT) return;
+  if (TAB !== 'lab' || Lab.mode !== 'mol' || !$('#ov').hidden) return;
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); }
   else if (e.key === 'Enter') synth();
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
@@ -930,7 +992,7 @@ function frame(t) {
   const dt = Math.min(.1, (t - (last || t)) / 1000); last = t;
   if (!TEST) tick(dt);
   if (MUS.ctx) { const mm = BT ? 'battle' : SO ? 'sort' : document.getElementById('cover') || document.getElementById('story') ? 'menu' : 'lab'; if (mm !== MUS.mode) MUS.mode = mm; }
-  if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
+  if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null || t / 1000 < Lab.animT || BT)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
   requestAnimationFrame(frame);
 }
 
@@ -942,14 +1004,14 @@ function boot() {
   <nav id="nav"><button data-act="tab" data-arg="lab"><i>⚗</i>Lab</button><button data-act="tab" data-arg="fr"><i>⚱</i>Frascos</button><button data-act="tab" data-arg="bt"><i>☣</i>Batalla</button><button data-act="tab" data-arg="tx"><i>▶</i>Videos</button></nav>
   <main id="stage">
    <div class="tab" id="t-lab"><div class="lmode"><button data-act="mode" data-arg="mol" class="on">⚛ Moléculas</button><button data-act="mode" data-arg="react">⇄ Reactor</button><button data-act="mode" data-arg="forge">☢ Forja</button></div>
-    <div class="pane" id="molPane"><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Sintetizar</button></div><div id="tray"></div></div>
+    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Sintetizar</button></div><div id="tray"></div></div>
     <div class="pane" id="reactPane" hidden></div><div class="pane" id="forgePane" hidden></div></div>
    <div class="tab" id="t-fr"><div class="filt">${[['all', 'Todos'], ['el', 'Elementos'], ['mol', 'Compuestos'], ['med', 'Bio y fármacos'], ['poly', 'Polímeros'], ['hyb', 'Híbridos'], ['org', 'Organismos'], ['tab', 'Tabla periódica']].map(([k, t]) => `<button data-act="filt" data-arg="${k}">${t}</button>`).join('')}</div><div class="scroll" id="frBody"></div></div>
    <div class="tab" id="t-bt"><div class="lvls" id="lvls"></div><div class="scroll" id="mapBody"></div></div>
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="battle" hidden></div><div id="sortOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);

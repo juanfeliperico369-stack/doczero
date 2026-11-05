@@ -287,3 +287,34 @@ input.inp{width:auto;min-width:140px}
 .scanbox video{width:100%;max-height:40vh;border:2px solid var(--amb);margin-top:6px}
 .native #rotate{display:none!important}
 @media (orientation:portrait){.qrrow{grid-template-columns:1fr}}
+/* ---------- v1.3: síntesis bajo presión + jugo visual ---------- */
+#bstrip{flex:none;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:6px 10px;border-bottom:3px solid var(--mag);background:linear-gradient(90deg,rgba(255,47,179,.14),#000 60%);position:relative;overflow:hidden}
+#bstrip[hidden]{display:none}
+#bstrip .tw{width:68px;height:68px;position:relative;flex:none}
+#bstrip .threat{font-size:34px;border-width:3px}
+#bstrip .bs-c{min-width:0;display:flex;flex-direction:column;gap:4px}
+#bstrip .bs-t{display:flex;align-items:baseline;gap:8px;min-width:0}
+#bstrip .bs-t .mega{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mag);text-shadow:0 0 8px rgba(255,47,179,.5)}
+#bstrip .combo{position:static;font-size:20px}
+#bstrip .phase{margin:0;text-align:left;font-size:11.5px;min-height:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bstrip .bs-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#bstrip .tm{font-size:26px}
+#bstrip .pop{font-size:22px}
+.inbattle .lmode{display:none}
+.inbattle #bSyn{background:var(--mag);border-color:#ff8ad6;box-shadow:0 0 14px rgba(255,47,179,.6)}
+.ars{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ars .dk{min-height:58px;padding:4px}
+.ars .dk .f{font-size:17px}
+.dk .am{font-size:10px;letter-spacing:.15em;color:var(--amb)}
+.shot{position:fixed;z-index:66}
+.stars span{display:inline-block;animation:starPop .5s cubic-bezier(.2,1.6,.4,1) both}
+.stars span.off{opacity:.2}
+@keyframes starPop{0%{transform:scale(0) rotate(-40deg);opacity:0}100%{transform:scale(1) rotate(0)}}
+.sheet{animation:sheetIn .24s cubic-bezier(.2,1.2,.4,1)}
+@keyframes sheetIn{from{transform:translateY(18px) scale(.97);opacity:0}}
+#comms.say .por{animation:bob .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bob{40%{transform:translateY(-5px) scale(1.06)}}
+.tab.on{animation:tabIn .18s ease-out}
+@keyframes tabIn{from{opacity:.4;transform:translateX(6px)}}
+.btn:not([disabled]):hover{filter:brightness(1.15)}
+@media (max-height:520px){#bstrip{padding:4px 8px;gap:8px}#bstrip .tw{width:54px;height:54px}#bstrip .threat{font-size:26px}#bstrip .bs-t .mega{font-size:16px}#bstrip .tm{font-size:20px}#bstrip .phase{display:none}.ars .dk{min-height:46px}}

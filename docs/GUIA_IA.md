@@ -41,7 +41,14 @@ tools/build.mjs → index.html (≈300 KB)   tools/bot.mjs → Playwright: móvi
 - **Reactor**: reactivos de los frascos (compuestos o elementos puros `@Fe`). Si la combinación es conocida aparecen los productos; los coeficientes deben igualar los átomos (Lavoisier). N1–4 ÉTER balancea (`DIFF.bal`); después a mano o pista ⚡15. Varias rutas con los mismos reactivos (p. ej. CO₂+H₂O → ácido carbónico o fotosíntesis) se eligen con "Ruta". Energía = −ΔH/40 (tope −90…+80).
 - **Destilación** (clasificar líquidos): n sustancias × 4 capas + 2 tubos vacíos; verter la capa superior sobre el mismo líquido o en vacío; cada puzzle se genera con semilla y se comprueba resoluble con un solucionador DFS.
 - **Forja**: igual que v1 (Z y A se suman, valle de estabilidad, β±, A=5/8 imposibles, Z≥104 evapora 2n, isla Z114–126/N176–190, Feynman Z>137). Los núcleos que pide la misión brillan en niveles guiados.
-- **Batalla**: eficacia = Σ etiqueta × (debilidad − lo que la alimenta); daño = eficacia × 2 × potencia × combo (≤×2) × 1,5 si es CRÍTICO. Crítico = lanzar cuando el anillo dorado toca la amenaza (ciclo 1,6 s, ventana 0,34 s; desde N2). Propagación `DIFF.rg` hp/s (×1,5 jefes, desde N6). Jefes mutan al 50 %. Drenaje de la nave dps + pico cada 5 s.
+- **Batalla = síntesis bajo presión (v1.3)**: la amenaza aparece en una franja sobre el laboratorio.
+  - Lo que el jugador sintetiza durante la batalla se LANZA: daño = eficacia × 5 × complejidad × combo × crítico × resistencia.
+    - Complejidad: `BAT.cpow` = 1 + átomos pesados/8, con tope ×2,5.
+    - Resistencia (`BAT.fatigue`): −15 % por cada vez que se repite la misma sustancia, hasta ×0,35.
+  - Las cartas de los frascos son munición preparada: 2 tiros cada una, ×1,5 de daño, teclas 1–4.
+  - En niveles guiados (g ≥ 2) aparece el plano de la molécula más rentable (`recommend`).
+  - Vida ×0,6 respecto a v1.2; T = 60 s (normal) / 90 s (jefe); drenaje ×0,75.
+  - El validador simula de forma voraz: munición primero, luego construir lo más rentable con el tiempo `BAT.build(pesados, H)`.
 - **Estrellas**: misiones ★★★ <40 % del tiempo, ★★ <70 %; batalla por integridad (≥70 / ≥40).
 
 ## 6. Contenido actual: Temporada 1 "NÚCLEO" (niveles 1–10, 100 problemas: 22 síntesis · 17 reacciones · 23 forjas · 6 polímeros · 6 destilaciones · 26 batallas)
