@@ -133,6 +133,15 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Dificultad de la temporada 2: g 2 → 0, ⚡H de 3 a 8, propagación de 0,5 a 2. La vida de las amenazas se ajustó con el simulador (script de afinado: −8 % por paso, mínimo 55 %).
 - Rangos: Despierto, Aprendiz, Alquimista, Doc Element (240★), Farmacólogo (330★), Maestro de la Mente (420★), Ente de la Creación (540★).
 
+## 7d. Escuela de ÉTER y consejos (v2.1, `src/school.js`)
+- `DE.school.run(clave, pasos)`: cada paso tiene `{t, p, target (selector o función → rect), btn?, done?(), drag?(), enter?(), who/mood, cheer}`.
+  - Avanza solo cuando `done()` es verdadero, o con el botón.
+  - Guarda `S.seen[clave]` al terminar.
+  - Mientras está activo, `tick()` no avanza los relojes.
+- La Escuela (clave `school`) arranca tras la historia inicial. Los consejos `tip_react`, `tip_forge`, `tip_sort` y `tip_battle` se disparan la primera vez en cada sala (`autoTips`).
+- Caritas en los átomos (canvas): feliz si no tiene manos libres y está unido (o es gas noble).
+- Para el bot: `DE.school.skipTips()`.
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

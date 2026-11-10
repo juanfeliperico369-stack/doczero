@@ -326,7 +326,7 @@ function guideStep() {
 function stepText(st) {
   if (!st) return '';
   const nm = el => '<b class="hl">' + esc(el) + '</b>';
-  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => BT ? '¡Listo! Pulsa <b class="hl">⚗ LANZAR</b> contra la amenaza.' : '¡Completo! Pulsa <b class="hl">⚗ SINTETIZAR</b>.' }[st.k]();
+  return { place: () => 'Toca ' + nm(st.el) + ' en la bandeja: irá a la pieza punteada que brilla.', link: () => 'Arrastra un átomo sobre el otro para unirlos.', bond: () => 'Toca el <b class="hl">enlace que parpadea</b>: todavía hay manos libres → enlace ' + (st.o === 2 ? 'DOBLE' : 'TRIPLE') + '.', autoH: () => 'Toca <b class="hl">⚡H</b>: llena las manos libres con hidrógeno.', count: () => 'Te falta: ' + esc(st.miss), free: () => 'Hay manos libres (puntos rosados): únelas o toca un enlace.', synth: () => BT ? '¡Listo! Pulsa <b class="hl">⚗ LANZAR</b> contra la amenaza.' : '¡Completo! Pulsa <b class="hl">⚗ CREAR</b>.' }[st.k]();
 }
 /* ---------- efectos visuales del laboratorio ---------- */
 Lab.fx = []; Lab.vanish = []; Lab.labels = []; Lab.animT = 0;
@@ -382,6 +382,10 @@ function draw() {
     ctx.strokeStyle = c; ctx.globalAlpha = .25; ctx.lineWidth = 7 * z; ctx.stroke(); ctx.globalAlpha = 1; ctx.lineWidth = 2 * z; ctx.stroke();
     if (sel) { ctx.strokeStyle = '#ffc23a'; ctx.lineWidth = 2.5 * z; ctx.setLineDash([4 * z, 3 * z]); ctx.beginPath(); ctx.arc(x, y, r + 6 * z, now * 2, now * 2 + 7); ctx.stroke(); ctx.setLineDash([]); }
     ctx.fillStyle = '#e9f6ff'; ctx.font = F((a.el.length > 1 ? 16 : 19) * (a.el === 'H' ? .8 : 1)); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(a.el, x, y + 1);
+    { const happy = nd === 0 && (nbrs(a.id).length > 0 || D.maxVal(a.el) === 0), fx = x + r * .8, fy = y - r * .8, fr = 6.8 * z, fc = happy ? '#2dffb3' : '#ff6fd0';
+      ctx.fillStyle = happy ? '#06261b' : '#2a0820'; ctx.strokeStyle = fc; ctx.lineWidth = 1.4 * z; ctx.beginPath(); ctx.arc(fx, fy, fr, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = fc;
+      ctx.beginPath(); ctx.arc(fx - 2.3 * z, fy - 1.6 * z, .95 * z, 0, 7); ctx.arc(fx + 2.3 * z, fy - 1.6 * z, .95 * z, 0, 7); ctx.fill(); ctx.beginPath();
+      if (happy) ctx.arc(fx, fy + .2 * z, 3 * z, .18 * Math.PI, .82 * Math.PI); else ctx.arc(fx, fy + 4.6 * z, 3 * z, 1.2 * Math.PI, 1.8 * Math.PI); ctx.stroke(); }
     if (nd > 0) { // manos libres: pequeños conectores
       const nb = nbrs(a.id), base = nb.length ? Math.atan2(nb.reduce((s, n) => s + n.y - a.y, 0), nb.reduce((s, n) => s + n.x - a.x, 0)) + Math.PI : -Math.PI / 2;
       ctx.strokeStyle = ctx.fillStyle = Lab.flash ? '#ff2fb3' : '#ff6fd0'; ctx.lineWidth = 2 * z;
@@ -403,7 +407,7 @@ function analysis() {
   if (sg.atoms.some(a => a.mono)) { el.innerHTML = `<span class="fm">⛓ ${c.length}×</span> <span class="m">${esc([...new Set(sg.atoms.map(a => DB.comp[a.mono].name))].join(' + '))}</span> ` + (c.length >= 3 ? '<span class="ok">✓ cadena lista</span>' : '<span class="bad">mínimo 3</span>'); return; }
   const cnt = D.countOf(sg), sums = D.bondSums(sg), miss = sg.atoms.reduce((s, a, i) => s + Math.max(0, D.freeOf(a.el, sums[i])), 0), stable = sg.atoms.every((a, i) => D.valence(a.el).includes(sums[i]));
   const gr = sg.atoms.length > 1 ? D.groupsOf(sg).filter(x => x !== 'anillo').slice(0, 2).join(', ') : '';
-  el.innerHTML = `<span class="fm">${fHTML(D.hill(cnt))}</span> <span class="m">${D.molarMass(cnt).toFixed(2).replace('.', ',')} g/mol</span><br>` + (stable && sg.atoms.length > 1 ? '<span class="ok">✓ estable</span>' : `<span class="bad">⚠ ${miss ? miss + ' mano(s) libre(s)' : 'inestable'}</span>`) + (gr ? ` <span class="m">· ${esc(gr)}</span>` : '') + (comps.length > 1 ? ` <span class="m">· ${comps.length} piezas</span>` : '');
+  el.innerHTML = `<span class="fm">${fHTML(D.hill(cnt))}</span> <span class="m">${D.molarMass(cnt).toFixed(2).replace('.', ',')} g/mol</span><br>` + (stable && sg.atoms.length > 1 ? '<span class="ok">😀 ¡todos felices! (estable)</span>' : `<span class="bad">😟 ${miss ? miss + ' mano(s) libre(s)' : 'inestable'}</span>`) + (gr ? ` <span class="m">· ${esc(gr)}</span>` : '') + (comps.length > 1 ? ` <span class="m">· ${comps.length} piezas</span>` : '');
 }
 function fit(list) {
   list = list || Lab.atoms; if (!list.length) { Lab.view = { x: 0, y: 0, z: 1 }; return redraw(); }
@@ -631,7 +635,7 @@ function chalList(seed) {
   return out;
 }
 function startChallenge(kind, seed, opt) {
-  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; $('#bSyn').textContent = '⚗ Sintetizar'; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
+  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; $('#bSyn').textContent = '⚗ Crear'; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
   CH = Object.assign({ kind, seed, list: chalList(seed), idx: 0, el: 0, skips: 0, rival: null }, opt || {});
   setTab('lab'); setMode('mol'); chalTarget();
   showLine(['eter', 'feliz', kind === 'daily' ? 'Reto diario: cinco moléculas, todos los elementos comunes. El reloj corre.' : 'Duelo: las mismas cinco moléculas para los dos. Que gane la mejor química.']);
@@ -763,7 +767,7 @@ function battleUI() {
 }
 function endBattle() {
   const { b, L, i } = BT; BT = null; document.body.classList.remove('inbattle'); const st = $('#bstrip'); st.hidden = true; st.innerHTML = '';
-  $('#bSyn').textContent = '⚗ Sintetizar'; Lab.ghost = null; clearLab(true); renderSide(); renderTray();
+  $('#bSyn').textContent = '⚗ Crear'; Lab.ghost = null; clearLab(true); renderSide(); renderTray();
   if (b.win) { fxBurst(0, 0, ['#2dffb3', '#ffc23a', '#39c8ff'], 40); win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15 + b.launches * 5); }
   else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Construye en vivo sustancias con esas propiedades y alterna para evitar la resistencia.'); }
 }
@@ -886,7 +890,7 @@ function cover() {
   const c = document.createElement('div'); c.className = 'cover'; c.id = 'cover'; const has = S.intro || Object.keys(S.prog).length;
   c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–2 · Núcleo y Fármacos</div></div>
   <div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
-  <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button></div></div></div>
+  <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button>${has ? '<button class="btn gh" data-act="schoolC">🍼 Química para bebés (1 min)</button>' : ''}</div></div></div>
   <div class="cfoot"><span class="pag">Por: ${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</span><span class="adv">Lab advisory<b>Verídico</b>Contenido seguro</span><span class="mega">El laboratorio más actual</span></div>`;
   document.body.appendChild(c);
 }
@@ -900,10 +904,10 @@ function endSlides() { const el = $('#story'); if (el) el.remove(); const f = AF
 function levelTalk(L) { if (S.seen['t' + L]) return; S.seen['t' + L] = 1; save(); const t = LEVELS[L - 1].talk; if (t) talk(t); }
 function enterGame() {
   const c = $('#cover'); if (c) c.remove(); hud(); renderTray(); setTab(TAB); requestAnimationFrame(resize);
-  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => { levelTalk(1); startProblem(1, 0); }); }
+  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); }); }
   else { levelTalk(S.cur); if (!TQ.length) say('win'); }
 }
-function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
+function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
   modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporadas 1–2: Núcleo y Fármacos</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
@@ -964,7 +968,7 @@ const ACT = {
   chskip: () => chalSkip(), chquit: () => chalEnd(true), cards: () => printCards(), report: () => download(reportCSV(), 'informe-doc-element-' + dateKey() + '.csv', 'text/csv'), dshare: t => shareOut(t),
   export: () => exportSave(), reset: () => { if (confirm('¿Borrar toda tu partida? No se puede deshacer.')) { S = D.newState(); save(true); location.reload(); } },
   donate: () => openLink(CFG.DONATE_URL, 'Donaciones'), channel: () => openLink(CFG.CHANNEL_URL, 'Videos'),
-  tocover: () => { closeModal(); cover(); }, cont: () => enterGame(),
+  tocover: () => { closeModal(); cover(); }, cont: () => enterGame(), schoolC: () => { enterGame(); if (DE.school) DE.school.start(() => renderSide()); },
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
   ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
@@ -984,6 +988,7 @@ document.addEventListener('keydown', e => {
 /* ---------- bucle ---------- */
 let last = 0, regen = 0;
 function tick(dt) {
+  if (DE.school && DE.school.blocking()) return;
   if (MIS && MIS.ch) { CH.el += dt; updTimer(); }
   else if (MIS) { MIS.t -= dt; if (MIS.t <= 0 && !MIS.late) { if (dOf(MIS.L).fail) failMission('Se acabó el tiempo.'); else { MIS.late = true; MIS.t = 0; toast('Sin prisa: sigue a tu ritmo (1 ★)'); } } updTimer(); }
   if (SO) { SO.t -= dt; const e = $('#soT'); if (e) e.textContent = Math.max(0, Math.ceil(SO.t)); if (SO.t <= 0 && !SO.late) { if (dOf(SO.L).fail) { const s = SO; SO = null; $('#sortOv').hidden = true; lose(s.L, s.i, 'Se acabó el tiempo.', 'Deja siempre un tubo vacío para maniobrar.'); } else SO.late = true; } }
@@ -994,6 +999,7 @@ let anaT = 0;
 function frame(t) {
   const dt = Math.min(.1, (t - (last || t)) / 1000); last = t;
   if (!TEST) tick(dt);
+  if (DE.school) DE.school.frame(t);
   if (MUS.ctx) { const mm = BT ? 'battle' : SO ? 'sort' : document.getElementById('cover') || document.getElementById('story') ? 'menu' : 'lab'; if (mm !== MUS.mode) MUS.mode = mm; }
   if (TAB === 'lab' && Lab.mode === 'mol' && (Lab.dirty || Lab.ghost || Lab.sel != null || t / 1000 < Lab.animT || BT)) { const d = Lab.dirty; Lab.dirty = false; draw(); if (d || (anaT += dt) > .5) { anaT = 0; analysis(); if (MIS && MIS.p.k === 'm' && d) renderSide(); } }
   requestAnimationFrame(frame);
@@ -1007,7 +1013,7 @@ function boot() {
   <nav id="nav"><button data-act="tab" data-arg="lab"><i>⚗</i>Lab</button><button data-act="tab" data-arg="fr"><i>⚱</i>Frascos</button><button data-act="tab" data-arg="bt"><i>☣</i>Batalla</button><button data-act="tab" data-arg="tx"><i>▶</i>Videos</button></nav>
   <main id="stage">
    <div class="tab" id="t-lab"><div class="lmode"><button data-act="mode" data-arg="mol" class="on">⚛ Moléculas</button><button data-act="mode" data-arg="react">⇄ Reactor</button><button data-act="mode" data-arg="forge">☢ Forja</button></div>
-    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Sintetizar</button></div><div id="tray"></div></div>
+    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Crear</button></div><div id="tray"></div></div>
     <div class="pane" id="reactPane" hidden></div><div class="pane" id="forgePane" hidden></div></div>
    <div class="tab" id="t-fr"><div class="filt">${[['all', 'Todos'], ['el', 'Elementos'], ['mol', 'Compuestos'], ['med', 'Bio y fármacos'], ['poly', 'Polímeros'], ['hyb', 'Híbridos'], ['org', 'Organismos'], ['tab', 'Tabla periódica']].map(([k, t]) => `<button data-act="filt" data-arg="${k}">${t}</button>`).join('')}</div><div class="scroll" id="frBody"></div></div>
    <div class="tab" id="t-bt"><div class="lvls" id="lvls"></div><div class="scroll" id="mapBody"></div></div>
@@ -1022,9 +1028,11 @@ function boot() {
   document.addEventListener('visibilitychange', () => { if (document.hidden) { save(true); if (MUS.ctx) MUS.stop(); } });
   document.addEventListener('pointerdown', () => MUS.start());
   if (window.Capacitor) document.body.classList.add('native', 'vok');
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.Capacitor && !TEST) navigator.serviceWorker.register('./sw.js').catch(() => { });
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.Capacitor && !TEST) { const had = !!navigator.serviceWorker.controller; navigator.serviceWorker.register('./sw.js').catch(() => { }); navigator.serviceWorker.addEventListener('controllerchange', () => { if (!had || document.querySelector('.upd')) return; const u = document.createElement('button'); u.className = 'upd'; u.textContent = '✦ Nueva versión de Doc Element lista · toca para actualizar'; u.onclick = () => { save(true); location.reload(); }; document.body.appendChild(u); }); }
 }
-DE.k = { S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud };
+DE.k = { S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
+  atomRect: id => { const a = A(id), cv = $('#cv'); if (!a || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s(a.x, a.y), r = (rad(a) || 30) * Lab.view.z + 6; return { left: c.left + x - r, top: c.top + y - r, width: 2 * r, height: 2 * r }; },
+  bondRect: b => { const p = A(b.a), q = A(b.b), cv = $('#cv'); if (!p || !q || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s((p.x + q.x) / 2, (p.y + q.y) / 2); return { left: c.left + x - 16, top: c.top + y - 16, width: 32, height: 32 }; } };
 DE.ui = { startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
   guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

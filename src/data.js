@@ -4,7 +4,7 @@
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '2.0.0',
+  VERSION: '2.1.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -229,7 +229,7 @@ const LEVELS = [
        dato:'Cada gota de agua que bebes tiene hidrógeno nacido en el Big Bang, hace 13 800 millones de años.',
        fic:'Desperté en la Ouroboros sin saber leer. Mi primer experimento fue una explosión. ÉTER dice que así empiezan todos los universos.' },
   P:[
-   {k:'m',id:'H2',t:'Primer enlace',d:'Toca H en la bandeja dos veces: los átomos se colocan en el plano y se toman de la mano. Luego pulsa SINTETIZAR.',T:120},
+   {k:'m',id:'H2',t:'Primer enlace',d:'Toca H en la bandeja dos veces: los átomos se colocan en el plano y se toman de la mano. Luego pulsa CREAR.',T:120},
    {k:'m',id:'O2',t:'Dos manos',d:'El oxígeno tiene dos manos. Coloca dos oxígenos y TOCA EL ENLACE entre ellos para que usen ambas manos: O=O.',T:120},
    {k:'r',id:'R_H2O',t:'La explosión controlada',d:'Abre el REACTOR. Pon H₂ y O₂: ÉTER balancea la ecuación 2H₂ + O₂ → 2H₂O. Pulsa REACCIONAR. Esta vez, a propósito.',T:120},
    {k:'m',id:'H2O',t:'Agua a mano',d:'Ahora construye el agua átomo por átomo: un oxígeno en el centro y un hidrógeno en cada mano.',T:120},
@@ -397,7 +397,7 @@ const LEVELS = [
 
 const GUIDE = [
  ['LA IDEA','Los átomos son piezas con MANOS (los puntos rosados). Cada mano se une a la mano de otro átomo. Una molécula es estable cuando no queda ninguna mano libre. Con eso resuelves 100 problemas del universo.'],
- ['LABORATORIO','Toca un átomo de la bandeja: aparece en el plano punteado y se une solo a sus vecinos. Para unir dos átomos: arrástralo sobre otro, o toca uno y luego el otro. Toca un ENLACE para hacerlo doble o triple (y una vez más para borrarlo). ⚡H llena las manos libres con hidrógeno. ⚗ SINTETIZAR identifica tu molécula.'],
+ ['LABORATORIO','Toca un átomo de la bandeja: aparece en el plano punteado y se une solo a sus vecinos. Para unir dos átomos: arrástralo sobre otro, o toca uno y luego el otro. Toca un ENLACE para hacerlo doble o triple (y una vez más para borrarlo). ⚡H llena las manos libres con hidrógeno. ⚗ CREAR identifica tu molécula.'],
  ['AYUDAS QUE SE RETIRAN','Niveles 1–2: plano completo y paso a paso (la pieza que toca brilla). 3–4: plano sin hidrógenos. 5–8: solo la lista de átomos. 9–10: solo el nombre; la fórmula cuesta ⚡. Como aprender a andar en bicicleta.'],
  ['VALENCIA','H 1 · O 2 · N 3 · C 4 · Na 1 · Mg 2 · Al 3 · Si 4 · Cl 1 · F 1 · P 3 o 5 · S 2, 4 o 6 · Fe 2 o 3 · Cu 1 o 2. Las líneas de colores indican el tipo de enlace: morado apolar, azul polar, rosa discontinuo iónico.'],
  ['REACTOR','Mezcla sustancias de tus frascos. Si ÉTER conoce la reacción, muestra los productos: ajusta los números (coeficientes) hasta que cada lado tenga los mismos átomos (ley de Lavoisier) y pulsa REACCIONAR. En los niveles 1–4 ÉTER balancea por ti.'],

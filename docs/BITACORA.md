@@ -1,5 +1,14 @@
 # Bitácora de Doc Element
 
+## v2.1.0 — Escuela de ÉTER: química para bebés (2026-11-10)
+1. Tutorial interactivo de 14 pasos que no se puede fallar. Se arma agua y oxígeno; un foco dorado ilumina qué tocar, una mano animada enseña a arrastrar y cada paso avanza solo cuando el jugador lo hace.
+2. Arranca solo después de la historia inicial en partidas nuevas. También está en la portada ("🍼 Química para bebés") y en el menú.
+3. Caritas en cada átomo: triste 😟 con manos libres, feliz 😀 cuando está completo. La regla de la química se ve sin leer.
+4. El botón ⚗ SINTETIZAR pasa a ser ⚗ CREAR, y el análisis habla en lenguaje simple ("😀 ¡todos felices!" / "😟 2 manos libres").
+5. Consejos de primera vez en cada sala (Reactor, Forja, Destilación, Batalla) con foco y explicación. Los relojes se pausan mientras ÉTER explica.
+6. Aviso "Nueva versión lista · toca para actualizar" en la app instalada.
+7. Bot: hace la Escuela completa con toques y arrastres reales en celular y PC, y cierra 7 consejos de sala. 200/200 problemas, 0 errores.
+
 ## v2.0.0 — Temporada 2: FÁRMACOS (2026-11-05)
 1. 10 niveles nuevos (11–20) y 100 problemas: 35 síntesis, 7 reacciones, 7 forjas, 3 polímeros, 8 destilaciones y 40 batallas.
 2. Contenido nuevo: 31 compuestos reales (medicinas, drogas legales, neurotransmisores, antídotos, vitaminas, radiofármacos), 3 polímeros médicos y 8 reacciones reales, entre ellas la síntesis escolar de la aspirina y el metabolismo del alcohol.
