@@ -331,13 +331,14 @@ const BAT = {
   inWin: b => !!b.crit && (b.cyc % BAT.WIN) < BAT.WIN_ON,
   create(p, deck, diff) {
     diff = diff || {}; const ammo = {}; deck.forEach(c => ammo[c.id] = BAT.AMMO);
-    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
+    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, mutT: p.mut || 0, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
   },
   step(b, dt) {
     if (b.over) return;
     b.t -= dt; b.cyc += dt; b.integ -= b.p.dps * dt; b.comboT -= dt; if (b.comboT <= 0) b.combo = 0;
     if (b.rg && b.hp > 0) b.hp = Math.min(b.max, b.hp + b.rg * dt);
     for (const k in b.cd) b.cd[k] = Math.max(0, b.cd[k] - dt);
+    if (b.p.mut && b.p.ph2) { b.mutT -= dt; if (b.mutT <= 0) { b.mutT = b.p.mut; b.phase = 3 - b.phase; b.ph = BAT.phaseOf(b.p, b.phase); b.ev.push({ k: 'phase' }); } } // muta: la debilidad alterna cada «mut» segundos
     b.spikeT -= dt; if (b.spikeT <= 0) { b.spikeT = 5; b.integ -= b.p.dps * 2; b.ev.push({ k: 'spike' }); }
     if (b.integ <= 0 || b.t <= 0) { b.integ = Math.max(0, b.integ); b.over = true; b.win = false; b.why = b.integ <= 0 ? 'La integridad de la nave llegó a 0 %.' : 'Se acabó el tiempo.'; }
   },
@@ -346,7 +347,7 @@ const BAT = {
     if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * mul * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1) * f); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
     else if (e < 0) { b.combo = 0; dmg = Math.round(-e * mul * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
     else { b.combo = 0; dmg = 1; b.hp -= 1; kind = 'none'; }
-    if (b.phase === 1 && b.p.ph2 && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
+    if (b.phase === 1 && b.p.ph2 && !b.p.mut && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
     if (b.hp <= 0) { b.hp = 0; b.over = true; b.win = true; b.stars = b.integ >= 70 ? 3 : b.integ >= 40 ? 2 : 1; }
     return { e, dmg, kind, crit, f };
   },

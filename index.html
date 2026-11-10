@@ -228,8 +228,8 @@ p{margin:6px 0;line-height:1.45}
 .stext{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .stext .film{font-size:clamp(13px,2.4vh,18px);width:100%}
 /* ---------- batalla / destilación ---------- */
-#battle,#sortOv,#geneOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
-#battle[hidden],#sortOv[hidden],#geneOv[hidden]{display:none}
+#battle,#sortOv,#geneOv,#orgOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
+#battle[hidden],#sortOv[hidden],#geneOv[hidden],#orgOv[hidden]{display:none}
 .bt-top{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:3px solid var(--pur);flex:none}
 .bt-top .mega{font-size:24px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt-top .tm{font-size:28px}
@@ -368,6 +368,35 @@ input.inp{width:auto;min-width:140px}
 .ctab .crow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .ctab b{color:var(--wht)}.ctab .hot{color:#000;background:var(--amb)}.ctab .hot b{color:#000}
 @media (max-height:520px){.gt{width:24px;height:28px;font-size:17px}.gb{width:52px;height:44px;font-size:26px}.chain .aa{width:30px;height:30px;font-size:18px}}
+/* ---------- sala de cultivo (temporada 4) ---------- */
+.cellsvg{width:min(100%,560px,calc((100vh - 150px)*1.68));height:auto;flex:none}
+.cellsvg .ml{stroke:var(--dim);stroke-width:1;stroke-dasharray:3 3}
+.cellsvg .md{fill:none;stroke:var(--wht);stroke-width:1.5}
+.cellsvg .mk{cursor:pointer}
+.cellsvg .mk circle{fill:#000;stroke:var(--amb);stroke-width:2.5}
+.cellsvg .mk text{fill:var(--amb);font-family:var(--fd);font-size:17px;pointer-events:none}
+.cellsvg .mk.ok circle{stroke:var(--grn)}
+.cellsvg .mk.ok text{fill:var(--grn);font-size:12px}
+.cellsvg .mk.ok .nm{fill:var(--wht);font-family:var(--fb);font-size:10px}
+.olist{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;max-width:100%}
+.olist i{color:var(--dim);font-style:normal}
+.oi{border:2px solid var(--grn);color:var(--wht);padding:2px 8px;font-size:12.5px;border-radius:14px}
+.oi b{font-family:var(--fd);color:var(--grn);margin-right:5px}
+.olist.sm .oi{border-color:var(--pur2);font-size:11px;color:var(--ink2)}
+.ccard{font-family:var(--fd);font-size:clamp(22px,7vh,42px);line-height:1;color:var(--wht);border:3px solid var(--pur);padding:10px 24px;text-align:center;box-shadow:var(--glow)}
+.cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.cats .btn{min-width:150px;min-height:48px;font-size:14px}
+.egrid{--ec:clamp(28px,9.5vh,46px);display:grid;gap:4px}
+.ec{width:var(--ec);height:var(--ec);border-radius:50%;border:2px solid var(--grn);background:#04140d;color:#000;font-size:calc(var(--ec)*.5);line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+.ec.w{border:none;border-radius:4px;background:repeating-linear-gradient(45deg,#1a0f2e,#1a0f2e 4px,#000 4px,#000 8px)}
+.ec.x{border-color:var(--mag);background:radial-gradient(circle,var(--mag) 35%,#3a0425 75%);box-shadow:0 0 10px var(--mag)}
+.ec.x.new{animation:epop .5s}
+.ec.v{border-color:var(--ink);background:var(--ink);box-shadow:0 0 10px var(--ink)}
+.ec.hintc{animation:hint 1s infinite;border-color:var(--amb)}
+.lg{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid var(--grn);vertical-align:middle}
+.lg.v{background:var(--ink);border-color:var(--ink)}.lg.x{background:var(--mag);border-color:var(--mag)}
+@keyframes epop{0%{transform:scale(.3)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.fbk{text-align:center;min-height:1.3em;margin:0}.fbk.ok{color:var(--grn)}.fbk.bad{color:var(--mag)}
 
 </style></head><body><noscript>Doc Element necesita JavaScript activado.</noscript>
 <script>
@@ -388,7 +417,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '2.2.0',
+  VERSION: '2.3.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -1278,6 +1307,286 @@ LEVELS.push(
 </script>
 <script>
 /* ============================================================
+   DOC ELEMENT · TEMPORADA 4: ORGANISMOS (niveles 31–40)
+   Células, energía, bacterias, virus, hongos, plantas, defensas, resistencia, ecosistemas
+   y el Primogénito (ficción). Educativo: microbios solo como idea, sin protocolos ni recetas.
+   ============================================================ */
+'use strict';
+TAGS.inm = ['Inmunidad', '✚'];
+TAGS.eco = ['Ecológico', '❀'];
+ELTAGS.Zn = 'struct1,cond1,inm1';
+/* datos y reglas puras de la sala de Cultivo (sin DOM: las usan el juego, el validador y el bot) */
+const ORG = {
+  /* parte: [nombre, qué hace, pregunta] */
+  PART: {
+    mem: ['Membrana', 'la piel de la célula: decide qué entra y qué sale', '¿Qué parte decide qué entra y qué sale?'],
+    par: ['Pared celular', 'una armadura rígida por fuera de la membrana', '¿Cuál es la armadura rígida de afuera?'],
+    adn: ['ADN', 'el manual de instrucciones, suelto y sin núcleo', '¿Dónde están las instrucciones?'],
+    pla: ['Plásmido', 'un anillo pequeño de ADN que las bacterias se pasan entre sí', '¿Cuál es el anillito de ADN que se comparten?'],
+    rib: ['Ribosomas', 'las fábricas de proteínas', '¿Quién fabrica las proteínas?'],
+    fla: ['Flagelo', 'una cola que gira como hélice para nadar', '¿Con qué nada?'],
+    nuc: ['Núcleo', 'la caja fuerte que guarda el ADN', '¿Dónde se guarda el ADN?'],
+    mit: ['Mitocondria', 'la central de energía: quema azúcar con oxígeno', '¿Quién produce la energía?'],
+    gol: ['Aparato de Golgi', 'el correo: empaqueta y envía las proteínas', '¿Quién empaqueta y envía las proteínas?'],
+    lis: ['Lisosoma', 'el centro de reciclaje: digiere lo que sobra', '¿Quién recicla la basura?'],
+    clo: ['Cloroplasto', 'el panel solar: fabrica azúcar con luz', '¿Quién fabrica azúcar con la luz?'],
+    vac: ['Vacuola', 'el tanque de agua y reservas', '¿Cuál es el tanque de agua?'],
+    cap: ['Cápside', 'la caja de proteínas que protege sus genes', '¿Cuál es la caja que protege sus genes?'],
+    esp: ['Espículas', 'las llaves con las que se pega a una célula', '¿Con qué se pega a la célula?'],
+    gen: ['Material genético', 'ADN o ARN: solo instrucciones para copiarse', '¿Dónde están sus instrucciones?'],
+    env: ['Envoltura', 'una capa de grasa: el jabón la rompe', '¿Qué parte rompe el jabón?'],
+    gem: ['Yema', 'un brote: así se reproduce la levadura', '¿Por dónde se reproduce?']
+  },
+  CELL: {
+    bact: ['Bacteria', ['par', 'mem', 'adn', 'pla', 'rib', 'fla']],
+    animal: ['Célula animal', ['mem', 'nuc', 'mit', 'rib', 'gol', 'lis']],
+    planta: ['Célula vegetal', ['par', 'mem', 'nuc', 'clo', 'vac', 'mit', 'rib']],
+    virus: ['Virus', ['cap', 'esp', 'gen', 'env']],
+    hongo: ['Levadura (hongo)', ['par', 'nuc', 'mit', 'vac', 'gem']]
+  },
+  /* brote: '.' sano · 'X' infectado · '#' muro · 'V' protegido. Cada turno proteges «per» casillas y luego el brote pasa a las vecinas */
+  grid: map => ({ w: map[0].length, h: map.length, c: map.join('').split('') }),
+  nb(g, i) { const x = i % g.w, o = []; if (x > 0) o.push(i - 1); if (x < g.w - 1) o.push(i + 1); if (i >= g.w) o.push(i - g.w); if (i < g.w * (g.h - 1)) o.push(i + g.w); return o; },
+  front(g) { const f = []; for (let i = 0; i < g.c.length; i++) if (g.c[i] === '.' && ORG.nb(g, i).some(j => g.c[j] === 'X')) f.push(i); return f; },
+  spread(g) { const f = ORG.front(g); f.forEach(i => { g.c[i] = 'X'; }); return f; },
+  safe: g => g.c.filter(v => v === '.' || v === 'V').length,
+  /* simula una lista de casillas protegidas; devuelve cuántas quedan a salvo (−1 si la lista no es válida) */
+  run(p, sol) {
+    const g = ORG.grid(p.map); let q = 0, guard = 0;
+    while (ORG.front(g).length && guard++ < 99) {
+      for (let n = 0; n < p.per && ORG.front(g).length; n++) { const i = sol[q++]; if (i == null || g.c[i] !== '.') return -1; g.c[i] = 'V'; }
+      ORG.spread(g);
+    }
+    return ORG.safe(g);
+  },
+  sol: p => String(p.sol).split(',').map(Number)
+};
+/* etiquetas nuevas para sustancias que ya existían */
+(function () {
+  const add = (id, t) => { const c = COMPOUNDS.find(c => c[0] === id); if (c) c[4] += ',' + t; };
+  [['VITC', 'inm1'], ['ZNO', 'inm1'], ['HIST', 'inm1'], ['GLU', 'eco1'], ['H2O', 'eco1'], ['CO2', 'eco1'], ['NH3', 'eco2'], ['UREA', 'eco2'], ['C2H4', 'eco1'], ['H3PO4', 'eco1'], ['CaCO3', 'eco1'], ['KCL', 'eco1'], ['CaOH2', 'eco1'], ['SALI', 'eco1'], ['O2', 'eco1']].forEach(([id, t]) => add(id, t));
+})();
+COMPOUNDS.push(
+ ['PIR','C3H4O3','Ácido pirúvico','CC(=O)C(=O)O','nrg2,bio1','El cruce de caminos de la energía: cada glucosa se parte en dos piruvatos.'],
+ ['PROP','C3H6O2','Ácido propiónico','CCC(=O)O','anti1,bio1,acid1','Lo fabrican las bacterias del queso suizo. También conserva el pan.'],
+ ['DIAC','C4H6O2','Diacetilo','CC(=O)C(C)=O','bio1,org1','El aroma de la mantequilla: lo producen las bacterias lácticas.'],
+ ['BUT','C4H8O2','Ácido butírico','CCCC(=O)O','bio2,eco1,nrg1','Tus bacterias intestinales lo fabrican con la fibra, y alimenta a las células del colon.'],
+ ['CIT','C6H8O7','Ácido cítrico','OC(=O)CC(O)(CC(=O)O)C(=O)O','acid1,nrg2,bio1,eco1','El ácido de los limones y una pieza central del ciclo de Krebs, la rueda de energía de la mitocondria.'],
+ ['BLAC','C3H5NO','β-Lactama','O=C1CCN1','med2,anti2','Un anillo cuadrado y tenso: el corazón de la penicilina. Bloquea la construcción de la pared bacteriana.'],
+ ['NAG','C8H15NO6','N-acetilglucosamina','CC(=O)NC1C(O)OC(CO)C(O)C1O','struct2,bio2','Ladrillo de la pared de las bacterias y de la quitina de hongos e insectos.'],
+ ['ISO','C6H7N3O','Isoniazida','NNC(=O)C1=CC=NC=C1','med3,anti1','Medicina contra la tuberculosis desde 1952. Se toma durante meses y siempre con control médico.'],
+ ['XIL','C5H12O5','Xilitol','OCC(O)C(O)C(O)CO','anti1,nrg1,bio1','Endulza, pero las bacterias de la caries no pueden fermentarlo.'],
+ ['ACV','C8H11N5O3','Aciclovir','NC1=NC2=C(N=CN2COCCO)C(=O)N1','med2,gen2','Antiviral que imita a la guanina: el virus lo usa por error y su copia se detiene.'],
+ ['TIMOL','C10H14O','Timol','CC1=CC(O)=C(C=C1)C(C)C','anti3,org1,eco1','El antiséptico del tomillo: está en muchos enjuagues bucales.'],
+ ['SORB','C6H8O2','Ácido sórbico','CC=CC=CC(=O)O','anti2,eco1','Conservante de alimentos: frena mohos y levaduras.'],
+ ['PUT','C4H12N2','Putrescina','NCCCCN','bio2,base1','El olor de lo que se descompone. En dosis mínimas, todas tus células la usan para crecer.'],
+ ['FRU','C6H12O6','Fructosa','OCC(=O)C(O)C(O)C(O)CO','nrg3,eco2','El azúcar de la fruta: los mismos átomos que la glucosa, ordenados de otra forma (isómeros).'],
+ ['AIA','C10H9NO2','Ácido indolacético','OC(=O)CC1=CNC2=CC=CC=C12','eco3,bio1','Auxina: la hormona que hace crecer a las plantas hacia la luz.'],
+ ['MAL','C4H6O5','Ácido málico','OC(=O)CC(O)C(=O)O','acid1,nrg1,eco2','El ácido de las manzanas verdes.'],
+ ['AlOH3','Al(OH)3','Hidróxido de aluminio','O[Al](O)O','inm2,base1','Adyuvante: ayuda a que algunas vacunas despierten mejor a las defensas. También es antiácido.'],
+ ['TMA','C3H9N','Trimetilamina','CN(C)C','base1,bio1','El olor del pescado pasado: la producen las bacterias al descomponerlo.']
+);
+REACTIONS.push(
+ ['R_GLUC','Glucólisis (simplificada)','GLU+O2=2PIR+2H2O',-20,'La glucosa se parte en dos piruvatos: el primer paso para sacarle energía, en todos los seres vivos.'],
+ ['R_LACP','Fermentación láctica','PIR+H2=LAC',-25,'Sin oxígeno, el piruvato recibe hidrógenos y se vuelve ácido láctico: yogur… y agujetas.'],
+ ['R_BUTF','Fermentación butírica','GLU=BUT+2CO2+2H2',-60,'Bacterias del intestino y del suelo convierten el azúcar en ácido butírico y gases.'],
+ ['R_UREASA','Ureasa','UREA+H2O=CO2+2NH3',30,'Algunas bacterias rompen la urea para rodearse de amoníaco y resistir el ácido.'],
+ ['R_METG','Metanogénesis','CO2+4H2=CH4+2H2O',-165,'Las arqueas de los pantanos y del estómago de las vacas respiran CO₂ y sueltan metano.'],
+ ['R_QUIM','Quimiosíntesis','CO2+4H2S+O2=CH2O+4@S+3H2O',-50,'En el fondo del mar no hay luz: las bacterias fabrican alimento con la energía del sulfuro de hidrógeno.']
+);
+DIFF.push(
+ {g:1,fail:1,ah:5,bal:0,crit:1,rg:1},{g:1,fail:1,ah:5,bal:0,crit:1,rg:1.2},{g:1,fail:1,ah:6,bal:0,crit:1,rg:1.4},{g:1,fail:1,ah:6,bal:0,crit:1,rg:1.5},{g:0,fail:1,ah:7,bal:0,crit:1,rg:1.6},
+ {g:0,fail:1,ah:7,bal:0,crit:1,rg:1.8},{g:0,fail:1,ah:8,bal:0,crit:1,rg:2},{g:0,fail:1,ah:8,bal:0,crit:1,rg:2},{g:0,fail:1,ah:9,bal:0,crit:1,rg:2.2},{g:0,fail:1,ah:9,bal:0,crit:1,rg:2.2}
+);
+STORY.s4i = [
+  ['doc','loco','¡VIDA!','Ya sé leer el manual de la vida. Ahora quiero escribir uno. ¡Voy a crear un organismo!'],
+  ['eter','enojado','DESPACIO, DOC','Antes de crear vida hay que entenderla. Empieza por lo más pequeño que está vivo: una célula.'],
+  ['eter','neutral','REGLAS DEL CULTIVO','Aquí verás los microbios solo como idea: qué son, cómo se frenan y por qué casi todos son útiles. Nada de recetas.'],
+  ['doc','sorpresa','TEMPORADA 4: ORGANISMOS','Células, bacterias, virus, hongos, plantas, defensas… y algo que late en el tanque 7.']
+];
+STORY.s4e = [
+  ['eter','feliz','EQUILIBRIO','El Primogénito dejó de crecer. No lo destruiste: le pusiste un límite, como hace todo ecosistema.'],
+  ['doc','triste','MI CRIATURA','Quise fabricar vida para sentirme un dios. Me salió un espejo.'],
+  ['doc','feliz','JARDINERO','Ahora cuido el invernadero. Crear resultó fácil; lo difícil es cuidar.'],
+  ['eter','sorpresa','TEMPORADA 5','Queda una puerta: la TESIS. Niveles 41–50… ¿se puede dominar la realidad?']
+];
+const o = (mode, x) => Object.assign({ k: 'o', mode }, x);
+LEVELS.push(
+{ n:31, t:'CÉLULA', s:'La pieza más pequeña que está viva', gift:[],
+  talk:[['eter','neutral','Todo ser vivo está hecho de células. La más sencilla es una bacteria: una bolsa con instrucciones y fábricas.'],['doc','sorpresa','¿Y yo cuántas tengo?'],['eter','feliz','Unos 30 billones. Y otras tantas bacterias de inquilinas.']],
+  tx:{ teo:'La célula es la unidad más pequeña de la vida. Las bacterias (procariotas) no tienen núcleo: su ADN flota suelto. Las células de animales, plantas y hongos (eucariotas) guardan el ADN en un núcleo y tienen orgánulos, como las mitocondrias.',
+       dato:'En tu cuerpo hay más o menos tantas bacterias como células humanas: unos 30 billones de cada una.',
+       fic:'Puse una gota del tanque 7 bajo el microscopio. Algo nadaba. ÉTER: «Salúdala: es tu tatarabuela».' },
+  P:[
+   o('cel',{cel:'bact',q:['mem','adn','rib'],t:'La bacteria',d:'Lee la pregunta y toca el círculo «?» de la parte correcta.',T:80}),
+   {k:'m',id:'GLYC',t:'Glicerol',d:'Tres carbonos, cada uno con un –OH: la base de las grasas de la membrana.',T:300},
+   o('ord',{rule:'Del más pequeño al más grande',items:['Átomo','Molécula de agua','Proteína','Virus','Bacteria','Glóbulo rojo','Grano de arena'],t:'¿Qué tan pequeño?',d:'Toca en orden, del más pequeño al más grande.',T:80}),
+   o('cel',{cel:'bact',q:['par','fla','pla','mem','rib','adn'],t:'Bacteria completa',d:'Las seis partes de una bacteria.',T:110}),
+   {k:'b',t:'Agua contaminada',d:'El tanque de agua se llenó de bacterias.',sc:'Bacterias en el agua · turbidez',w:'anti2,oxi1',h:'nrg1,bio1',hp:330,T:60,dps:1.6},
+   o('cel',{cel:'animal',q:['nuc','mit','mem','rib'],t:'Célula animal',d:'Tus células guardan el ADN en un núcleo.',T:90}),
+   {k:'m',id:'PIR',t:'Ácido pirúvico',d:'Tres carbonos: un metilo, un C=O y un ácido –COOH.',T:300},
+   o('cls',{rule:'¿Guarda su ADN en un núcleo?',cats:['Sin núcleo (procariota)','Con núcleo (eucariota)'],items:[['Bacteria del yogur',0],['Célula de tu piel',1],['Levadura del pan',1],['Salmonela',0],['Célula de una hoja',1],['Arquea de aguas termales',0],['Ameba',1]],t:'Con o sin núcleo',d:'Clasifica cada célula.',T:80}),
+   {k:'r',id:'R_GLUC',t:'Glucólisis',d:'Glucosa + oxígeno → 2 piruvatos + 2 aguas (simplificada). Balancea.',T:170},
+   {k:'b',boss:1,t:'La biopelícula',d:'Las bacterias se pegaron en una capa babosa que las protege.',sc:'Biopelícula en las tuberías',w:'anti2,org1',h:'bio1,nrg1',hp:450,T:90,dps:1.6,ph2:{d:'Se esconden bajo el limo',w:'oxi2,anti1',h:'bio1'}}
+  ]},
+{ n:32, t:'ENERGÍA', s:'Respirar o fermentar', gift:[],
+  talk:[['doc','sorpresa','¿Las bacterias respiran?'],['eter','neutral','Algunas sí. Otras fermentan: sacan energía del azúcar sin oxígeno. Así se hacen el yogur, el pan y el queso.']],
+  tx:{ teo:'Con oxígeno, la célula quema la glucosa por completo en la mitocondria (respiración). Sin oxígeno, la fermenta: las levaduras producen etanol y CO₂; las bacterias lácticas, ácido láctico. Fermentar da mucha menos energía, pero no necesita aire.',
+       dato:'Los agujeros del queso suizo son burbujas de CO₂ que sueltan las bacterias propiónicas.',
+       fic:'Dejé leche en el tanque equivocado. Al tercer día tenía yogur. ÉTER lo anotó como mi primer experimento exitoso.' },
+  P:[
+   {k:'r',id:'R_LACP',t:'Fermentación láctica',d:'Piruvato + hidrógeno → ácido láctico: así nace el yogur.',T:150},
+   {k:'m',id:'PROP',t:'Ácido propiónico',d:'Tres carbonos en fila y un ácido: el sabor del queso suizo.',T:260},
+   o('cel',{cel:'animal',q:['mit','gol','lis','nuc','mem','rib'],t:'La central de energía',d:'Las seis partes de una célula animal.',T:110}),
+   {k:'m',id:'DIAC',t:'Diacetilo',d:'Cuatro carbonos con dos C=O seguidos en el centro: el aroma de la mantequilla.',T:280},
+   {k:'b',t:'Fermentación desbocada',d:'Los tanques de comida se inflan de gas.',sc:'Levaduras sin control · CO₂ y etanol',w:'cool2,anti1',h:'nrg2',hp:300,T:60,dps:1.6},
+   {k:'r',id:'R_BUTF',t:'Fermentación butírica',d:'Glucosa → ácido butírico + 2 CO₂ + 2 H₂.',T:170},
+   {k:'m',id:'CIT',t:'Ácido cítrico',d:'Un carbono central con un –OH y un –COOH, y dos brazos –CH₂–COOH.',T:380},
+   o('ord',{rule:'El viaje de la energía',items:['Luz del Sol','El cloroplasto fabrica glucosa','Te comes la planta','La mitocondria quema la glucosa','ATP: energía lista para usar','El músculo se mueve'],t:'Del Sol al músculo',d:'Ordena los pasos.',T:90}),
+   {k:'s',n:6,mix:['GLU','PIR','LAC','C2H5OH','CO2','BUT'],t:'Fermentador',d:'Separa lo que produce cada microbio.',T:170},
+   {k:'b',boss:1,t:'Asfixia celular',d:'Un veneno bloquea las mitocondrias: hay oxígeno, pero las células no pueden usarlo.',sc:'Mitocondrias bloqueadas · sin energía',w:'antid2,nrg2',h:'fuel1',hp:400,T:90,dps:1.6,ph2:{d:'Se acumula ácido láctico',w:'base2,salt1',h:'acid1'}}
+  ]},
+{ n:33, t:'BACTERIAS', s:'Pequeñas, antiguas y casi siempre útiles', gift:[],
+  talk:[['eter','neutral','De cada cien tipos de bacterias, menos de uno te enferma. Las demás hacen el suelo, el queso y parte de tu digestión.'],['doc','loco','¿Y a las malas?'],['eter','neutral','A esas se les rompe la pared. Así funciona la penicilina.']],
+  tx:{ teo:'Las bacterias tienen una pared de peptidoglicano: una malla de azúcares, como la N-acetilglucosamina, cosida con péptidos. La penicilina lleva un anillo de cuatro átomos, la β-lactama, que bloquea a la enzima que cose la malla; la bacteria crece y se revienta. Nuestras células no tienen pared, así que no les afecta.',
+       dato:'Alexander Fleming descubrió la penicilina en 1928, al ver que un moho había matado las bacterias de una placa olvidada.',
+       fic:'Olvidé una placa junto a la ventilación y le creció moho. ÉTER dijo que así empiezan los premios Nobel… y las intoxicaciones.' },
+  P:[
+   {k:'m',id:'BLAC',t:'El anillo de la penicilina',d:'β-lactama: un cuadrado de tres carbonos y un nitrógeno, con un C=O.',T:260},
+   o('epi',{map:['X......'],per:1,save:6,sol:'1',t:'Cierra el paso',d:'El brote pasa a las casillas vecinas. Toca una casilla sana para protegerla y cortarle el camino.',T:60}),
+   {k:'m',id:'NAG',t:'Ladrillo de la pared',d:'Una glucosa en anillo que cambia un –OH por –NH–CO–CH₃.',T:400},
+   o('cls',{rule:'Casi todas las bacterias son inofensivas o útiles',cats:['Útil','Peligrosa'],items:[['Lactobacilos del yogur',0],['Bacteria del cólera',1],['Rizobios que abonan las raíces',0],['Salmonela',1],['Bacterias de tu intestino',0],['Bacilo de la tuberculosis',1]],t:'¿Amiga o enemiga?',d:'Clasifica cada bacteria.',T:80}),
+   {k:'b',t:'Herida infectada',d:'El corte de un tripulante se infectó.',sc:'Bacterias en la herida · pus',w:'anti2,med1',h:'bio1,nrg1',hp:340,T:60,dps:1.6},
+   {k:'m',id:'ISO',t:'Isoniazida',d:'Una piridina (benceno con un N) unida a –CO–NH–NH₂.',T:340},
+   o('epi',{map:['...X...'],per:1,save:5,sol:'2,5',t:'Dos caminos',d:'Ahora el brote avanza hacia los dos lados. No siempre se salva a todos.',T:70}),
+   {k:'m',id:'XIL',t:'Xilitol',d:'Cinco carbonos en fila, cada uno con un –OH.',T:300},
+   {k:'b',t:'Caries espacial',d:'Las bacterias de la boca convierten el azúcar en ácido.',sc:'Ácido sobre el esmalte',w:'base1,anti1,salt1',h:'nrg2,acid1',hx:'GLU',hp:220,T:60,dps:1.6},
+   {k:'b',boss:1,t:'Neumonía bacteriana',d:'Una bacteria se instaló en los pulmones de un durmiente.',sc:'Bacterias en los pulmones · fiebre',w:'med2,anti2',h:'bio1',hp:450,T:90,dps:1.6,ph2:{d:'Se cubre con una cápsula',w:'med2,inm1',h:'nrg1'}}
+  ]},
+{ n:34, t:'VIRUS', s:'Un mensaje con caja', gift:[],
+  talk:[['eter','neutral','Un virus no come, no respira y no crece. Es un mensaje dentro de una caja: necesita una célula para copiarse.'],['doc','sorpresa','¿Entonces los antibióticos…?'],['eter','enojado','No le hacen nada: no tiene pared que romper. Contra los virus sirven las vacunas, los antivirales y el jabón.']],
+  tx:{ teo:'Un virus es material genético (ADN o ARN) dentro de una cápside de proteína; algunos llevan además una envoltura de grasa. No tiene metabolismo: entra en una célula y usa sus ribosomas para copiarse. Por eso los antibióticos no sirven contra ellos.',
+       dato:'El jabón rompe la envoltura de grasa de virus como los de la gripe: por eso lavarse las manos 20 segundos funciona.',
+       fic:'Un durmiente estornudó dentro de su cápsula. ÉTER selló tres cubiertas antes de que yo dijera «salud».' },
+  P:[
+   o('cel',{cel:'virus',q:['gen','cap','esp','env'],t:'Anatomía de un virus',d:'Un virus tiene muy pocas piezas.',T:90}),
+   o('ord',{rule:'Cómo se copia un virus',items:['Se pega a una célula','Entra','La célula copia sus genes','Los ribosomas fabrican sus piezas','Las piezas se ensamblan','Salen virus nuevos'],t:'El ciclo del virus',d:'Ordena los pasos.',T:90}),
+   {k:'m',id:'ACV',t:'Aciclovir',d:'Una guanina con una cadena –CH₂–O–CH₂–CH₂–OH en el lugar del azúcar.',T:420},
+   o('cls',{rule:'Los antibióticos solo sirven contra bacterias',cats:['Bacteria','Virus'],items:[['Gripe',1],['Tuberculosis',0],['Resfriado común',1],['Cólera',0],['Sarampión',1],['Salmonelosis',0],['Varicela',1],['Rabia',1]],t:'¿Bacteria o virus?',d:'¿Qué causa cada enfermedad?',T:90}),
+   {k:'b',t:'Gripe de a bordo',d:'Tres cubiertas con fiebre.',sc:'Virus respiratorio · fiebre',w:'med2,cool1,inm1',h:'bio1',hp:340,T:60,dps:1.6},
+   o('epi',{map:['....#....','.X..#....','.........','....#....'],per:1,save:17,sol:'11,2,21,30',t:'Cuarentena',d:'Hay un solo paso entre las dos cubiertas. Protege la casilla que lo cierra.',T:80}),
+   {k:'m',id:'TIMOL',t:'Timol',d:'Un fenol (benceno con –OH) con un metilo y un isopropilo.',T:360},
+   {k:'s',n:7,mix:['ACV','TIMOL','C2H5OH','H2O2','NaClO','H2O','I2'],t:'Botiquín antiviral',d:'Un antiviral y seis desinfectantes.',T:190},
+   {k:'b',mut:10,t:'Virus mutante',d:'Cambia de forma cada 10 s: mira el escáner antes de lanzar.',sc:'Virus de ARN · muta rápido',w:'med2,gen1',h:'bio1',hp:340,T:60,dps:1.6,ph2:{d:'Cambió sus espículas',w:'anti2,inm1',h:'bio1'}},
+   {k:'b',boss:1,mut:12,t:'La gripe estelar',d:'Muta: su debilidad cambia cada 12 s. Mira el escáner antes de lanzar.',sc:'Virus nuevo · salta de cápsula en cápsula',w:'med2,inm1',h:'bio1',hp:380,T:90,dps:1.6,ph2:{d:'Estrena espículas',w:'anti2,gen2',h:'nrg1'}}
+  ]},
+{ n:35, t:'HONGOS', s:'Levaduras, mohos y setas', gift:[],
+  talk:[['doc','feliz','¡Pan! ¡Por fin algo que entiendo!'],['eter','neutral','La levadura es un hongo de una sola célula. Come azúcar y suelta CO₂: por eso sube la masa.']],
+  tx:{ teo:'Los hongos no son plantas: no hacen fotosíntesis, se alimentan de materia orgánica y su pared es de quitina, el material del caparazón de los insectos. Hay levaduras (una sola célula), mohos y setas. Son los grandes recicladores del planeta.',
+       dato:'El ser vivo más grande conocido es un hongo: una Armillaria de Oregón, en Estados Unidos, que ocupa unos 9 km² bajo el suelo.',
+       fic:'El moho de la despensa escribió un círculo perfecto en el pan. ÉTER lo midió. Yo me lo quería comer.' },
+  P:[
+   o('cel',{cel:'hongo',q:['gem','par','nuc','vac','mit'],t:'La levadura',d:'Un hongo de una sola célula.',T:100}),
+   {k:'r',id:'R_FERM',t:'Que suba el pan',d:'Glucosa → 2 etanol + 2 CO₂. Balancea.',T:150},
+   {k:'m',id:'SORB',t:'Ácido sórbico',d:'Seis carbonos con dos dobles enlaces alternados y un ácido al final.',T:320},
+   o('cls',{rule:'Tres microbios muy distintos',cats:['Bacteria','Virus','Hongo'],items:[['Levadura del pan',2],['Moho del queso azul',2],['Gripe',1],['Pie de atleta',2],['Lactobacilo del yogur',0],['Champiñón',2],['Sarampión',1],['Cólera',0]],t:'¿Quién es quién?',d:'Clasifica cada uno.',T:90}),
+   {k:'b',t:'Moho en la despensa',d:'Manchas verdes sobre la comida.',sc:'Moho · esporas en el aire',w:'anti2,cool1',h:'solv1,nrg1',hp:340,T:60,dps:1.6},
+   {k:'m',id:'PUT',t:'Putrescina',d:'Cuatro carbonos en fila con una amina en cada punta.',T:260},
+   o('ord',{rule:'Cómo recicla un hongo',items:['Cae una hoja','El hongo suelta enzimas','La hoja se deshace en moléculas','El hongo las absorbe','Los minerales vuelven al suelo','Una planta los aprovecha'],t:'Los recicladores',d:'Ordena los pasos.',T:90}),
+   {k:'m',id:'APA',t:'El núcleo de la penicilina',d:'Ácido 6-aminopenicilánico: la β-lactama pegada a un anillo con azufre.',T:440},
+   {k:'b',t:'Roya en los cultivos',d:'Un hongo cubre las hojas del invernadero.',sc:'Hongo en las hojas',w:'anti2,eco1',h:'solv1',hp:340,T:60,dps:1.6},
+   {k:'b',boss:1,t:'El micelio',d:'Una red de hilos de hongo se extiende por los ductos.',sc:'Micelio en los ductos · esporas',w:'anti2,seal1',h:'solv1,bio1',hp:450,T:90,dps:1.6,ph2:{d:'Suelta esporas',w:'seal2,cool1',h:'nrg1'}}
+  ]},
+{ n:36, t:'PLANTAS', s:'Comer luz', gift:[],
+  talk:[['eter','neutral','Una planta fabrica su comida con aire, agua y luz. Todo lo que comes empezó así.'],['doc','loco','¡Quiero un invernadero que crezca en una noche!'],['eter','enojado','Las plantas no tienen prisa. Aprende de ellas.']],
+  tx:{ teo:'En los cloroplastos, la clorofila atrapa la luz y la usa para unir CO₂ y agua en glucosa, soltando oxígeno. Las plantas se coordinan con hormonas: la auxina las hace crecer hacia la luz y el etileno madura los frutos.',
+       dato:'Un plátano maduro suelta etileno, un gas que hace madurar a las frutas que tiene cerca.',
+       fic:'Puse un plátano junto a los tomates verdes del invernadero. Por la mañana estaban rojos. ÉTER lo llamó «química de frutero».' },
+  P:[
+   o('cel',{cel:'planta',q:['clo','vac','par','nuc'],t:'Célula vegetal',d:'Tiene pared, un gran tanque de agua y paneles solares.',T:90}),
+   {k:'r',id:'R_FOTO',t:'Fotosíntesis',d:'6 CO₂ + 6 H₂O → glucosa + 6 O₂. Balancea.',T:170},
+   {k:'m',id:'FRU',t:'Fructosa',d:'Seis carbonos en fila: el segundo lleva un C=O y los demás un –OH.',T:360},
+   o('ord',{rule:'De la semilla al fruto',items:['Semilla','Raíz','Tallo y hojas','Flor','Polinización','Fruto con semillas'],t:'Una vida de planta',d:'Ordena las etapas.',T:80}),
+   {k:'m',id:'AIA',t:'Auxina',d:'Un indol (dos anillos fusionados, uno con N) y una cola –CH₂–COOH.',T:400},
+   {k:'b',t:'Invernadero marchito',d:'Las plantas de la nave se quedan sin nutrientes.',sc:'Hojas amarillas · falta nitrógeno',w:'eco2,solv1',h:'salt1',hp:250,T:60,dps:1.6},
+   {k:'m',id:'MAL',t:'Ácido málico',d:'Cuatro carbonos: un –COOH en cada punta y un –OH en el segundo.',T:300},
+   o('cel',{cel:'planta',q:['mit','rib','mem','clo','vac','par','nuc'],t:'Célula vegetal completa',d:'Las siete partes.',T:120}),
+   {k:'s',n:7,mix:['GLU','FRU','MAL','CIT','AIA','C2H4','H2O'],t:'Savia',d:'Azúcares, ácidos y hormonas de una planta.',T:190},
+   {k:'b',boss:1,t:'La plaga del invernadero',d:'Insectos y hongos atacan a la vez.',sc:'Hojas mordidas · manchas',w:'eco2,anti1',h:'nrg1',hp:320,T:90,dps:1.6,ph2:{d:'El hongo entra por las heridas',w:'anti2,seal1',h:'solv1'}}
+  ]},
+{ n:37, t:'DEFENSAS', s:'El ejército de adentro', gift:[],
+  talk:[['eter','neutral','Una vacuna le enseña a tu cuerpo una foto del enemigo. Si el de verdad llega, ya lo conoce.'],['doc','feliz','¡Un simulacro!'],['eter','feliz','Exacto. Y cuantos más lo hacen, menos caminos le quedan al brote.']],
+  tx:{ teo:'Las defensas tienen dos líneas. La innata actúa en minutos: piel, fiebre y glóbulos blancos que se comen a los invasores. La adaptativa tarda días, pero aprende: los linfocitos B fabrican anticuerpos a la medida y dejan células de memoria. Una vacuna entrena esa memoria sin pasar la enfermedad.',
+       dato:'La viruela mató a cientos de millones de personas. Se declaró erradicada en 1980 gracias a la vacunación en anillo: vacunar a todos los contactos alrededor de cada caso.',
+       fic:'ÉTER me pidió vacunar a los durmientes de la cubierta 3 antes que a mí. «Tú ya estás inmunizado contra el sentido común», dijo.' },
+  P:[
+   o('ord',{rule:'Cómo funciona una vacuna',items:['Vacuna: una pieza inofensiva del microbio','Las defensas la detectan','Los linfocitos B fabrican anticuerpos','Quedan células de memoria','Llega el microbio de verdad','Respuesta rápida: no enfermas'],t:'El simulacro',d:'Ordena los pasos.',T:90}),
+   {k:'m',id:'AlOH3',t:'Adyuvante',d:'Hidróxido de aluminio: un aluminio con tres –OH.',T:220},
+   o('epi',{map:['.......','..X....','.......','.......'],per:2,save:21,sol:'8,16,11,17,0,4',t:'Vacunación en anillo',d:'Ahora tienes 2 protecciones por turno. Rodea el brote.',T:100}),
+   {k:'b',t:'Alergia',d:'Las defensas atacan al polen del invernadero.',sc:'Histamina alta · estornudos',w:'med2,cool1',h:'bio1',hx:'HIST',hp:340,T:60,dps:1.6},
+   o('cls',{rule:'Tres líneas de defensa',cats:['Barrera','Innata (rápida)','Adaptativa (aprende)'],items:[['Piel',0],['Fiebre',1],['Anticuerpos',2],['Lágrimas',0],['Glóbulo blanco que se come al invasor',1],['Células de memoria',2],['Moco',0]],t:'Líneas de defensa',d:'¿A qué línea pertenece cada una?',T:90}),
+   {k:'m',id:'HIST',t:'Histamina experta',d:'La alarma de la alergia, sin plano ni fórmula.',T:300},
+   o('epi',{map:['..V...V..','V.X..V...','..V..V.V.','.V..V..V.'],per:1,save:32,sol:'12,1,18',t:'Inmunidad de rebaño',d:'Muchos ya están protegidos (azul). Aprovecha y cierra los huecos.',T:100}),
+   {k:'b',t:'Tormenta de citoquinas',d:'Las defensas exageran y dañan al propio cuerpo.',sc:'Inflamación descontrolada',w:'med3,cool1',h:'inm1,bio1',hp:340,T:60,dps:1.6},
+   {k:'r',id:'R_H2O2',t:'Estallido oxidativo',d:'Tus glóbulos blancos atacan con agua oxigenada; la catalasa la descompone. Balancea.',T:140},
+   {k:'b',boss:1,mut:12,t:'El impostor',d:'Un virus que se disfraza de célula propia y cambia de disfraz cada 12 s.',sc:'Virus camuflado',w:'inm1,med2',h:'bio1',hp:350,T:90,dps:1.6,ph2:{d:'Se disfraza de célula sana',w:'gen2,anti2',h:'nrg1'}}
+  ]},
+{ n:38, t:'RESISTENCIA', s:'Lo que no las mata…', gift:[],
+  talk:[['eter','enojado','Cada vez que un antibiótico se usa mal, sobreviven las bacterias más duras. Y se pasan el truco en plásmidos.'],['doc','sorpresa','¡Evolución en directo!'],['eter','neutral','Por eso se toma solo cuando lo receta un médico, y el tratamiento completo.']],
+  tx:{ teo:'La resistencia a los antibióticos es selección natural: en una población siempre hay alguna bacteria que aguanta más. Si el antibiótico se usa sin necesidad o se corta antes de tiempo, esas sobreviven y se multiplican. Además comparten genes de resistencia en plásmidos.',
+       dato:'La OMS considera la resistencia a los antibióticos una de las mayores amenazas para la salud mundial: en 2019 se asoció a casi 5 millones de muertes.',
+       fic:'Una bacteria del tanque 7 sobrevivió a todo mi botiquín. ÉTER: «No es más fuerte que tú. Solo se reproduce cada veinte minutos».' },
+  P:[
+   o('ord',{rule:'Cómo nace una superbacteria',items:['Millones de bacterias, casi todas sensibles','Se usa mal un antibiótico','Mueren las sensibles','Sobreviven las resistentes','Se multiplican','Pasan su plásmido a otras'],t:'Selección natural',d:'Ordena los pasos.',T:90}),
+   {k:'b',fat:2,t:'Estafilococo resistente',d:'Se adapta el doble de rápido: varía lo que lanzas.',sc:'Bacteria resistente · herida que no cierra',w:'anti2,med2',h:'bio1',hp:350,T:60,dps:1.6},
+   o('cel',{cel:'bact',q:['pla','par','rib','fla','adn','mem'],t:'¿Dónde viaja la resistencia?',d:'Empieza por el anillo que se comparten.',T:90}),
+   {k:'m',id:'SULF',t:'Sulfanilamida experta',d:'El primer antibacteriano moderno, sin plano ni fórmula.',T:360},
+   o('epi',{map:['X...#...X','....#....','.........','....#....'],per:2,save:26,sol:'1,9,6,16,25,35',t:'Brote hospitalario',d:'Dos focos a la vez y 2 protecciones por turno.',T:110}),
+   {k:'m',id:'TMA',t:'Trimetilamina',d:'Un nitrógeno con tres metilos.',T:240},
+   {k:'b',fat:2,t:'Bacilo multirresistente',d:'Ya resistía dos antibióticos.',sc:'Resistencia múltiple',w:'med2,inm1,anti1',h:'bio1,nrg1',hp:350,T:60,dps:1.6},
+   {k:'r',id:'R_UREASA',t:'Ureasa',d:'Urea + agua → CO₂ + 2 amoníaco: el truco de una bacteria para aguantar el ácido del estómago.',T:150},
+   {k:'s',n:8,mix:['BLAC','ISO','SULF','APA','TIMOL','C2H5OH','I2','H2O2'],t:'Arsenal completo',d:'Cuatro antibacterianos y cuatro antisépticos.',T:210},
+   {k:'b',boss:1,fat:2,mut:14,t:'La superbacteria',d:'Se adapta el doble de rápido y cambia de debilidad cada 14 s.',sc:'Resistente a casi todo',w:'anti3,med1',h:'bio1',hp:420,T:90,dps:1.6,ph2:{d:'Activa otro plásmido',w:'med2,inm1,oxi1',h:'nrg1'}}
+  ]},
+{ n:39, t:'ECOSISTEMAS', s:'Nadie vive solo', gift:[],
+  talk:[['eter','neutral','En un ecosistema, la basura de uno es la comida de otro. Los átomos dan vueltas; nada se desperdicia.'],['doc','sorpresa','¿Y la energía?'],['eter','triste','Esa sí se pierde: en cada bocado se escapa casi toda como calor.']],
+  tx:{ teo:'Un ecosistema es una red. Los productores (plantas y algas) capturan la energía del Sol, los consumidores se los comen y los descomponedores (hongos y bacterias) devuelven los nutrientes al suelo. Los átomos se reciclan; la energía no: en cada paso se pierde cerca del 90 %.',
+       dato:'En las fuentes hidrotermales del fondo del mar no llega la luz: allí las bacterias fabrican alimento con la energía del sulfuro de hidrógeno.',
+       fic:'El invernadero de la Ouroboros es un planeta de bolsillo. Cuando murieron las lombrices, tardé una semana en notar que todo lo demás se moría detrás.' },
+  P:[
+   o('ord',{rule:'¿Quién se come a quién?',items:['Luz del Sol','Algas','Krill','Pez','Foca','Orca'],t:'Cadena alimenticia',d:'Toca en orden, empezando por la fuente de energía.',T:70}),
+   {k:'r',id:'R_METG',t:'Arqueas del metano',d:'CO₂ + 4 H₂ → CH₄ + 2 H₂O. Balancea.',T:160},
+   o('cls',{rule:'Tres oficios en todo ecosistema',cats:['Productor','Consumidor','Descomponedor'],items:[['Alga',0],['Vaca',1],['Champiñón',2],['Roble',0],['Águila',1],['Bacteria del suelo',2],['Krill',1],['Musgo',0]],t:'Oficios de la vida',d:'¿Qué hace cada uno?',T:90}),
+   {k:'m',id:'BUT',t:'Ácido butírico',d:'Cuatro carbonos en fila y un ácido.',T:260},
+   {k:'b',t:'Lago sin oxígeno',d:'Demasiado fertilizante: las algas crecen, mueren y agotan el oxígeno.',sc:'Algas en exceso · peces sin aire',w:'oxi2,eco1,base1',h:'salt1',hp:320,T:60,dps:1.6},
+   {k:'r',id:'R_QUIM',t:'Quimiosíntesis',d:'CO₂ + 4 H₂S + O₂ → formaldehído + 4 S + 3 H₂O: vida sin luz.',T:200},
+   o('ord',{rule:'El viaje del nitrógeno',items:['N₂ en el aire','Las bacterias lo fijan en la raíz','La planta fabrica proteínas','Un animal se come la planta','Los descomponedores lo liberan','Vuelve al aire'],t:'Ciclo del nitrógeno',d:'Ordena los pasos.',T:90}),
+   {k:'s',n:8,mix:['CO2','O2','N2','NH3','CH4','H2O','GLU','H2S'],t:'Biosfera en frascos',d:'Los gases y nutrientes de un planeta vivo.',T:210},
+   {k:'b',t:'Especie invasora',d:'Una maleza llegó en una semilla perdida y lo cubre todo.',sc:'Crecimiento sin depredadores',w:'eco2,bio1,acid1',h:'solv1',hp:290,T:60,dps:1.6},
+   {k:'b',boss:1,t:'Colapso del invernadero',d:'La biosfera de la nave perdió el equilibrio.',sc:'CO₂ alto · suelo muerto',w:'eco2,base1',h:'fuel1',hp:280,T:90,dps:1.6,ph2:{d:'Faltan descomponedores: no los mates',w:'bio2,eco1',h:'anti1'}}
+  ]},
+{ n:40, t:'EL PRIMOGÉNITO', s:'La vida no es un juguete', gift:[],
+  talk:[['doc','loco','¡Lo hice! Junté todo lo aprendido en una sola célula. ¡Mi criatura!'],['eter','enojado','Rompió el tanque 7. Crece, se copia y cambia. No la venzas a golpes: ponle un límite.'],['doc','triste','Como a mí.']],
+  tx:{ teo:'La biología sintética diseña células con funciones nuevas: bacterias que fabrican insulina o levaduras que producen medicinas. Se trabaja con normas de bioseguridad y contención, porque un ser vivo, a diferencia de una molécula, se copia a sí mismo.',
+       dato:'En 2010 se arrancó por primera vez una bacteria con un genoma fabricado en el laboratorio. Seguía necesitando una célula ya existente para funcionar.',
+       fic:'El Primogénito es ficción. Lo que aprendí con él no: crear es fácil; lo difícil es cuidar lo creado.' },
+  P:[
+   {k:'b',t:'Algo despertó',d:'Tu criatura rompió el tanque de cultivo.',sc:'Organismo sintético · crece rápido',w:'anti2,cool1',h:'nrg2,bio1',hp:360,T:60,dps:1.6},
+   o('cel',{cel:'bact',q:['adn','pla','par','mem','rib','fla'],t:'Su anatomía',d:'Se parece a una bacteria. Repasa sus seis partes.',T:70}),
+   o('epi',{map:['....#....','.X.....#.','....#....','##.###.##','....#....'],per:1,save:25,sol:'11,20,3',t:'Sellar la cubierta',d:'Una protección por turno. Busca los pasos estrechos.',T:110}),
+   {k:'m',id:'NAG',t:'Su pared, sin ayudas',d:'N-acetilglucosamina sin plano ni fórmula.',T:400},
+   {k:'b',mut:10,t:'El Primogénito muta',d:'Cambia de debilidad cada 10 s.',sc:'Mutación rápida',w:'med2,gen1',h:'bio1',hp:360,T:60,dps:1.6,ph2:{d:'Estrena pared',w:'anti2,oxi1',h:'nrg1'}},
+   o('ord',{rule:'De lo simple a lo complejo',items:['Átomo','Molécula','Orgánulo','Célula','Tejido','Órgano','Organismo','Ecosistema'],t:'Niveles de la vida',d:'Toca en orden.',T:80}),
+   o('cls',{rule:'Cada microbio tiene su medicina',cats:['Antibiótico','Antiviral','Antifúngico'],items:[['Neumonía por bacterias',0],['Herpes',1],['Pie de atleta',2],['Tuberculosis',0],['Gripe',1],['Hongo en las uñas',2],['Cólera',0]],t:'La medicina correcta',d:'¿Qué tipo de medicina se usa en cada caso?',T:90}),
+   {k:'b',fat:2,t:'Esporas en los ductos',d:'Se adapta el doble de rápido.',sc:'Esporas resistentes',w:'seal2,anti2',h:'solv1',hp:360,T:60,dps:1.6},
+   o('epi',{map:['.........','...#.#...','....X....','...#.#...','.........'],per:2,save:36,sol:'13,21,24,40',t:'Última barrera',d:'El foco está en el centro. Dos protecciones por turno.',T:120}),
+   {k:'b',boss:1,fat:2,mut:12,t:'EL PRIMOGÉNITO',d:'Tu creación se adapta el doble de rápido y muta cada 12 s. No repitas, mira el escáner y combina.',sc:'Vida sintética · fuera de control',w:'anti2,med2,eco1',h:'nrg1',hp:430,T:90,dps:1.6,ph2:{d:'Cambia su pared',w:'gen2,inm1,cool1',h:'nrg1'}}
+  ]}
+);
+
+</script>
+<script>
+/* ============================================================
    DOC ELEMENT · ENGINE  (química, núcleos, batalla, partida)
    Sin DOM: se puede probar en Node o en el bot.
    ============================================================ */
@@ -1610,13 +1919,14 @@ const BAT = {
   inWin: b => !!b.crit && (b.cyc % BAT.WIN) < BAT.WIN_ON,
   create(p, deck, diff) {
     diff = diff || {}; const ammo = {}; deck.forEach(c => ammo[c.id] = BAT.AMMO);
-    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
+    return { p, deck, ammo, uses: {}, launches: 0, hp: p.hp, max: p.hp, t: p.T, T: p.T, integ: 100, combo: 0, comboT: 0, maxCombo: 0, cd: {}, phase: 1, ph: BAT.phaseOf(p, 1), over: false, win: false, spikeT: 5, mutT: p.mut || 0, ev: [], cyc: .8, crit: diff.crit || 0, rg: (diff.rg || 0) * (p.boss ? 1.5 : 1), crits: 0 };
   },
   step(b, dt) {
     if (b.over) return;
     b.t -= dt; b.cyc += dt; b.integ -= b.p.dps * dt; b.comboT -= dt; if (b.comboT <= 0) b.combo = 0;
     if (b.rg && b.hp > 0) b.hp = Math.min(b.max, b.hp + b.rg * dt);
     for (const k in b.cd) b.cd[k] = Math.max(0, b.cd[k] - dt);
+    if (b.p.mut && b.p.ph2) { b.mutT -= dt; if (b.mutT <= 0) { b.mutT = b.p.mut; b.phase = 3 - b.phase; b.ph = BAT.phaseOf(b.p, b.phase); b.ev.push({ k: 'phase' }); } } // muta: la debilidad alterna cada «mut» segundos
     b.spikeT -= dt; if (b.spikeT <= 0) { b.spikeT = 5; b.integ -= b.p.dps * 2; b.ev.push({ k: 'spike' }); }
     if (b.integ <= 0 || b.t <= 0) { b.integ = Math.max(0, b.integ); b.over = true; b.win = false; b.why = b.integ <= 0 ? 'La integridad de la nave llegó a 0 %.' : 'Se acabó el tiempo.'; }
   },
@@ -1625,7 +1935,7 @@ const BAT = {
     if (e > 0) { b.combo++; b.comboT = BAT.COMBO_T; b.maxCombo = Math.max(b.maxCombo, b.combo); dmg = Math.round(e * mul * card.pow * BAT.mult(b.combo) * (crit ? 1.5 : 1) * f); b.hp -= dmg; kind = 'hit'; if (crit) b.crits++; }
     else if (e < 0) { b.combo = 0; dmg = Math.round(-e * mul * card.pow); b.hp = Math.min(b.max, b.hp + Math.round(dmg / 2)); b.integ -= 4; kind = 'heal'; }
     else { b.combo = 0; dmg = 1; b.hp -= 1; kind = 'none'; }
-    if (b.phase === 1 && b.p.ph2 && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
+    if (b.phase === 1 && b.p.ph2 && !b.p.mut && b.hp <= b.max / 2) { b.phase = 2; b.ph = BAT.phaseOf(b.p, 2); b.ev.push({ k: 'phase' }); }
     if (b.hp <= 0) { b.hp = 0; b.over = true; b.win = true; b.stars = b.integ >= 70 ? 3 : b.integ >= 40 ? 2 : 1; }
     return { e, dmg, kind, crit, f };
   },
@@ -1908,7 +2218,7 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 
 /* ---------- personajes y comunicaciones ---------- */
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
-const SEASON = L => L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
+const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
 function showLine(l) {
   const [who, mood, text] = l, el = $('#comms'); if (!el) return;
@@ -2441,6 +2751,7 @@ function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
   if (CH) chalEnd(true);
+  if (L === 31 && !S.seen.s4i) { S.seen.s4i = 1; save(); if (!QUIET) { slides(STORY.s4i, () => { levelTalk(31); startProblem(L, i); }); return; } }
   if (L === 21 && !S.seen.s3i) { S.seen.s3i = 1; save(); if (!QUIET) { slides(STORY.s3i, () => { levelTalk(21); startProblem(L, i); }); return; } }
   if (L === 11 && !S.seen.s2i) { S.seen.s2i = 1; save(); if (!QUIET) { slides(STORY.s2i, () => { levelTalk(11); startProblem(L, i); }); return; } }
   { const k = D.pk(L, i), t = S.pt[k] || (S.pt[k] = {}); t.a = (t.a || 0) + 1; PT0[k] = Date.now(); }
@@ -2449,6 +2760,7 @@ function startProblem(L, i) {
   endMission();
   if (p.k === 's') { startSort(L, i); return; }
   if (p.k === 'g') { DE.genes.start(L, i); return; }
+  if (p.k === 'o') { DE.org.start(L, i); return; }
   MIS = { L, i, p, t: p.T, T: p.T, hint: false, late: false };
   const g = dOf(L).g;
   setTab('lab');
@@ -2559,7 +2871,7 @@ function startBattle(L, i, ids) {
   document.body.classList.add('inbattle'); setTab('lab'); setMode('mol'); clearLab(true); Lab.view = { x: 0, y: 0, z: 1 };
   const st = $('#bstrip');
   st.innerHTML = `<div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div>
-  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}</div></div>
+  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}${p.mut ? ' · ⟳ muta cada ' + p.mut + ' s' : ''}</div></div>
   <div class="bs-r"><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>`;
   st.hidden = false; $('#bSyn').textContent = '⚗ Lanzar';
   battleGhost(); renderSide(); renderTray(); sfx('tap'); vib(40);
@@ -2607,7 +2919,7 @@ function battleUI() {
   set('btC', e => e.textContent = b.combo > 1 ? 'COMBO ×' + b.combo : '');
   if (b.crit) set('ring', e => { const f = (b.cyc % BAT.WIN) / BAT.WIN, w = BAT.WIN_ON / BAT.WIN, on = f < w; e.style.transform = 'scale(' + (on ? 1 : 1 + .9 * (1 - (f - w) / (1 - w))) + ')'; e.classList.toggle('on', on); });
   b.deck.forEach((c, k) => set('cd' + k, e => e.style.height = (100 * (b.cd[c.id] || 0) / BAT.CD) + '%'));
-  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); battleGhost(); } }
+  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { const mu = b.p.mut, wk = Object.keys(b.ph.w).map(t => TAGS[t] ? TAGS[t][0] : t).join(' + '); set('btPh', e => e.innerHTML = '<b class="gold">' + (mu ? '⟳ MUTÓ' : 'FASE 2 · MUTACIÓN') + '</b> · ' + esc(mu && b.phase === 1 ? b.p.sc : b.ph.d) + (mu ? ' · débil a ' + esc(wk) : '')); toast((mu ? '⟳ MUTÓ · ahora es débil a ' + esc(wk) : 'MUTACIÓN: ' + esc(b.ph.d)), 'bad'); battleGhost(); } }
   if (b.over) endBattle();
 }
 function endBattle() {
@@ -2701,7 +3013,7 @@ function detail(id) {
   }
   modal(html); const m = $('#miniCv'); if (m && lay) drawMini(m, lay);
 }
-const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭' };
+const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀' };
 function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
@@ -2710,14 +3022,14 @@ function renderMap() {
   const d = dOf(L), lvlTag = d.g === 3 ? 'Guiado' : d.g === 2 ? 'Aprendiz' : d.g === 1 ? (d.rg <= 1 ? 'Medio' : 'Difícil') : 'Experto', se = SEASON(L);
   box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada ${se[0]} · ${se[1]} · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
   <div class="map"><div class="mapin"><svg viewBox="0 0 1020 230" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#4d1785" stroke-width="3" stroke-dasharray="8 7"/></svg>${nodes}</div></div>
-  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
   const lc = $('#lvls .on'); if (lc && lc.scrollIntoView) lc.scrollIntoView({ inline: 'center', block: 'nearest' });
   const map = $('.map', box), nx = $('.node.next', box); if (map && nx) map.scrollLeft = Math.max(0, parseFloat(nx.style.left) - map.clientWidth / 2);
 }
 function openProblem(L, i) {
   const p = LEVELS[L - 1].P[i]; if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior');
-  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética' }[p.k];
-  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
+  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: 'Cultivo' }[p.k];
+  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
   modal(`<div class="res"><div class="por big">${D.CH.eter(p.k === 'b' ? 'enojado' : 'neutral')}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10${dOf(L).fail ? '' : ' · sin prisa'}</div><div class="boxed spaced">${spaced(kind)}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">${tgt}<br>Tiempo: ${p.T} s</div>${st ? `<div class="stars" style="font-size:22px">${'★'.repeat(st)}</div>` : ''}<div class="row" style="margin-top:10px"><button class="btn pri" data-act="go" data-arg="${L},${i}">${p.k === 'b' ? 'Preparar mazo' : 'Iniciar'} ▸</button><button class="btn gh" data-act="close">Cerrar</button></div></div></div>`);
 }
 function renderTx() {
@@ -2816,7 +3128,7 @@ const ACT = {
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(), schoolC: () => { enterGame(); if (DE.school) DE.school.start(() => renderSide()); },
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
-  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
+  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('keydown', e => {
@@ -2839,6 +3151,7 @@ function tick(dt) {
   if (SO) { SO.t -= dt; const e = $('#soT'); if (e) e.textContent = Math.max(0, Math.ceil(SO.t)); if (SO.t <= 0 && !SO.late) { if (dOf(SO.L).fail) { const s = SO; SO = null; $('#sortOv').hidden = true; lose(s.L, s.i, 'Se acabó el tiempo.', 'Deja siempre un tubo vacío para maniobrar.'); } else SO.late = true; } }
   if (BT) { BAT.step(BT.b, dt); battleUI(); }
   if (DE.genes) DE.genes.tick(dt);
+  if (DE.org) DE.org.tick(dt);
   regen += dt; if (regen >= 2) { regen = 0; if (S.en < 100) { S.en++; hud(); } }
 }
 let anaT = 0;
@@ -2866,7 +3179,7 @@ function boot() {
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
@@ -3121,6 +3434,136 @@ DE.genes = { start, tick, solve, tap, sel, base, aa, quit, active: () => !!GN, s
 </script>
 <script>
 /* ============================================================
+   DOC ELEMENT · SALA DE CULTIVO (Temporada 4)
+   cel: señalar las partes de una célula · ord: ordenar pasos · cls: clasificar · epi: contener un brote
+   Todo es conceptual: dibujos, clasificaciones y un tablero de casillas.
+   ============================================================ */
+'use strict';
+(function () {
+const K = () => DE.k, $ = s => document.querySelector(s), esc = DE.esc;
+const PU = '#c77dff', BL = '#39c8ff', GR = '#2dffb3', PK = '#ff2fb3', AM = '#ffc23a', BG = '#0b0418';
+let OG = null;
+const dots = (pts, c) => `<g fill="${c || PK}">${pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2"/>`).join('')}</g>`;
+const mito = (x, y, a, s) => `<g transform="translate(${x} ${y}) rotate(${a}) scale(${s || 1})"><ellipse rx="22" ry="10" fill="${BG}" stroke="${AM}" stroke-width="3"/><path d="M-15 0l5-6 5 12 5-12 5 12 5-12 5 6" fill="none" stroke="${AM}" stroke-width="2"/></g>`;
+const wave = (d, c, w) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w || 4}" stroke-linecap="round"/>`;
+/* dibujos (viewBox 320×190) y marcadores: parte → [x, y del botón, x, y del punto señalado] */
+const DRAW = {
+  bact: { s: `<rect x="62" y="52" width="196" height="90" rx="45" fill="${BG}" stroke="${PU}" stroke-width="7"/><rect x="70" y="60" width="180" height="74" rx="37" fill="none" stroke="${BL}" stroke-width="2.5"/>`
+      + wave('M112 98c8-20 22 16 34-2s22 18 34 2 14-12 22 0', GR) + `<circle cx="216" cy="116" r="8" fill="none" stroke="${AM}" stroke-width="3"/>`
+      + dots([[96, 84], [106, 117], [150, 76], [182, 120], [222, 82], [140, 122]]) + wave('M258 97c12-16 16 14 28 0s14 12 26 2', PU, 3),
+    m: { par: [34, 32, 76, 64], mem: [130, 20, 130, 60], adn: [150, 172, 150, 100], pla: [252, 172, 219, 123], rib: [40, 156, 106, 117], fla: [298, 54, 290, 94] } },
+  animal: { s: `<path d="M160 22c60-6 122 22 124 72s-50 80-122 78S34 140 36 92 100 28 160 22z" fill="${BG}" stroke="${BL}" stroke-width="4"/><circle cx="150" cy="96" r="30" fill="#160830" stroke="${PU}" stroke-width="4"/>`
+      + wave('M134 96c6-12 12 10 18 0s10 8 14 0', GR, 3) + mito(232, 70, 25) + mito(88, 132, -20, .9)
+      + `<g fill="none" stroke="${GR}" stroke-width="3" stroke-linecap="round"><path d="M200 124q22-10 44 0"/><path d="M202 134q20-9 40 0"/><path d="M206 144q16-7 32 0"/></g><circle cx="92" cy="68" r="9" fill="${PU}"/>`
+      + dots([[70, 100], [190, 52], [124, 50], [256, 108], [150, 148]]),
+    m: { mem: [22, 40, 58, 56], nuc: [160, 12, 152, 66], mit: [300, 38, 244, 64], rib: [20, 108, 70, 100], gol: [298, 164, 238, 136], lis: [76, 14, 90, 60] } },
+  planta: { s: `<rect x="44" y="24" width="232" height="144" rx="14" fill="${BG}" stroke="${GR}" stroke-width="7"/><rect x="53" y="33" width="214" height="126" rx="9" fill="none" stroke="${BL}" stroke-width="2.5"/>`
+      + `<rect x="112" y="56" width="110" height="80" rx="26" fill="#0a1c33" stroke="${BL}" stroke-width="2" stroke-dasharray="5 4"/><circle cx="84" cy="122" r="19" fill="#160830" stroke="${PU}" stroke-width="4"/>`
+      + `<g fill="#0b2a1c" stroke="${GR}" stroke-width="2.5"><ellipse cx="84" cy="58" rx="17" ry="9"/><ellipse cx="246" cy="62" rx="9" ry="17"/><ellipse cx="170" cy="147" rx="17" ry="8"/></g>`
+      + mito(244, 124, 70, .75) + dots([[70, 90], [126, 46], [232, 96], [216, 148], [150, 44]]),
+    m: { par: [20, 20, 46, 28], mem: [120, 176, 120, 159], nuc: [20, 150, 70, 128], clo: [302, 36, 252, 54], vac: [167, 96], mit: [302, 132, 254, 126], rib: [20, 84, 70, 90] } },
+  virus: { s: `<g stroke="${PK}" stroke-width="3" fill="${PK}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => { const a = k * Math.PI / 5, c = Math.cos(a), s = Math.sin(a), f = n => n.toFixed(1); return `<line x1="${f(160 + 62 * c)}" y1="${f(95 + 62 * s)}" x2="${f(160 + 76 * c)}" y2="${f(95 + 76 * s)}"/><circle cx="${f(160 + 79 * c)}" cy="${f(95 + 79 * s)}" r="4"/>`; }).join('')}</g>`
+      + `<circle cx="160" cy="95" r="62" fill="${BG}" stroke="${AM}" stroke-width="4" stroke-dasharray="3 5"/><polygon points="160,52 197,73 197,117 160,138 123,117 123,73" fill="#160830" stroke="${PU}" stroke-width="4"/>`
+      + wave('M140 95c6-16 12 14 20 0s12 12 20-2', GR),
+    m: { gen: [40, 166, 148, 100], cap: [284, 162, 197, 112], esp: [286, 24, 226, 48], env: [38, 24, 124, 45] } },
+  hongo: { s: `<ellipse cx="246" cy="62" rx="34" ry="27" fill="${BG}" stroke="${AM}" stroke-width="6"/><ellipse cx="140" cy="100" rx="86" ry="62" fill="${BG}" stroke="${AM}" stroke-width="7"/>`
+      + `<circle cx="112" cy="92" r="22" fill="#160830" stroke="${PU}" stroke-width="4"/><ellipse cx="172" cy="122" rx="28" ry="20" fill="#0a1c33" stroke="${BL}" stroke-width="2" stroke-dasharray="5 4"/>` + mito(172, 70, -15, .8),
+    m: { gem: [300, 24, 262, 48], par: [24, 34, 70, 64], nuc: [24, 152, 98, 106], vac: [292, 166, 196, 128], mit: [150, 14, 168, 62] } }
+};
+function cellSVG() {
+  const d = DRAW[OG.p.cel]; let h = '';
+  for (const key in d.m) { const [mx, my, px, py] = d.m[key], ok = OG.found[key];
+    if (px != null) h += `<line x1="${mx}" y1="${my}" x2="${px}" y2="${py}" class="ml"/><circle cx="${px}" cy="${py}" r="5" class="md"/>`;
+    if (ok) { const an = mx < 60 ? 'start' : mx > 260 ? 'end' : 'middle', tx = mx < 60 ? mx - 13 : mx > 260 ? mx + 13 : mx;
+      h += `<g class="mk ok"><circle cx="${mx}" cy="${my}" r="10"/><text x="${mx}" y="${my + 4}" text-anchor="middle">✓</text><text class="nm" x="${tx}" y="${my < 95 ? my + 22 : my - 15}" text-anchor="${an}">${esc(ORG.PART[key][0])}</text></g>`; }
+    else h += `<g class="mk" data-act="ogPart" data-arg="${key}"><circle cx="${mx}" cy="${my}" r="13"/><text x="${mx}" y="${my + 6}" text-anchor="middle">?</text></g>`;
+  }
+  return `<svg class="cellsvg" viewBox="0 0 320 190" role="img" aria-label="${esc(ORG.CELL[OG.p.cel][0])}">${d.s}${h}</svg>`;
+}
+function start(L, i) {
+  const p = LEVELS[L - 1].P[i], k = K(), st = { L, i, p, t: p.T, T: p.T, errs: 0, pos: 0 };
+  if (p.mode === 'cel') st.found = {};
+  else if (p.mode === 'ord') { const r = DE.mulberry(L * 613 + i * 29), n = p.items.length; let o; do { o = p.items.map((_, j) => j); for (let q = n - 1; q > 0; q--) { const j = Math.floor(r() * (q + 1)); [o[q], o[j]] = [o[j], o[q]]; } } while (o.every((v, j) => v === j)); st.ord = o; }
+  else if (p.mode === 'epi') { st.tries = 0; reset(st); }
+  OG = st; $('#orgOv').hidden = false; render(); k.sfx('tap');
+}
+function reset(st) { st.g = ORG.grid(st.p.map); st.left = st.p.per; st.turn = 1; st.moves = []; st.fresh = []; }
+function render() {
+  if (!OG) return; const p = OG.p, el = $('#orgOv'); let body = '';
+  if (p.mode === 'cel') {
+    const key = p.q[OG.pos];
+    body = `<div class="rule">${esc(ORG.PART[key][2])}</div><div class="lbl">${esc(ORG.CELL[p.cel][0])} · ${OG.pos + 1} de ${p.q.length}</div>${cellSVG()}`;
+  } else if (p.mode === 'ord') {
+    body = `<div class="rule">${esc(p.rule)}</div><div class="olist">${p.items.slice(0, OG.pos).map((t, j) => `<span class="oi"><b>${j + 1}</b>${esc(t)}</span>`).join('<i>▸</i>') || '<span class="m">Toca el primero…</span>'}</div>
+      <div class="lbl">¿Cuál sigue?</div><div class="opts">${OG.ord.filter(j => j >= OG.pos).map(j => `<button class="btn gh" data-act="ogPick" data-arg="${j}">${esc(p.items[j])}</button>`).join('')}</div>`;
+  } else if (p.mode === 'cls') {
+    const it = p.items[OG.pos];
+    body = `<div class="rule">${esc(p.rule)}</div><div class="lbl">${OG.pos + 1} de ${p.items.length}</div><div class="ccard">${esc(it[0])}</div>
+      <div class="cats">${p.cats.map((c, j) => `<button class="btn" data-act="ogCat" data-arg="${j}">${esc(c)}</button>`).join('')}</div>
+      <div class="olist sm">${p.items.slice(Math.max(0, OG.pos - 3), OG.pos).map(x => `<span class="oi">✓ ${esc(x[0])} → ${esc(p.cats[x[1]])}</span>`).join('')}</div>`;
+  } else {
+    const g = OG.g, sol = ORG.sol(p), hint = OG.tries >= 2 && OG.moves.every((m, j) => m === sol[j]) ? sol[OG.moves.length] : -1;
+    body = `<div class="rule">Protege <b>${OG.left}</b> casilla${OG.left === 1 ? '' : 's'} · A salvo <b>${ORG.safe(g)}</b> · Meta <b>${p.save}</b> o más</div>
+      <div class="egrid" style="grid-template-columns:repeat(${g.w},var(--ec))">${g.c.map((v, j) => v === '#' ? '<span class="ec w"></span>' : `<button class="ec ${v === 'X' ? 'x' : v === 'V' ? 'v' : 's'}${OG.fresh.includes(j) ? ' new' : ''}${j === hint ? ' hintc' : ''}" data-act="ogCell" data-arg="${j}" aria-label="${v === 'X' ? 'brote' : v === 'V' ? 'protegida' : 'sana'}">${v === 'V' ? '✚' : ''}</button>`).join('')}</div>
+      <div class="m sm"><span class="lg s"></span> sana · <span class="lg v"></span> protegida · <span class="lg x"></span> brote · turno ${OG.turn}</div>`;
+  }
+  el.innerHTML = `<div class="bt-top"><span class="mega">❀ ${esc(p.t)}</span><span class="m">Errores ${OG.errs}</span><span class="tm" id="ogT">${Math.ceil(OG.t)}</span><button class="btn gh sm" data-act="ogQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OG.msg ? OG.msg[1] : ''}">${esc(OG.msg ? OG.msg[0] : p.d)}</p>${body}</div>`;
+}
+function wrong(msg) { const k = K(); OG.errs++; OG.t = Math.max(0, OG.t - 3); k.sfx('bad'); k.vib(60); OG.msg = [msg || '', 'bad']; render(); const b = $('#orgOv .gbody'); if (b) b.classList.add('shake'); }
+function right(msg) { const k = K(); k.sfx('bond'); k.vib(10); OG.msg = msg ? [msg, 'ok'] : null; render(); }
+function done() {
+  const g = OG, k = K(); OG = null; $('#orgOv').hidden = true; const used = 1 - Math.max(0, g.t) / g.T;
+  const stars = g.late ? 1 : g.errs === 0 && used <= .45 ? 3 : used <= .75 && g.errs <= 2 ? 2 : 1;
+  k.say('win'); k.win(g.L, g.i, stars, Math.max(0, Math.round(g.t)) * 2);
+}
+function part(key) {
+  if (!OG || OG.p.mode !== 'cel' || OG.found[key] || !ORG.PART[key]) return; const want = OG.p.q[OG.pos], P = ORG.PART[key];
+  if (key !== want) return wrong(`Eso es ${P[0].toLowerCase()}: ${P[1]}.`);
+  OG.found[key] = 1; OG.pos++; if (OG.pos >= OG.p.q.length) return done(); right(`✓ ${P[0]}: ${P[1]}.`);
+}
+function pick(j) {
+  if (!OG || OG.p.mode !== 'ord') return; j = +j; if (j < OG.pos) return;
+  if (j !== OG.pos) return wrong(OG.pos ? 'Todavía no: ¿qué viene justo después de «' + OG.p.items[OG.pos - 1] + '»?' : 'Ese no es el primero.');
+  OG.pos++; if (OG.pos >= OG.p.items.length) return done(); right();
+}
+function cat(j) {
+  if (!OG || OG.p.mode !== 'cls') return; const it = OG.p.items[OG.pos];
+  if (+j !== it[1]) return wrong(`«${it[0]}» va en «${OG.p.cats[it[1]]}».`);
+  OG.pos++; if (OG.pos >= OG.p.items.length) return done(); right();
+}
+function endEpi() {
+  const safe = ORG.safe(OG.g), p = OG.p;
+  if (safe >= p.save) return done();
+  OG.tries++; reset(OG); wrong(`Quedaron a salvo ${safe} y hacían falta ${p.save}. ${OG.tries >= 2 ? 'Sigue la casilla que parpadea.' : 'Prueba a cerrarle el paso un poco más lejos.'}`);
+}
+function cell(j) {
+  if (!OG || OG.p.mode !== 'epi') return; j = +j; const g = OG.g;
+  if (g.c[j] !== '.') { if (g.c[j] === 'X') { OG.msg = ['Ahí ya llegó el brote: protege una casilla sana.', 'bad']; render(); } return; }
+  g.c[j] = 'V'; OG.moves.push(j); OG.left--; OG.fresh = [];
+  if (!ORG.front(g).length) return endEpi();
+  if (OG.left <= 0) { OG.fresh = ORG.spread(g); OG.turn++; OG.left = OG.p.per; if (!ORG.front(g).length) return endEpi(); }
+  right();
+}
+function tick(dt) {
+  if (!OG) return; OG.t -= dt; const e = $('#ogT'); if (e) { e.textContent = Math.max(0, Math.ceil(OG.t)); e.classList.toggle('low', OG.t < 10); }
+  if (OG.t <= 0 && !OG.late) { const k = K(); if (k.dOf(OG.L).fail) { const g = OG; OG = null; $('#orgOv').hidden = true; k.lose(g.L, g.i, 'Se acabó el tiempo.', 'Lee la pregunta con calma: cada error enseña qué es esa parte.'); } else OG.late = true; }
+}
+function quit() { if (!OG) return; const g = OG, k = K(); OG = null; $('#orgOv').hidden = true; k.lose(g.L, g.i, 'Saliste de la sala de cultivo.', 'Ve despacio: una pregunta a la vez.'); }
+/* solución automática (para el bot y el validador) */
+function solve() {
+  let n = 0;
+  while (OG && n++ < 400) { const p = OG.p;
+    if (p.mode === 'cel') part(p.q[OG.pos]); else if (p.mode === 'ord') pick(OG.pos); else if (p.mode === 'cls') cat(p.items[OG.pos][1]); else cell(ORG.sol(p)[OG.moves.length]);
+  }
+}
+DE.ACTX = DE.ACTX || {};
+Object.assign(DE.ACTX, { ogPart: x => part(x), ogPick: x => pick(x), ogCat: x => cat(x), ogCell: x => cell(x), ogQuit: () => quit() });
+DE.org = { start, tick, solve, part, pick, cat, cell, quit, active: () => !!OG, state: () => OG, DRAW };
+})();
+
+</script>
+<script>
+/* ============================================================
    DOC ELEMENT · ESCUELA DE ÉTER (química para bebés) + consejos de primera vez
    Un foco ilumina lo que hay que tocar, una mano animada muestra cómo arrastrar,
    y cada paso avanza solo cuando el jugador lo hace. Imposible fallar.
@@ -3215,6 +3658,8 @@ const TIPS = {
     { t: 'Destilación', p: 'Cada color es un líquido. Toca un tubo para levantarlo y luego otro para verter la capa de arriba. Solo cae sobre el <b>mismo color</b> o en un tubo <b>vacío</b>. Meta: un color por tubo.', target: '.tubes', btn: '¡Vale!' }],
   tip_gene: () => [
     { t: 'Sala de Genética', p: 'El ADN se escribe con cuatro letras. Las parejas son fijas: <b>A con T</b> y <b>G con C</b> (en el ARN, la T se cambia por <b>U</b>). Toca la letra que falta y la sala te dice si acertaste.', target: '#geneOv .gbody', btn: '¡Vale!' }],
+  tip_org: () => [
+    { t: 'Sala de Cultivo', p: 'Aquí estudias seres vivos sin tocar ninguno. Lee la pregunta de arriba y toca la respuesta: un círculo <b>?</b>, un botón o una casilla. Si fallas, la sala te explica por qué.', target: '#orgOv .gbody', btn: '¡Vale!' }],
   tip_battle: () => [
     { t: 'La batalla', p: 'Este es el problema. La barra <span class="bad">rosada</span> es su vida; la <span class="ok">verde</span>, tu nave. El reloj está en pausa mientras te explico.', target: '#bstrip', btn: 'Entendido' },
     { t: 'Construye', p: 'Arma moléculas aquí, como siempre. Si ves un plano punteado, síguelo: es la molécula que más daño hace.', target: '#cvWrap', btn: 'Entendido' },
@@ -3223,7 +3668,7 @@ const TIPS = {
 function autoTips() {
   const k = K(); if (!k || k.quiet() || !k.S().seen.school && !k.S().intro) return; const s = k.S().seen;
   if (document.getElementById('cover') || document.getElementById('story') || !document.getElementById('ov').hidden) return;
-  const key = DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
+  const key = DE.org && DE.org.active() ? 'tip_org' : DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
   if (key && !s[key] && (key !== 'tip_battle' || $('#bstrip:not([hidden])'))) run(key, TIPS[key](), { skip: 'Cerrar' });
 }
 function skipTips() { const s = K().S().seen; Object.keys(TIPS).forEach(k => s[k] = 1); s.school = 1; if (RUN) finish(false); }
@@ -3328,6 +3773,12 @@ function selfTest() {
         else if (p.mode === 'fix') { const goal = p.tgt || p.ref; if (!ok(p.ref) || !ok(p.pat) || !ok(goal) || p.pat.length !== goal.length || p.pat === goal) E.push(tag + 'mutación mal definida'); }
         else if (p.mode === 'trad') { if (!/^[AUGC]+$/.test(p.mrna) || p.mrna.length % 3) E.push(tag + 'ARN inválido'); }
         else E.push(tag + 'modo genético desconocido');
+      } else if (p.k === 'o') {
+        if (p.mode === 'cel') { const c = ORG.CELL[p.cel]; if (!c || !p.q || !p.q.length) E.push(tag + 'célula mal definida'); else p.q.forEach(x => { if (!c[1].includes(x) || !ORG.PART[x]) E.push(tag + 'parte inválida ' + x); }); if (c && new Set(p.q).size !== p.q.length) E.push(tag + 'parte repetida'); }
+        else if (p.mode === 'ord') { if (!p.rule || !p.items || p.items.length < 3 || new Set(p.items).size !== p.items.length) E.push(tag + 'orden mal definido'); }
+        else if (p.mode === 'cls') { if (!p.rule || !p.cats || p.cats.length < 2 || !p.items || !p.items.length || p.items.some(x => !(x[1] >= 0 && x[1] < p.cats.length))) E.push(tag + 'clasificación mal definida'); else if (p.cats.some((_, j) => !p.items.some(x => x[1] === j))) W.push(tag + 'categoría sin ejemplos'); }
+        else if (p.mode === 'epi') { const w = p.map && p.map[0].length; if (!p.map || p.map.some(r => r.length !== w || /[^.X#V]/.test(r)) || !(p.per >= 1) || !p.map.join('').includes('X')) E.push(tag + 'brote mal definido'); else { const r = ORG.run(p, ORG.sol(p)); if (r < p.save) E.push(tag + 'la solución del brote salva ' + r + ' de ' + p.save); } }
+        else E.push(tag + 'modo de cultivo desconocido');
       } else E.push(tag + 'tipo desconocido ' + p.k);
     });
   });
@@ -3399,6 +3850,8 @@ function solver() {
             fight(U, S, out);
           } else if (p.k === 'g') {
             U.startProblem(L.n, i); if (!DE.genes.active()) throw new Error('no abrió la sala de genética'); DE.genes.solve();
+          } else if (p.k === 'o') {
+            U.startProblem(L.n, i); if (!DE.org.active()) throw new Error('no abrió la sala de cultivo'); DE.org.solve(); if (DE.org.active()) throw new Error('la sala de cultivo no terminó');
           } else if (p.k === 's') {
             U.startProblem(L.n, i); const so = U.SO(); if (!so) throw new Error('no abrió la destilación');
             so.sol.forEach(([a, b]) => { U.sortTap(a); U.sortTap(b); });
@@ -3455,6 +3908,7 @@ function monkey(n, seed) {
     rx: () => { const ids = [...Object.keys(U.state().fr).filter(id => DB.comp[id]), '@Fe', '@Al', '@Na', '@C', '@S', '@Mg']; if (r() < .3) { U.React.L = []; U.React.R = []; } U.rxAdd(pickA(ids)); if (U.React.L.length) U.rxCoef(r() < .5 ? 'L' : 'R', 0, r() < .5 ? 1 : -1); if (r() < .5) U.react(); },
     rxReal: () => { const rx = pickA(Object.values(REACT.rx)); U.React.L = []; U.React.R = []; rx.L.forEach(([, id]) => U.rxAdd(id)); U.React.L = rx.L.map(t => t.slice()); U.React.R = rx.R.map(t => t.slice()); U.react(); },
     gene: () => { if (!DE.genes.active()) { const q = openP('g'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.genes.state(); if (r() < .5) DE.genes.solve(); else if (g.p.mode === 'fix') DE.genes.sel(Math.floor(r() * g.pat.length)); else if (g.p.mode === 'trad') DE.genes.aa(pickA(Object.keys(GENE.AA))); else DE.genes.tap(pickA(['A', 'T', 'G', 'C', 'U'])); } },
+    org: () => { if (!DE.org.active()) { const q = openP('o'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.org.state(), m = g.p.mode; if (r() < .4) DE.org.solve(); else if (m === 'cel') DE.org.part(pickA(Object.keys(ORG.PART))); else if (m === 'ord') DE.org.pick(Math.floor(r() * g.p.items.length)); else if (m === 'cls') DE.org.cat(Math.floor(r() * 3)); else DE.org.cell(Math.floor(r() * (g.g.c.length + 2))); } },
     sort: () => { if (!U.SO()) { const q = openP('s'); if (q) U.startProblem(q[0], q[1]); } else U.sortTap(Math.floor(r() * (U.SO().st.length + 1))); },
     hint: () => U.useHint(),
     tab: () => U.setTab(pickA(['lab', 'fr', 'bt', 'tx'])), mode: () => U.setMode(pickA(['mol', 'forge', 'react'])),
@@ -3495,6 +3949,7 @@ function monkey(n, seed) {
       if (U.MIS()) U.failMission('bot');
       if (U.SO()) U.squit();
       if (DE.genes.active()) DE.genes.quit();
+      if (DE.org.active()) DE.org.quit();
     }
   } catch (e) { errors.push('abortado: ' + e.message); }
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }

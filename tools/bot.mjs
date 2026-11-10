@@ -103,6 +103,16 @@ for (const v of views) {
       if (shots) await page.screenshot({ path: `${shots}/${v.name}-genetica.png` });
       ui.push('genética por clics: ' + (await ev(() => DE.k.S().prog['21-2'] || 0)) + '★');
       await ev(() => DE.ui.closeModal());
+      // sala de cultivo con clics reales: partes de la bacteria (31-1) y contener un brote (33-2)
+      await ev(() => { const S = DE.k.S(); S.unl = 33; S.cur = 31; S.seen.s4i = 1; DE.ui.closeModal(); DE.ui.startProblem(31, 0); });
+      await page.waitForTimeout(500);
+      for (let q = 0; q < 8; q++) { const kx = await ev(() => DE.org.active() ? DE.org.state().p.q[DE.org.state().pos] : null); if (!kx) break; if (q === 1 && shots) await page.screenshot({ path: `${shots}/${v.name}-cultivo.png` }); await click(`#orgOv [data-act=ogPart][data-arg=${kx}]`); }
+      ui.push('cultivo por clics: ' + (await ev(() => DE.k.S().prog['31-0'] || 0)) + '★');
+      await ev(() => { DE.ui.closeModal(); DE.k.S().prog['33-0'] = 1; DE.ui.startProblem(33, 1); });
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-brote.png` });
+      await click('#orgOv [data-act=ogCell][data-arg="1"]');
+      ui.push('brote por clics: ' + (await ev(() => DE.k.S().prog['33-1'] || 0)) + '★');
+      await ev(() => DE.ui.closeModal());
       ui.push('consejos de sala vistos: ' + tips);
       for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#nav [data-arg=${t}]`);
       await click('[data-act=mode][data-arg=forge]'); await click('#forgePane .nuc >> nth=0'); await click('#forgePane .nuc >> nth=1'); await click('[data-act=fuse]');

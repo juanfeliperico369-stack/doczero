@@ -152,7 +152,24 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
   - `trad`: `mrna`.
   - Estrellas: sin errores y menos del 40 % del tiempo → 3. Un error resta 3 s.
 - Batallas con `fat:2`: la resistencia (fatiga) sube 2 por cada uso.
-- Temporada 4 (ORGANISMOS, 31–40) queda anunciada en el final de la temporada 3.
+- Temporada 4 (ORGANISMOS, 31–40): hecha, ver 7f.
+
+## 7f. Temporada 4: ORGANISMOS (v2.3, `src/season4.js` + `src/cultivo.js`)
+- `ORG` (en season4.js, sin DOM):
+  - `PART`: parte → `[nombre, qué hace, pregunta]`. `CELL`: tipo → `[nombre, partes]`.
+  - Reglas del brote: `grid(map)`, `front(g)`, `spread(g)`, `safe(g)` y `run(p, sol)`, que simula una lista de casillas y devuelve cuántas quedan a salvo.
+- Problema `k:'o'` con `mode`:
+  - `cel`: `cel` (bact, animal, planta, virus, hongo) y `q` (partes que se preguntan, en orden). Los dibujos y la posición de cada marcador «?» están en `DRAW` (cultivo.js).
+  - `ord`: `rule` e `items` ya en el orden correcto; el juego los baraja.
+  - `cls`: `rule`, `cats` e `items` como `[texto, índice de categoría]`.
+  - `epi`: `map` (filas con `.` sano, `X` brote, `#` muro, `V` ya protegido), `per` (protecciones por turno), `save` (mínimo a salvo) y `sol` (casillas `fila×ancho+columna` separadas por coma). No usar `k` para `per`: `k` es el tipo de problema.
+  - `tools/epi-solver.cjs` (búsqueda con memoria) sirve para hallar `sol` y un `save` razonable; conviene dejar `save` 2 por debajo del mejor resultado.
+  - Tras 2 intentos fallidos en un brote, parpadea la siguiente casilla de `sol`.
+  - Estrellas: sin errores y menos del 45 % del tiempo → 3. Un error resta 3 s.
+- Batallas con `mut:N` (necesitan `ph2`): la fase alterna cada N segundos en `BAT.step` y ya no cambia a media vida.
+- Etiquetas `inm` y `eco`; season4.js añade esas etiquetas a compuestos de temporadas anteriores (vitamina C, urea, amoníaco…).
+- Seguridad: los organismos son bloques abstractos. Nada de cultivo, obtención o mejora de patógenos.
+- Temporada 5 (TESIS, 41–50) queda anunciada en el final de la temporada 4.
 
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.

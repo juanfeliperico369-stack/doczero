@@ -1,5 +1,18 @@
 # Bitácora de Doc Element
 
+## v2.3.0 — Temporada 4: ORGANISMOS y sala de Cultivo (2026-11-10)
+1. 10 niveles nuevos (31–40) y 100 problemas: célula, energía, bacterias, virus, hongos, plantas, defensas, resistencia, ecosistemas y el Primogénito. El juego llega a 40 niveles y 400 problemas.
+2. Sala nueva de Cultivo (`src/cultivo.js`) con cuatro minijuegos:
+   - Señalar las partes de una bacteria, una célula animal, una vegetal, un virus y una levadura sobre un dibujo.
+   - Ordenar pasos (tamaños, ciclo de un virus, cómo funciona una vacuna, cadena alimenticia, ciclo del nitrógeno).
+   - Clasificar (con o sin núcleo, bacteria o virus, productor/consumidor/descomponedor, qué medicina va con qué microbio).
+   - Contener un brote en un tablero: proteges casillas por turno y el brote pasa a las vecinas (cuarentena, vacunación en anillo, inmunidad de rebaño).
+3. 18 compuestos nuevos para construir (pirúvico, cítrico, butírico, β-lactama, N-acetilglucosamina, isoniazida, aciclovir, timol, auxina, fructosa…) y 6 reacciones (glucólisis, fermentaciones láctica y butírica, ureasa, metanogénesis, quimiosíntesis). Etiquetas nuevas ✚ Inmunidad y ❀ Ecológico.
+4. Amenazas que mutan (`mut:N`): su debilidad alterna cada N segundos y el escáner dice a qué son débiles ahora.
+5. Historia de entrada y final de la temporada 4. Los microbios aparecen solo como idea: sin cultivos reales, sin protocolos y sin recetas.
+6. Validación: 0 errores en los 400 problemas. 8 tableros de brote con solución comprobada y 12 batallas afinadas con el simulador.
+7. Bot: 400/400 problemas, cultivo y brote por clics reales, 2×60 partidas al azar sin errores.
+
 ## v2.2.0 — Temporada 3: GENES y sala de Genética (2026-11-10)
 1. 10 niveles nuevos (21–30) y 100 problemas: ADN, ARN, código genético, proteínas, mutaciones, edición genética, fuerza, resistencia, telómeros y la Quimera.
 2. Sala nueva de Genética (`src/genes.js`) con cuatro puzzles:

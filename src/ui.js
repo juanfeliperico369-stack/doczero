@@ -65,7 +65,7 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 
 /* ---------- personajes y comunicaciones ---------- */
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
-const SEASON = L => L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
+const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
 function showLine(l) {
   const [who, mood, text] = l, el = $('#comms'); if (!el) return;
@@ -598,6 +598,7 @@ function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
   if (CH) chalEnd(true);
+  if (L === 31 && !S.seen.s4i) { S.seen.s4i = 1; save(); if (!QUIET) { slides(STORY.s4i, () => { levelTalk(31); startProblem(L, i); }); return; } }
   if (L === 21 && !S.seen.s3i) { S.seen.s3i = 1; save(); if (!QUIET) { slides(STORY.s3i, () => { levelTalk(21); startProblem(L, i); }); return; } }
   if (L === 11 && !S.seen.s2i) { S.seen.s2i = 1; save(); if (!QUIET) { slides(STORY.s2i, () => { levelTalk(11); startProblem(L, i); }); return; } }
   { const k = D.pk(L, i), t = S.pt[k] || (S.pt[k] = {}); t.a = (t.a || 0) + 1; PT0[k] = Date.now(); }
@@ -606,6 +607,7 @@ function startProblem(L, i) {
   endMission();
   if (p.k === 's') { startSort(L, i); return; }
   if (p.k === 'g') { DE.genes.start(L, i); return; }
+  if (p.k === 'o') { DE.org.start(L, i); return; }
   MIS = { L, i, p, t: p.T, T: p.T, hint: false, late: false };
   const g = dOf(L).g;
   setTab('lab');
@@ -716,7 +718,7 @@ function startBattle(L, i, ids) {
   document.body.classList.add('inbattle'); setTab('lab'); setMode('mol'); clearLab(true); Lab.view = { x: 0, y: 0, z: 1 };
   const st = $('#bstrip');
   st.innerHTML = `<div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div>
-  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}</div></div>
+  <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}${p.mut ? ' · ⟳ muta cada ' + p.mut + ' s' : ''}</div></div>
   <div class="bs-r"><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>`;
   st.hidden = false; $('#bSyn').textContent = '⚗ Lanzar';
   battleGhost(); renderSide(); renderTray(); sfx('tap'); vib(40);
@@ -764,7 +766,7 @@ function battleUI() {
   set('btC', e => e.textContent = b.combo > 1 ? 'COMBO ×' + b.combo : '');
   if (b.crit) set('ring', e => { const f = (b.cyc % BAT.WIN) / BAT.WIN, w = BAT.WIN_ON / BAT.WIN, on = f < w; e.style.transform = 'scale(' + (on ? 1 : 1 + .9 * (1 - (f - w) / (1 - w))) + ')'; e.classList.toggle('on', on); });
   b.deck.forEach((c, k) => set('cd' + k, e => e.style.height = (100 * (b.cd[c.id] || 0) / BAT.CD) + '%'));
-  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { set('btPh', e => e.innerHTML = '<b class="gold">FASE 2 · MUTACIÓN</b> · ' + esc(b.ph.d)); toast('MUTACIÓN: ' + esc(b.ph.d), 'bad'); battleGhost(); } }
+  while (b.ev.length) { const ev = b.ev.shift(); if (ev.k === 'spike') { shake($('#bstrip')); vib(40); } if (ev.k === 'phase') { const mu = b.p.mut, wk = Object.keys(b.ph.w).map(t => TAGS[t] ? TAGS[t][0] : t).join(' + '); set('btPh', e => e.innerHTML = '<b class="gold">' + (mu ? '⟳ MUTÓ' : 'FASE 2 · MUTACIÓN') + '</b> · ' + esc(mu && b.phase === 1 ? b.p.sc : b.ph.d) + (mu ? ' · débil a ' + esc(wk) : '')); toast((mu ? '⟳ MUTÓ · ahora es débil a ' + esc(wk) : 'MUTACIÓN: ' + esc(b.ph.d)), 'bad'); battleGhost(); } }
   if (b.over) endBattle();
 }
 function endBattle() {
@@ -858,7 +860,7 @@ function detail(id) {
   }
   modal(html); const m = $('#miniCv'); if (m && lay) drawMini(m, lay);
 }
-const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭' };
+const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀' };
 function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
@@ -867,14 +869,14 @@ function renderMap() {
   const d = dOf(L), lvlTag = d.g === 3 ? 'Guiado' : d.g === 2 ? 'Aprendiz' : d.g === 1 ? (d.rg <= 1 ? 'Medio' : 'Difícil') : 'Experto', se = SEASON(L);
   box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada ${se[0]} · ${se[1]} · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
   <div class="map"><div class="mapin"><svg viewBox="0 0 1020 230" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#4d1785" stroke-width="3" stroke-dasharray="8 7"/></svg>${nodes}</div></div>
-  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
   const lc = $('#lvls .on'); if (lc && lc.scrollIntoView) lc.scrollIntoView({ inline: 'center', block: 'nearest' });
   const map = $('.map', box), nx = $('.node.next', box); if (map && nx) map.scrollLeft = Math.max(0, parseFloat(nx.style.left) - map.clientWidth / 2);
 }
 function openProblem(L, i) {
   const p = LEVELS[L - 1].P[i]; if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior');
-  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética' }[p.k];
-  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
+  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: 'Cultivo' }[p.k];
+  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
   modal(`<div class="res"><div class="por big">${D.CH.eter(p.k === 'b' ? 'enojado' : 'neutral')}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10${dOf(L).fail ? '' : ' · sin prisa'}</div><div class="boxed spaced">${spaced(kind)}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">${tgt}<br>Tiempo: ${p.T} s</div>${st ? `<div class="stars" style="font-size:22px">${'★'.repeat(st)}</div>` : ''}<div class="row" style="margin-top:10px"><button class="btn pri" data-act="go" data-arg="${L},${i}">${p.k === 'b' ? 'Preparar mazo' : 'Iniciar'} ▸</button><button class="btn gh" data-act="close">Cerrar</button></div></div></div>`);
 }
 function renderTx() {
@@ -973,7 +975,7 @@ const ACT = {
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(), schoolC: () => { enterGame(); if (DE.school) DE.school.start(() => renderSide()); },
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
-  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
+  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('keydown', e => {
@@ -996,6 +998,7 @@ function tick(dt) {
   if (SO) { SO.t -= dt; const e = $('#soT'); if (e) e.textContent = Math.max(0, Math.ceil(SO.t)); if (SO.t <= 0 && !SO.late) { if (dOf(SO.L).fail) { const s = SO; SO = null; $('#sortOv').hidden = true; lose(s.L, s.i, 'Se acabó el tiempo.', 'Deja siempre un tubo vacío para maniobrar.'); } else SO.late = true; } }
   if (BT) { BAT.step(BT.b, dt); battleUI(); }
   if (DE.genes) DE.genes.tick(dt);
+  if (DE.org) DE.org.tick(dt);
   regen += dt; if (regen >= 2) { regen = 0; if (S.en < 100) { S.en++; hud(); } }
 }
 let anaT = 0;
@@ -1023,7 +1026,7 @@ function boot() {
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
