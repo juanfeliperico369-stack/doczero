@@ -142,6 +142,18 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Caritas en los átomos (canvas): feliz si no tiene manos libres y está unido (o es gas noble).
 - Para el bot: `DE.school.skipTips()`.
 
+## 7e. Temporada 3: GENES (v2.2, `src/season3.js` + `src/genes.js`)
+- `GENE` (en season3.js):
+  - `CODE` es el código genético estándar en orden TCAG.
+  - `aa(codón)` devuelve el aminoácido, `comp(seq, rna)` la hebra complementaria y `seq(n, semilla)` una secuencia al azar.
+- Problema `k:'g'` con `mode`:
+  - `pair` y `rna`: `seq` o `n`.
+  - `fix`: `ref`, `pat`, y opcionalmente `tgt` para editar hacia un objetivo.
+  - `trad`: `mrna`.
+  - Estrellas: sin errores y menos del 40 % del tiempo → 3. Un error resta 3 s.
+- Batallas con `fat:2`: la resistencia (fatiga) sube 2 por cada uso.
+- Temporada 4 (ORGANISMOS, 31–40) queda anunciada en el final de la temporada 3.
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

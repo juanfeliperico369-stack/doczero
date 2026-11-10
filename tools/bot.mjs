@@ -97,6 +97,12 @@ for (const v of views) {
       ui.push('lanzar en batalla: ' + (await ev(() => !!DE.ui.BT() && DE.ui.BT().b.launches >= 1)));
       if (shots) await page.screenshot({ path: `${shots}/${v.name}-batalla.png` });
       await ev(() => DE.ui.flee()); await ev(() => DE.ui.tick(.1)); await ev(() => DE.ui.closeModal());
+      // sala de genética con clics reales: completar la doble hélice
+      await ev(() => { const S = DE.k.S(); S.unl = 21; S.cur = 21; S.seen.s3i = 1; S.seen.t21 = 1; for (let i = 0; i < 2; i++) S.prog['21-' + i] = 1; DE.ui.closeModal(); DE.ui.startProblem(21, 2); });
+      for (let q = 0; q < 12; q++) { const b = await ev(() => DE.genes.active() ? DE.genes.state().tgt[DE.genes.state().pos] : null); if (!b) break; await click(`#geneOv [data-act=gnTap][data-arg=${b}]`); }
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-genetica.png` });
+      ui.push('genética por clics: ' + (await ev(() => DE.k.S().prog['21-2'] || 0)) + '★');
+      await ev(() => DE.ui.closeModal());
       ui.push('consejos de sala vistos: ' + tips);
       for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#nav [data-arg=${t}]`);
       await click('[data-act=mode][data-arg=forge]'); await click('#forgePane .nuc >> nth=0'); await click('#forgePane .nuc >> nth=1'); await click('[data-act=fuse]');

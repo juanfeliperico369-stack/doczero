@@ -1,5 +1,18 @@
 # Bitácora de Doc Element
 
+## v2.2.0 — Temporada 3: GENES y sala de Genética (2026-11-10)
+1. 10 niveles nuevos (21–30) y 100 problemas: ADN, ARN, código genético, proteínas, mutaciones, edición genética, fuerza, resistencia, telómeros y la Quimera.
+2. Sala nueva de Genética (`src/genes.js`) con cuatro puzzles:
+   - Completar la doble hélice (A–T, G–C).
+   - Transcribir a ARN (A→U).
+   - Traducir codones con el código genético real.
+   - Reparar o editar mutaciones: anemia falciforme GAG→GTG, miostatina, progeria (simplificadas).
+3. 12 compuestos nuevos para construir: bases A, T, G, C, U; ribosa; desoxirribosa; aminoácidos; dipéptido; creatina. Hay una reacción real de enlace peptídico. Etiqueta nueva ⚭ Genético.
+4. Los jefes que copian (`fat:2`) se vuelven resistentes el doble de rápido: hay que variar las moléculas.
+5. Historia de entrada y final de la temporada 3, con ética de laboratorio: conceptos, no protocolos. Consejo de primera vez en la sala de Genética.
+6. Validación: 0 errores en los 300 problemas. Las batallas se afinaron con el simulador.
+7. Bot: 300/300 problemas, genética por clics reales, Escuela, duelo LAN, 2×60 partidas al azar sin errores.
+
 ## v2.1.0 — Escuela de ÉTER: química para bebés (2026-11-10)
 1. Tutorial interactivo de 14 pasos que no se puede fallar. Se arma agua y oxígeno; un foco dorado ilumina qué tocar, una mano animada enseña a arrastrar y cada paso avanza solo cuando el jugador lo hace.
 2. Arranca solo después de la historia inicial en partidas nuevas. También está en la portada ("🍼 Química para bebés") y en el menú.

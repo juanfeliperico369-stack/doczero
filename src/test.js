@@ -30,7 +30,7 @@ function simBattle(p, cards, L) {
     let best = null, bv = 0;
     for (const c of syn) { const e = BAT.eff(c, ph[k]); if (e <= 0) continue; const bt = buildT(c), f = BAT.fatigue(uses[c.id]), v = e * BAT.SYN * BAT.cpow(c) * f / bt; if (v > bv) { bv = v; best = { c, e, bt, f }; } }
     if (!best) return { ok: false, why: 'nada que construir sirve en la fase ' + (k + 1), t, loss: 0 };
-    t += best.bt; hp += rg * best.bt; hp -= best.e * BAT.SYN * BAT.cpow(best.c) * best.f; uses[best.c.id] = (uses[best.c.id] || 0) + 1;
+    t += best.bt; hp += rg * best.bt; hp -= best.e * BAT.SYN * BAT.cpow(best.c) * best.f; uses[best.c.id] = (uses[best.c.id] || 0) + (p.fat || 1);
     if (p.ph2 && k === 0 && hp <= p.hp / 2) k = 1;
   }
   const loss = p.dps * t + Math.floor(t / 5) * p.dps * 2;
@@ -84,6 +84,12 @@ function selfTest() {
         if (!r.ok) E.push(tag + 'no se puede ganar con lo disponible (' + (r.why || 't=' + r.t.toFixed(1) + 's, daño ' + r.loss.toFixed(0) + '%') + ')');
         const eff = cards.filter(c => BAT.eff(c, BAT.phaseOf(p, 1)) > 0);
         if (eff.length < 2) W.push(tag + 'solo ' + eff.length + ' carta efectiva');
+      } else if (p.k === 'g') {
+        const ok = s => /^[ATGC]+$/.test(s);
+        if (p.mode === 'pair' || p.mode === 'rna') { if (p.seq ? !ok(p.seq) : !(p.n >= 4 && p.n <= 30)) E.push(tag + 'secuencia inválida'); }
+        else if (p.mode === 'fix') { const goal = p.tgt || p.ref; if (!ok(p.ref) || !ok(p.pat) || !ok(goal) || p.pat.length !== goal.length || p.pat === goal) E.push(tag + 'mutación mal definida'); }
+        else if (p.mode === 'trad') { if (!/^[AUGC]+$/.test(p.mrna) || p.mrna.length % 3) E.push(tag + 'ARN inválido'); }
+        else E.push(tag + 'modo genético desconocido');
       } else E.push(tag + 'tipo desconocido ' + p.k);
     });
   });
@@ -153,6 +159,8 @@ function solver() {
             const score = c => Math.max(BAT.eff(c, BAT.phaseOf(p, 1)), p.ph2 ? BAT.eff(c, BAT.phaseOf(p, 2)) : 0) * c.pow;
             U.startBattle(L.n, i, cards.sort((a, b) => score(b) - score(a)).slice(0, 4).map(c => c.id));
             fight(U, S, out);
+          } else if (p.k === 'g') {
+            U.startProblem(L.n, i); if (!DE.genes.active()) throw new Error('no abrió la sala de genética'); DE.genes.solve();
           } else if (p.k === 's') {
             U.startProblem(L.n, i); const so = U.SO(); if (!so) throw new Error('no abrió la destilación');
             so.sol.forEach(([a, b]) => { U.sortTap(a); U.sortTap(b); });
@@ -208,6 +216,7 @@ function monkey(n, seed) {
     fuse: () => { const ks = Object.keys(U.state().nuc); U.Forge.slots = [pickA(ks), r() < .8 ? pickA(ks) : null, r() < .4 ? pickA(ks) : null]; U.Forge.flux = r() < .5 ? 0 : Math.floor(r() * 40); U.fuse(); },
     rx: () => { const ids = [...Object.keys(U.state().fr).filter(id => DB.comp[id]), '@Fe', '@Al', '@Na', '@C', '@S', '@Mg']; if (r() < .3) { U.React.L = []; U.React.R = []; } U.rxAdd(pickA(ids)); if (U.React.L.length) U.rxCoef(r() < .5 ? 'L' : 'R', 0, r() < .5 ? 1 : -1); if (r() < .5) U.react(); },
     rxReal: () => { const rx = pickA(Object.values(REACT.rx)); U.React.L = []; U.React.R = []; rx.L.forEach(([, id]) => U.rxAdd(id)); U.React.L = rx.L.map(t => t.slice()); U.React.R = rx.R.map(t => t.slice()); U.react(); },
+    gene: () => { if (!DE.genes.active()) { const q = openP('g'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.genes.state(); if (r() < .5) DE.genes.solve(); else if (g.p.mode === 'fix') DE.genes.sel(Math.floor(r() * g.pat.length)); else if (g.p.mode === 'trad') DE.genes.aa(pickA(Object.keys(GENE.AA))); else DE.genes.tap(pickA(['A', 'T', 'G', 'C', 'U'])); } },
     sort: () => { if (!U.SO()) { const q = openP('s'); if (q) U.startProblem(q[0], q[1]); } else U.sortTap(Math.floor(r() * (U.SO().st.length + 1))); },
     hint: () => U.useHint(),
     tab: () => U.setTab(pickA(['lab', 'fr', 'bt', 'tx'])), mode: () => U.setMode(pickA(['mol', 'forge', 'react'])),
@@ -247,6 +256,7 @@ function monkey(n, seed) {
       if (U.CH()) U.chalEnd(true);
       if (U.MIS()) U.failMission('bot');
       if (U.SO()) U.squit();
+      if (DE.genes.active()) DE.genes.quit();
     }
   } catch (e) { errors.push('abortado: ' + e.message); }
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }

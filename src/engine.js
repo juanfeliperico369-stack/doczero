@@ -355,7 +355,7 @@ const BAT = {
     b.cd[card.id] = BAT.CD; b.ammo[card.id]--; return BAT.hit(b, card, BAT.AMMO_MUL);
   },
   launch(b, card) { // sustancia sintetizada en vivo durante la batalla: mucho más fuerte
-    if (b.over) return null; const f = BAT.fatigue(b.uses[card.id]); b.uses[card.id] = (b.uses[card.id] || 0) + 1; b.launches++;
+    if (b.over) return null; const f = BAT.fatigue(b.uses[card.id]); b.uses[card.id] = (b.uses[card.id] || 0) + (b.p.fat || 1); b.launches++;
     const hb = card.kind === 'hyb' && b.p.hyb ? b.p.hyb : 1; // la Nebulina no reconoce lo inexistente
     return BAT.hit(b, Object.assign({}, card, { pow: BAT.cpow(card) * hb }), BAT.SYN, f);
   }
