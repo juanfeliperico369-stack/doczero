@@ -1,6 +1,6 @@
 # Doc Element
 
-Juego educativo arcade y offline de química real: forja elementos, construye moléculas, medicinas y polímeros, balancea reacciones y resuelve los problemas del universo a bordo de la nave alquimista Ouroboros. Temporada 1: Núcleo (niveles 1–10) · Temporada 2: Fármacos (11–20) · Temporada 3: Genes (21–30) · Temporada 4: Organismos (31–40).
+Juego educativo arcade y offline de química real: forja elementos, construye moléculas, medicinas y polímeros, balancea reacciones y resuelve los problemas del universo a bordo de la nave alquimista Ouroboros. Temporada 1: Núcleo (niveles 1–10) · Temporada 2: Fármacos (11–20) · Temporada 3: Genes (21–30) · Temporada 4: Organismos (31–40). Desde la v3.0 la nave dibujada es el menú: cada sala es un botón.
 
 **One Zero por Infinite Tree.**
 

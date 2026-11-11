@@ -1,5 +1,16 @@
 # Bitácora de Doc Element
 
+## v3.0.0 — La nave: menú dibujado y laboratorio rediseñado (2026-11-11)
+1. La nave Ouroboros dibujada en corte es el menú principal. Cada sala es un botón: Forja, Reactor, Laboratorio, Genética, Puente, Bodega, Destilería, ÉTER, Criogenia, Cultivo, Transmisiones y la Antena del techo.
+2. La sala de la siguiente misión brilla con una baliza y Doc espera ahí. La consola de abajo lleva a la misión en un toque y, si hay una a medias, deja volver a ella.
+3. Personajes dibujados: Doc de cuerpo entero (traje de criogenia; con rango 2 o más, bata con manchas), ÉTER como el ojo del núcleo y los durmientes en sus cápsulas. En la historia, Doc aparece de cuerpo entero.
+4. Sin barra de pestañas. La cabecera tiene "◂ Nave", el nombre de la sala y puertas entre Laboratorio, Reactor y Forja. No se quitó ninguna función: Reto diario y Duelos están en la Antena, la escuela y la historia en Criogenia, y el menú en ÉTER.
+5. Laboratorio: mesa de trabajo, panel de instrumentos con iconos y nombre, sintetizador CREAR y estante de frascos.
+6. Forja: acelerador de partículas con tres ranuras, tanque de neutrones y el elemento previsto en el centro; las partículas giran y chocan al fusionar.
+7. Reactor: caldera y matraces.
+8. Corregido: el texto de ÉTER que se montaba sobre la misión y sobre el botón ▸, y la portada, que seguía diciendo "Temporadas 1–3".
+9. Salas bloqueadas hasta su temporada (Destilería, Genética y Cultivo), lista de salas en vertical y movimiento reducido si el sistema lo pide.
+
 ## v2.3.0 — Temporada 4: ORGANISMOS y sala de Cultivo (2026-11-10)
 1. 10 niveles nuevos (31–40) y 100 problemas: célula, energía, bacterias, virus, hongos, plantas, defensas, resistencia, ecosistemas y el Primogénito. El juego llega a 40 niveles y 400 problemas.
 2. Sala nueva de Cultivo (`src/cultivo.js`) con cuatro minijuegos:

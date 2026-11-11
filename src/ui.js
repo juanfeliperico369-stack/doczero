@@ -86,17 +86,20 @@ function hud() {
   $('#hSc').innerHTML = '★<b>' + D.totalStars(S) + '</b>';
   $('#hRk').textContent = D.rankOf(S);
 }
-let TAB = 'lab';
+let TAB = 'nave', NEWFR = false;
 function setTab(t) {
-  TAB = t; $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.arg === t));
+  if (!['nave', 'lab', 'fr', 'bt', 'tx'].includes(t)) t = 'nave';
+  TAB = t; document.body.classList.toggle('hub', t === 'nave'); document.body.classList.toggle('noside', t === 'fr' || t === 'tx');
+  const com = $('#comms'), hc = $('#hubCom'); if (com && hc) { if (t === 'nave') { if (com.parentNode !== hc) hc.appendChild(com); } else if (com.parentNode !== $('#side')) $('#side').prepend(com); }
+  if (t === 'nave') renderHub();
   $$('.tab').forEach(x => x.classList.toggle('on', x.id === 't-' + t));
-  if (t === 'fr') { renderFr(); const d = $('#nav [data-arg=fr] .dot'); d && d.remove(); }
+  if (t === 'fr') { renderFr(); NEWFR = false; }
   if (t === 'bt') renderMap();
   if (t === 'tx') renderTx();
   if (t === 'lab') requestAnimationFrame(resize);
-  renderSide();
+  roomBar(); renderSide();
 }
-function dotFr() { const b = $('#nav [data-arg=fr]'); if (b && TAB !== 'fr' && !b.querySelector('.dot')) b.insertAdjacentHTML('beforeend', '<span class="dot"></span>'); }
+function dotFr() { if (TAB !== 'fr') NEWFR = true; }
 
 /* ============================================================
    LABORATORIO MOLECULAR (canvas) con plano guía
@@ -458,11 +461,12 @@ function renderTray() {
   if ((S.unl >= 8 || S.set.sandbox) && monos.length) h += '<span class="tsec">Monómeros</span>' + monos.map(id => `<button class="at mono" style="--c:#2dffb3" data-act="mono" data-arg="${id}"><span class="s">${fHTML(DB.comp[id].f)}</span><span class="n">${esc(DB.comp[id].name)}</span></button>`).join('');
   const t = $('#tray'); if (t) t.innerHTML = h; redraw();
 }
+const synT = t => { const e = $('#bSyn .t'); if (e) e.textContent = t; };
 function setMode(m) {
   Lab.mode = m; $$('.lmode button').forEach(b => b.classList.toggle('on', b.dataset.arg === m));
   $('#molPane').hidden = m !== 'mol'; $('#forgePane').hidden = m !== 'forge'; $('#reactPane').hidden = m !== 'react';
   if (m === 'forge') renderForge(); else if (m === 'react') renderReact(); else requestAnimationFrame(resize);
-  renderSide();
+  roomBar(); renderSide();
 }
 
 /* ============================================================
@@ -494,7 +498,7 @@ function renderReact() {
   const want = MIS && MIS.p.k === 'r' && dOf(MIS.L).g >= 2 ? new Set(REACT.rx[MIS.p.id].L.map(t => t[1])) : null;
   const st = stock().map(id => `<button class="nuc${want && want.has(id) && !React_.L.some(t => t[1] === id) ? ' hint' : ''}" style="--c:${id[0] === '@' ? colOf(id.slice(1)) : '#39c8ff'}" data-act="rxadd" data-arg="${esc(id)}"><span>${fHTML(REACT.form(id))}</span><small>${esc(REACT.name(id))}</small></button>`).join('');
   const miss = MIS && MIS.p.k === 'r' ? REACT.rx[MIS.p.id].L.map(t => t[1]).filter(id => !known(id)) : [];
-  box.innerHTML = `<div class="rx"><div class="eq">${lhs}<span class="arrow">→</span>${rhs}</div>
+  box.innerHTML = `<div class="rx"><div class="eq"><span class="vat" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M6 12h28l-3 18a6 6 0 0 1-6 5H15a6 6 0 0 1-6-5z" class="vb"/><path d="M9 22h22l-1.4 8a5 5 0 0 1-5 4H15.4a5 5 0 0 1-5-4z" class="vl"/><circle cx="16" cy="18" r="2" class="vbub"/><circle cx="24" cy="15" r="1.6" class="vbub b2"/></svg></span>${lhs}<span class="arrow">→</span>${rhs}</div>
    <div class="row">${tbl}${routes.length > 1 ? `<button class="btn gh sm" data-act="rxroute">Ruta ${React_.route % routes.length + 1}/${routes.length}: ${esc(rx.name)}</button>` : rx ? `<span class="m">${esc(rx.name)}</span>` : ''}</div>
    <div class="row"><button class="btn pri${rx && bal ? ' hint' : ''}" data-act="react" ${React_.L.length ? '' : 'disabled'}>⚗ Reaccionar</button><button class="btn gh" data-act="rxclear">✕</button>${rx && !assist && !bal && !React_.auto ? '<button class="btn gh" data-act="rxhint">Pista ⚡15</button>' : ''}${(assist || React_.auto) && rx ? '<span class="ok sm">ÉTER balanceó la ecuación</span>' : ''}${rx && bal ? '<span class="ok">✓ balanceada · ⚡' + (REACT.energy(rx) >= 0 ? '+' : '') + REACT.energy(rx) + '</span>' : rx ? '<span class="bad">✕ cuenta los átomos de cada lado</span>' : ''}</div>
    ${miss.length ? `<p class="bad sm">Te falta en los frascos: ${miss.map(id => fHTML(REACT.form(id))).join(', ')} · constrúyelo en ⚛ Moléculas</p>` : ''}
@@ -523,8 +527,8 @@ const Forge = { slots: [null, null, null], flux: 0, log: [] };
 const nucSort = (a, b) => { const x = NUC.parse(a), y = NUC.parse(b); return x.z - y.z || x.a - y.a; };
 function renderForge() {
   const items = Forge.slots.map(k => k && NUC.parse(k)), r = NUC.fuse(items, Forge.flux);
-  const sl = (k, i) => k ? (() => { const p = NUC.parse(k); return `<button class="slot" style="border-color:${colOf(D.elem(Math.max(1, p.z)).sym)}" data-act="unslot" data-arg="${i}" aria-label="Quitar">${NUC.label(p.z, p.a)}<small>${esc(NUC.name(p.z, p.a))}</small></button>`; })() : `<button class="slot empty" data-act="noop" aria-label="Vacío">+</button>`;
-  let pv = '<span class="m">Toca núcleos de la lista para llenar las ranuras. Z (protones) y A (masa) se suman.</span>';
+  const sl = (k, i) => k ? (() => { const p = NUC.parse(k); return `<button class="slot" style="--c:${colOf(D.elem(Math.max(1, p.z)).sym)}" data-act="unslot" data-arg="${i}" aria-label="Quitar ${esc(NUC.name(p.z, p.a))}">${NUC.label(p.z, p.a)}<small>${esc(NUC.name(p.z, p.a))}</small></button>`; })() : `<button class="slot empty" data-act="noop" aria-label="Ranura vacía">+<small>núcleo</small></button>`;
+  let pv = '<span class="m">Carga núcleos en las ranuras del acelerador. Z (protones) y A (masa) se suman: Z dice qué elemento sale.</span>';
   const zs = items.filter(Boolean);
   if (zs.length || Forge.flux) {
     const calc = 'Z = ' + (zs.map(p => p.z).join(' + ') || '0') + ' = <b>' + r.Z + '</b> · A = ' + ([...zs.map(p => p.a), ...(Forge.flux ? [Forge.flux + 'n'] : [])].join(' + ') || '0') + ' = <b>' + r.A + '</b>';
@@ -534,10 +538,12 @@ function renderForge() {
   }
   const want = MIS && MIS.p.k === 'f' && dOf(MIS.L).g >= 2 ? new Set(MIS.p.r.split('+').filter(t => !/^\d+n$/.test(t))) : null;
   const nucs = Object.keys(S.nuc).sort(nucSort).map(k => { const p = NUC.parse(k); if (!p) return ''; const hint = want && want.has(k) && !Forge.slots.includes(k) ? ' hint' : ''; return `<button class="nuc${hint}" style="--c:${colOf(D.elem(Math.max(1, p.z)).sym)}" data-act="nuc" data-arg="${k}">${NUC.label(p.z, p.a)}<small>Z${p.z} A${p.a}</small></button>`; }).join('');
-  $('#forgePane').innerHTML = `<div class="forge"><div class="fcol"><div class="slots">${sl(Forge.slots[0], 0)}<span class="plus">+</span>${sl(Forge.slots[1], 1)}<span class="plus">+</span>${sl(Forge.slots[2], 2)}<span class="plus">+</span><div class="flux" aria-label="Flujo de neutrones"><button data-act="flux" data-arg="-1">−</button><span>${Forge.flux}n</span><button data-act="flux" data-arg="1">+</button></div></div>
-  <div class="prev" id="fprev">${pv}</div>
-  <div class="row"><button class="btn pri${r.ok ? ' hint' : ''}" style="flex:1" data-act="fuse">☢ Fusionar</button><button class="btn gh" data-act="fclear">✕</button><button class="btn gh" data-act="flux" data-arg="10">+10n</button></div></div>
-  <div class="fcol"><div class="sec-t">Núcleos descubiertos (reutilizables)</div><div class="nucs">${nucs}</div>
+  const pr = r.ok && r.prod, pe = pr && D.elem(pr.z), core = pr ? `<div class="ptile${r.kind === 'shv' ? ' shv' : ''}" style="--c:${colOf(pe.sym)}"><small>${pr.z}</small><b>${esc(pr.z === 126 && S.eternio ? 'Et' : pe.sym)}</b><span>A ${pr.a}</span></div>` : `<div class="ptile q"><b>?</b><span>${zs.length ? 'no funde' : 'vacío'}</span></div>`;
+  const ring = `<svg viewBox="0 0 200 200" aria-hidden="true"><path d="M24 24L52 52M176 24L148 52M24 176L52 148M176 176L148 148" class="inj"/><circle cx="100" cy="100" r="72" class="rt"/><circle cx="100" cy="100" r="58" class="ri"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<rect x="94" y="20" width="12" height="16" rx="2" class="mg" transform="rotate(${i * 45 + 22.5} 100 100)"/>`).join('')}<g class="beam"><circle cx="100" cy="28" r="5" class="pa"/><circle cx="100" cy="172" r="5" class="pb"/></g><circle cx="100" cy="100" r="40" class="glow"/></svg>`;
+  $('#forgePane').innerHTML = `<div class="forge"><div class="fcol"><div class="accel${r.ok ? ' armed' : ''}" id="accel">${ring}<div class="port p0">${sl(Forge.slots[0], 0)}</div><div class="port p1">${sl(Forge.slots[1], 1)}</div><div class="port p2">${sl(Forge.slots[2], 2)}</div>
+   <div class="port p3 flux" aria-label="Tanque de neutrones"><button data-act="flux" data-arg="1" aria-label="Más neutrones">+</button><span>${Forge.flux}n</span><button data-act="flux" data-arg="-1" aria-label="Menos neutrones">−</button></div><div class="core">${core}</div></div>
+  <div class="fctl"><button class="fuse${r.ok ? ' hint' : ''}" data-act="fuse">☢ Fusionar</button><button class="btn gh sm" data-act="fclear" aria-label="Vaciar ranuras">✕</button><button class="btn gh sm" data-act="flux" data-arg="10">+10n</button></div></div>
+  <div class="fcol"><div class="prev" id="fprev">${pv}</div><div class="sec-t">Cápsulas de núcleos · toca para cargar</div><div class="nucs">${nucs}</div>
   <div class="sec-t">Bitácora de la forja</div><div class="flog">${Forge.log.slice(-5).reverse().map(esc).join('<br>') || 'Sin fusiones todavía. Prueba p + n.'}</div></div></div>`;
 }
 function addNuc(k) { const i = Forge.slots.indexOf(null); Forge.slots[i < 0 ? 2 : i] = k; sfx('tap'); renderForge(); }
@@ -555,7 +561,7 @@ function fuse() {
     if (newE) { renderTray(); dotFr(); say('element'); }
   }
   Forge.log.push(NUC.label(p.z, p.a) + ' ← ' + Forge.slots.filter(Boolean).join(' + ') + (Forge.flux ? ' + ' + Forge.flux + 'n' : '') + ' · ⚡' + (r.net >= 0 ? '+' : '') + r.net);
-  toast(msg, 'ok'); sfx('fuse'); vib(30); renderForge(); const pv = $('#fprev'); if (pv) pv.classList.add('fuseFx');
+  toast(msg, 'ok'); sfx('fuse'); vib(30); renderForge(); const pv = $('#fprev'); if (pv) pv.classList.add('fuseFx'); const ac = $('#accel'); if (ac) ac.classList.add('fire');
   hud(); save();
   if (MIS && MIS.p.k === 'f') { const q = MIS.p; if (p.z === q.z && (!q.a || q.a === p.a) && (q.det ? true : r.kind !== 'shv') && (!q.isl || r.kind === 'island')) completeMission(); }
   return r;
@@ -639,7 +645,7 @@ function chalList(seed) {
   return out;
 }
 function startChallenge(kind, seed, opt) {
-  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; $('#bSyn').textContent = '⚗ Crear'; } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
+  closeModal(); if (BT) { BT = null; document.body.classList.remove('inbattle'); $('#bstrip').hidden = true; synT('Crear'); } if (SO) { SO = null; $('#sortOv').hidden = true; } endMission();
   CH = Object.assign({ kind, seed, list: chalList(seed), idx: 0, el: 0, skips: 0, rival: null }, opt || {});
   setTab('lab'); setMode('mol'); chalTarget();
   showLine(['eter', 'feliz', kind === 'daily' ? 'Reto diario: cinco moléculas, todos los elementos comunes. El reloj corre.' : 'Duelo: las mismas cinco moléculas para los dos. Que gane la mejor química.']);
@@ -672,7 +678,7 @@ function win(L, i, stars, bonus) {
   say(done ? 'level' : 'win');
   modal(`<div class="res"><div class="por big">${D.CH.doc(stars === 3 ? 'loco' : 'feliz', rankN())}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10</div><div class="boxed spaced ok-b">Resuelto</div><h2 class="mega">${esc(lvl.P[i].t)}</h2><div class="stars">${[0, 1, 2].map(k => `<span class="${k < stars ? 'on' : 'off'}" style="animation-delay:${.15 + k * .18}s">★</span>`).join('')}</div><p>+${sc} puntos · ⚡ +${20 + 10 * stars}</p>` +
     (done ? `<div class="film">Nivel ${L} completado: ${esc(lvl.t)}.${up ? ' Se abre el nivel ' + (L + 1) + ': ' + esc(LEVELS[L].t) + '.' : ''}</div>` : '') +
-    `<div class="row" style="margin-top:10px">${isEnd ? `<button class="btn pri" data-act="ending" data-arg="${L / 10}">Final de temporada ▸</button>` : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
+    `<div class="row" style="margin-top:10px">${isEnd ? `<button class="btn pri" data-act="ending" data-arg="${L / 10}">Final de temporada ▸</button>` : nx ? `<button class="btn pri" data-act="go" data-arg="${nx[0]},${nx[1]}">Siguiente ▸</button>` : ''}<button class="btn gh" data-act="tomap">Mapa</button><button class="btn gh" data-act="toship">⌂ Nave</button>${done ? '<button class="btn gh" data-act="donate">☕ Apoyar</button>' : ''}</div></div></div>`);
   renderMap(); renderTray(); renderSide(); if (up) levelTalk(L + 1);
 }
 function lose(L, i, why, hint) {
@@ -720,7 +726,7 @@ function startBattle(L, i, ids) {
   st.innerHTML = `<div class="tw"><div class="threat" id="thr">${GLYPH[(L * 3 + i) % GLYPH.length]}</div>${b.crit ? '<div class="ring" id="ring"></div>' : ''}</div>
   <div class="bs-c"><div class="bs-t"><span class="mega">${esc(p.t)}</span><span class="combo" id="btC"></span></div><div class="hb"><i id="btHp" style="width:100%"></i><span id="btHpN">${p.hp}</span></div><div class="hb ship"><i id="btIn" style="width:100%"></i><span id="btInN">Nave 100 %</span></div><div class="phase" id="btPh">${esc(p.sc)}${b.rg ? ' · ☣ se propaga +' + b.rg + '/s' : ''}${p.mut ? ' · ⟳ muta cada ' + p.mut + ' s' : ''}</div></div>
   <div class="bs-r"><span class="tm" id="btT">${p.T}</span><button class="btn gh sm" data-act="flee">Huir</button></div>`;
-  st.hidden = false; $('#bSyn').textContent = '⚗ Lanzar';
+  st.hidden = false; synT('Lanzar');
   battleGhost(); renderSide(); renderTray(); sfx('tap'); vib(40);
   showLine(['eter', L <= 2 ? 'neutral' : 'enojado', L <= 2 ? 'Construye la molécula del plano y pulsa LANZAR. Lo que fabricas en vivo pega cinco veces más.' : 'Lee el escáner, construye y lanza. Si repites la misma sustancia, se vuelve resistente.']);
 }
@@ -771,7 +777,7 @@ function battleUI() {
 }
 function endBattle() {
   const { b, L, i } = BT; BT = null; document.body.classList.remove('inbattle'); const st = $('#bstrip'); st.hidden = true; st.innerHTML = '';
-  $('#bSyn').textContent = '⚗ Crear'; Lab.ghost = null; clearLab(true); renderSide(); renderTray();
+  synT('Crear'); Lab.ghost = null; clearLab(true); renderSide(); renderTray();
   if (b.win) { fxBurst(0, 0, ['#2dffb3', '#ffc23a', '#39c8ff'], 40); win(L, i, b.stars, Math.round(b.t) * 3 + b.maxCombo * 10 + b.crits * 15 + b.launches * 5); }
   else { const p = b.p, w = D.parseTags(p.w), h = D.parseTags(p.h); lose(L, i, b.why || 'Retirada.', 'Su debilidad: <b>' + tagWords(w) + '</b>' + (Object.keys(h).length ? ' · la alimenta: ' + tagWords(h) : '') + (p.hx ? ' · empeora con: ' + p.hx.split(',').map(x => nameOf(x).f).join(', ') : '') + '. Construye en vivo sustancias con esas propiedades y alterna para evitar la resistencia.'); }
 }
@@ -794,7 +800,7 @@ function renderSide() {
   }
   if (!MIS) {
     const nx = nextOpen(), ready = D.levelDone(S, 1);
-    box.innerHTML = `<div class="pag">Sin misión activa</div>${nx ? `<button class="btn pri wide" data-act="go" data-arg="${nx[0]},${nx[1]}">▶ ${esc(LEVELS[nx[0] - 1].P[nx[1]].t)}</button><span class="m sm">Nivel ${nx[0]} · problema ${nx[1] + 1}</span>` : '<span class="ok">¡Temporada completada!</span>'}<div class="row"><button class="btn sm" data-act="daily" ${ready ? '' : 'disabled'}>🔥 Reto diario${S.daily.streak ? ' ' + S.daily.streak : ''}</button><button class="btn sm" data-act="duel" ${ready ? '' : 'disabled'}>⚔ Duelo</button></div>${ready ? '' : '<span class="m sm">Reto diario y duelos: completa el nivel 1.</span>'}`;
+    box.innerHTML = `<div class="pag">Sin misión activa</div>${nx ? `<button class="btn pri wide" data-act="go" data-arg="${nx[0]},${nx[1]}">▶ ${esc(LEVELS[nx[0] - 1].P[nx[1]].t)}</button><span class="m sm">Nivel ${nx[0]} · problema ${nx[1] + 1}</span>` : '<span class="ok">¡Temporada completada!</span>'}<div class="row"><button class="btn gh sm" data-act="antena">📡 Retos y duelos${S.daily.streak ? ' · 🔥' + S.daily.streak : ''}</button><button class="btn gh sm" data-act="nave">◂ Nave</button></div>`;
   } else {
     const p = MIS.p, L = MIS.L, g = dOf(L).g, kind = { m: '⚗ Síntesis', p: '⛓ Polímero', f: '☢ Forja', r: '⇄ Reacción' }[p.k];
     let obj = '', list = '';
@@ -861,6 +867,50 @@ function detail(id) {
   modal(html); const m = $('#miniCv'); if (m && lay) drawMini(m, lay);
 }
 const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀' };
+/* ============================================================
+   LA NAVE: cada sala es un botón dibujado (ship.js)
+   ============================================================ */
+const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente' };
+const KIND_OF = { destil: 's', gen: 'g', cult: 'o' };
+const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
+const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
+const firstL = k => { const i = LEVELS.findIndex(l => l.P.some(p => p.k === k)); return i < 0 ? 1 : i + 1; };
+function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
+function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: ROOM_OF[p.k] || 'lab' }; }
+function renderHub() {
+  const box = $('#hub'); if (!box) return; const n = nextInfo(), se = SEASON(n ? n.L : S.cur), RM = DE.ship.ROOM;
+  box.innerHTML = DE.ship.svg({ next: n && n.room, threat: n && n.p.k === 'b', locks: roomLocks(), newFr: NEWFR, nFr: Object.keys(S.fr).length, lvl: S.cur, mood: n ? 'feliz' : 'loco', rank: rankN(), eter: n && n.p.k === 'b' ? 'enojado' : 'neutral' });
+  $('#hubGo').innerHTML = MIS ? `<button class="console" data-act="resume"><span class="ck">◂ Misión en curso</span><b>${esc(MIS.ch ? 'Reto' : MIS.p.t)}</b><small>Volver a la sala · el reloj sigue corriendo</small></button>` : n ? `<button class="console" data-act="go" data-arg="${n.L},${n.i}"><span class="ck">▶ Siguiente misión · ${RM[n.room].ic} ${esc(RM[n.room].n)}</span><b>${esc(n.p.t)}</b><small>Temporada ${se[0]} · nivel ${n.L} · problema ${n.i + 1}</small></button>` : `<button class="console" data-act="antena"><span class="ck">✦ Todo resuelto</span><b>Reto diario y duelos</b><small>en la Antena</small></button>`;
+  const lk = roomLocks();
+  $('#hubList').innerHTML = DE.ship.ROOMS.map(r => `<button class="hroom${n && n.room === r.id ? ' next' : ''}${lk[r.id] ? ' lock' : ''}" data-act="room" data-arg="${r.id}"><i>${r.ic}</i><b>${esc(r.n)}</b><small>${esc(lk[r.id] || r.s)}</small></button>`).join('');
+}
+const LABR = { mol: 'lab', react: 'react', forge: 'forge' };
+function roomBar() {
+  const el = $('#hRoom'); if (!el) return; if (TAB === 'nave') { el.innerHTML = ''; return; }
+  const RM = DE.ship.ROOM, cur = TAB === 'lab' ? LABR[Lab.mode] : { fr: 'bodega', bt: 'puente', tx: 'tx' }[TAB], r = RM[cur];
+  const doors = TAB === 'lab' ? Object.keys(LABR).filter(m => m !== Lab.mode).map(m => `<button class="door" data-act="mode" data-arg="${m}" aria-label="Ir a ${esc(RM[LABR[m]].n)}"><i>${RM[LABR[m]].ic}</i><span>${esc(RM[LABR[m]].n)}</span></button>`).join('') : '';
+  el.innerHTML = `<span class="rname">${r.ic} ${esc(r.n)}</span>${doors}`;
+}
+function openRoom(id) {
+  const r = DE.ship.ROOM[id]; if (!r) return; const lk = roomLocks()[id];
+  if (lk) { sfx('bad'); return toast(esc(r.n) + ': ' + esc(lk), 'bad'); }
+  sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = KIND_OF[id];
+  if (!here && !k && ENTER[id]) return ENTER[id]();
+  const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => p.k === k && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
+  modal(`<div class="pag">Ouroboros · sala</div><h2 class="mega">${r.ic} ${esc(r.n)}</h2><p class="kick">${esc(r.s)}</p><p>${esc(ROOM_INFO[id] || '')}</p>
+    ${here ? `<button class="btn pri wide" data-act="go" data-arg="${n.L},${n.i}">▶ Misión: ${esc(n.p.t)} · nivel ${n.L}</button>` : ''}
+    <div class="row" style="margin-top:8px">${ENTER[id] ? `<button class="btn gh" data-act="roomin" data-arg="${id}">Entrar sin misión</button>` : ''}${!here && n ? `<button class="btn gh" data-act="go" data-arg="${n.L},${n.i}">Siguiente misión: ${esc(n.p.t)} (${esc(DE.ship.ROOM[n.room].n)})</button>` : ''}</div>
+    ${done.length ? `<div class="sec-t">Repetir</div><div class="row">${done.map(([L, i, p]) => `<button class="btn sm" data-act="go" data-arg="${L},${i}">N${L}·${i + 1} ${esc(p.t)} ${'★'.repeat(S.prog[D.pk(L, i)])}</button>`).join('')}</div>` : k && !here ? '<p class="m sm">Todavía no resuelves problemas de esta sala.</p>' : ''}`);
+}
+function cryoSheet() {
+  const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4]].filter(e => e[2] && STORY[e[0]]);
+  modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button></div></div>
+    <div class="sec-t">Recuerdos · la historia hasta ahora</div><div class="row">${eps.map(e => `<button class="btn sm" data-act="story" data-arg="${e[0]}">▶ ${esc(e[1])}</button>`).join('')}</div>`);
+}
+function antenaSheet() {
+  const ready = D.levelDone(S, 1);
+  modal(`<div class="pag">Ouroboros · techo</div><h2 class="mega">📡 Antena</h2><p>${esc(ROOM_INFO.antena)}</p><div class="row"><button class="btn pri" data-act="daily" ${ready ? '' : 'disabled'}>🔥 Reto diario${S.daily.streak ? ' · racha ' + S.daily.streak : ''}</button><button class="btn" data-act="duel" ${ready ? '' : 'disabled'}>⚔ Duelo LAN / Bluetooth</button></div>${ready ? '' : '<p class="m sm">Se activa al completar el nivel 1.</p>'}`);
+}
 function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
@@ -892,8 +942,8 @@ function txLevel(L) {
    ============================================================ */
 function cover() {
   const c = document.createElement('div'); c.className = 'cover'; c.id = 'cover'; const has = S.intro || Object.keys(S.prog).length;
-  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–3 · Núcleo, Fármacos y Genes</div></div>
-  <div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
+  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–4 · Núcleo, Fármacos, Genes y Organismos</div></div>
+  <svg class="cship" viewBox="0 0 1280 600" aria-hidden="true">${DE.ship.hull(1)}</svg><div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
   <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button>${has ? '<button class="btn gh" data-act="schoolC">🍼 Química para bebés (1 min)</button>' : ''}</div></div></div>
   <div class="cfoot"><span class="pag">Por: ${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</span><span class="adv">Lab advisory<b>Verídico</b>Contenido seguro</span><span class="mega">El laboratorio más actual</span></div>`;
   document.body.appendChild(c);
@@ -902,7 +952,7 @@ let SLIDES = null, SI = 0, AFTER = null;
 function slides(list, after) { SLIDES = list; SI = 0; AFTER = after; const el = document.createElement('div'); el.className = 'cover'; el.id = 'story'; document.body.appendChild(el); slide(); }
 function slide() {
   const el = $('#story'); if (!el) return; const [who, mood, t, x] = SLIDES[SI];
-  el.innerHTML = `<div class="cband"><div>Ouroboros · Bitácora</div><div>${SI + 1} / ${SLIDES.length}</div></div><div class="sgrid"><div class="por huge">${who === 'doc' ? D.CH.doc(mood, rankN()) : D.CH.eter(mood)}</div><div class="stext"><div class="pag">${who === 'doc' ? 'Doc' : 'ÉTER · IA de la nave'}</div><div class="boxed spaced">${spaced(t)}</div><div class="film">${esc(x)}</div><div class="row"><button class="btn pri" data-act="snext">${SI < SLIDES.length - 1 ? 'Siguiente ▸' : 'Comenzar ▸'}</button><button class="btn gh" data-act="sskip">Saltar</button></div></div></div><div class="cfoot"><span class="pag">Pag ${SI + 1}</span><span class="pag">Doc Element</span></div>`;
+  el.innerHTML = `<div class="cband"><div>Ouroboros · Bitácora</div><div>${SI + 1} / ${SLIDES.length}</div></div><div class="sgrid">${who === 'doc' ? `<div class="full">${D.CH.full(mood, rankN())}</div>` : `<div class="por huge">${D.CH.eter(mood)}</div>`}<div class="stext"><div class="pag">${who === 'doc' ? 'Doc' : 'ÉTER · IA de la nave'}</div><div class="boxed spaced">${spaced(t)}</div><div class="film">${esc(x)}</div><div class="row"><button class="btn pri" data-act="snext">${SI < SLIDES.length - 1 ? 'Siguiente ▸' : 'Comenzar ▸'}</button><button class="btn gh" data-act="sskip">Saltar</button></div></div></div><div class="cfoot"><span class="pag">Pag ${SI + 1}</span><span class="pag">Doc Element</span></div>`;
 }
 function endSlides() { const el = $('#story'); if (el) el.remove(); const f = AFTER; AFTER = null; f && f(); }
 function levelTalk(L) { if (S.seen['t' + L]) return; S.seen['t' + L] = 1; save(); const t = LEVELS[L - 1].talk; if (t) talk(t); }
@@ -955,7 +1005,10 @@ function fullscreen() { const d = document.documentElement; try { const f = d.re
    ============================================================ */
 const two = s => s.split(',').map(Number);
 const ACT = {
-  close: () => closeModal(), noop() { }, tab: t => setTab(t), mode: m => setMode(m),
+  close: () => closeModal(), noop() { }, tab: t => { closeModal(); setTab(t); }, mode: m => setMode(m),
+  nave: () => { if (BT) return toast('Termina la batalla o huye primero', 'bad'); closeModal(); setTab('nave'); }, room: id => openRoom(id), roomin: id => { closeModal(); const f = ENTER[id]; if (f) f(); },
+  resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
+  hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
   nuc: k => addNuc(k), unslot: i => { Forge.slots[+i] = null; renderForge(); }, flux: d => { Forge.flux = D.clamp(Forge.flux + (+d), 0, 40); renderForge(); }, fuse: () => fuse(), fclear: () => { Forge.slots = [null, null, null]; Forge.flux = 0; renderForge(); },
@@ -964,7 +1017,7 @@ const ACT = {
   lvl: L => { L = +L; if (L > S.unl) return toast('Completa el nivel ' + (L - 1)); closeModal(); S.cur = L; giftLevel(L); save(); hud(); setTab('bt'); levelTalk(L); },
   open: a => { const [L, i] = two(a); closeModal(); openProblem(L, i); }, go: a => { const [L, i] = two(a); startProblem(L, i); },
   pick: (id, el) => pick(id, el), fight: a => { const [L, i] = two(a); startBattle(L, i); }, throw: k => throwCard(+k), flee: () => flee(),
-  abandon: () => { if (MIS) failMission('Abandonaste la misión.'); }, tomap: () => { closeModal(); setTab('bt'); },
+  abandon: () => { if (MIS) failMission('Abandonaste la misión.'); }, tomap: () => { closeModal(); setTab('bt'); }, toship: () => { closeModal(); setTab('nave'); },
   det: id => detail(id), filt: f => { FF = f; renderFr(); }, txl: L => txLevel(+L), talk: () => nextLine(),
   menu: () => menu(), guide: () => guide(), credits: () => credits(), settings: () => settings(), diag: () => diag(), fs: () => fullscreen(), vok: () => document.body.classList.add('vok'),
   set: k => { S.set[k] = S.set[k] ? 0 : 1; save(); settings(); if (k === 'sandbox') renderTray(); if (k === 'mus') S.set.mus ? MUS.start() : MUS.stop(); },
@@ -981,6 +1034,7 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-act]
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.dataset.act) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); return; }
   if (BT && /^[1-4]$/.test(e.key)) { throwCard(+e.key - 1); return; }
   if (TAB !== 'lab' || Lab.mode !== 'mol' || !$('#ov').hidden) return;
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); }
@@ -1015,11 +1069,11 @@ function frame(t) {
 function boot() {
   load(); giftLevel(1);
   document.body.innerHTML = `<div id="app">
-  <header id="hud"><div class="brand">Doc<b>Element</b></div><span class="chip" id="hLv"></span><span class="chip en" id="hEn"></span><span class="chip" id="hSc"></span><span class="chip rk" id="hRk"></span><span class="sp"></span><button class="hb2" data-act="fs" aria-label="Pantalla completa">⛶</button><button class="hb2" data-act="menu" aria-label="Menú">☰</button></header>
-  <nav id="nav"><button data-act="tab" data-arg="lab"><i>⚗</i>Lab</button><button data-act="tab" data-arg="fr"><i>⚱</i>Frascos</button><button data-act="tab" data-arg="bt"><i>☣</i>Batalla</button><button data-act="tab" data-arg="tx"><i>▶</i>Videos</button></nav>
+  <header id="hud"><button class="back" data-act="nave" aria-label="Volver a la nave">◂ Nave</button><div class="brand">Doc<b>Element</b></div><div id="hRoom"></div><span class="chip" id="hLv"></span><span class="chip en" id="hEn"></span><span class="chip" id="hSc"></span><span class="chip rk" id="hRk"></span><span class="sp"></span><button class="hb2" data-act="fs" aria-label="Pantalla completa">⛶</button><button class="hb2" data-act="menu" aria-label="Menú">☰</button></header>
   <main id="stage">
-   <div class="tab" id="t-lab"><div class="lmode"><button data-act="mode" data-arg="mol" class="on">⚛ Moléculas</button><button data-act="mode" data-arg="react">⇄ Reactor</button><button data-act="mode" data-arg="forge">☢ Forja</button></div>
-    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb"><button data-act="zin" aria-label="Acercar">＋</button><button data-act="zout" aria-label="Alejar">－</button><button data-act="fit" aria-label="Centrar">⌖</button></div><div class="tools-v"><button data-act="undo" aria-label="Deshacer">⟲</button><button data-act="del" aria-label="Borrar átomo">⌫</button><button data-act="clear" aria-label="Limpiar">✕</button><button data-act="autoH" id="bAH" aria-label="Completar hidrógenos">⚡H</button></div><button class="syn" id="bSyn" data-act="synth">⚗ Crear</button></div><div id="tray"></div></div>
+   <div class="tab" id="t-nave"><div id="hub"></div><div id="hubCom"></div><div id="hubGo"></div><div id="hubList"></div></div>
+   <div class="tab" id="t-lab">
+    <div class="pane" id="molPane"><div id="bstrip" hidden></div><div id="cvWrap"><canvas id="cv"></canvas><div id="coach"></div><div class="cvb panel"><button data-act="zin" aria-label="Acercar"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6.5 6.5M10 7v6M7 10h6"/></svg><span>Acercar</span></button><button data-act="zout" aria-label="Alejar"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l6.5 6.5M7 10h6"/></svg><span>Alejar</span></button><button data-act="fit" aria-label="Centrar"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.5"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg><span>Centrar</span></button></div><div class="tools-v panel"><button data-act="undo" aria-label="Deshacer"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 8H3V3"/><path d="M3.6 8A9 9 0 1 1 5 17"/></svg><span>Deshacer</span></button><button data-act="del" aria-label="Quitar"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 2l5 15h2l5-15"/><path d="M9.5 12h5"/><circle cx="12" cy="20.5" r="2"/></svg><span>Quitar</span></button><button data-act="clear" aria-label="Vaciar"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 9h18l-2.2 9.5a2 2 0 0 1-2 1.5H7.2a2 2 0 0 1-2-1.5z"/><path d="M12 20v2M8 5.5l4-3 4 3"/></svg><span>Vaciar</span></button><button data-act="autoH" id="bAH" aria-label="+H"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M9 3h6M12 3v2"/><rect x="6.5" y="5" width="11" height="17" rx="3"/><path d="M10 10v7M14 10v7M10 13.5h4"/></svg><span>+H</span></button></div><button class="syn" id="bSyn" data-act="synth" aria-label="Crear la molécula"><span class="sico"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M9 2.5h6M10 2.5v6.5L4.6 18.4A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.7-3.1L14 9V2.5"/><path d="M6.5 15.5h11"/></svg></span><span class="t">Crear</span></button></div><div id="tray"></div></div>
     <div class="pane" id="reactPane" hidden></div><div class="pane" id="forgePane" hidden></div></div>
    <div class="tab" id="t-fr"><div class="filt">${[['all', 'Todos'], ['el', 'Elementos'], ['mol', 'Compuestos'], ['med', 'Bio y fármacos'], ['poly', 'Polímeros'], ['hyb', 'Híbridos'], ['org', 'Organismos'], ['tab', 'Tabla periódica']].map(([k, t]) => `<button data-act="filt" data-arg="${k}">${t}</button>`).join('')}</div><div class="scroll" id="frBody"></div></div>
    <div class="tab" id="t-bt"><div class="lvls" id="lvls"></div><div class="scroll" id="mapBody"></div></div>
@@ -1030,7 +1084,7 @@ function boot() {
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
-  hud(); setTab('lab'); renderTray(); showLine(['eter', 'neutral', 'Sistemas en línea. Toca ▶ en este panel para seguir la historia.']); cover(); requestAnimationFrame(frame);
+  hud(); setTab('nave'); renderTray(); showLine(['eter', 'neutral', 'Bienvenido a la Ouroboros. Toca una sala de la nave o el botón ▶ de abajo.']); cover(); requestAnimationFrame(frame);
   document.addEventListener('visibilitychange', () => { if (document.hidden) { save(true); if (MUS.ctx) MUS.stop(); } });
   document.addEventListener('pointerdown', () => MUS.start());
   if (window.Capacitor) document.body.classList.add('native', 'vok');
@@ -1039,7 +1093,7 @@ function boot() {
 DE.k = { win, lose, dOf, S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
   atomRect: id => { const a = A(id), cv = $('#cv'); if (!a || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s(a.x, a.y), r = (rad(a) || 30) * Lab.view.z + 6; return { left: c.left + x - r, top: c.top + y - r, width: 2 * r, height: 2 * r }; },
   bondRect: b => { const p = A(b.a), q = A(b.b), cv = $('#cv'); if (!p || !q || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s((p.x + q.x) / 2, (p.y + q.y) / 2); return { left: c.left + x - 16, top: c.top + y - 16, width: 32, height: 32 }; } };
-DE.ui = { startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
+DE.ui = { openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
   guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

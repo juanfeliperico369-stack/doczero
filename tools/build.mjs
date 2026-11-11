@@ -8,7 +8,7 @@ const r = p => readFileSync(U(p));
 const data = r('src/data.js').toString();
 const VERSION = data.match(/VERSION: '([^']+)'/)[1], URL0 = data.match(/URL: '([^']+)'/)[1];
 const css = r('src/style.css').toString().replace('__TITULOS__', r('src/fonts/titulos.woff').toString('base64')).replace('__CUERPO__', r('src/fonts/cuerpo.woff2').toString('base64'));
-const files = ['vendor/qrcode.min.js', 'vendor/jsQR.min.js', 'data.js', 'season2.js', 'season3.js', 'season4.js', 'engine.js', 'chars.js', 'ui.js', 'online.js', 'genes.js', 'cultivo.js', 'school.js', 'test.js'];
+const files = ['vendor/qrcode.min.js', 'vendor/jsQR.min.js', 'data.js', 'season2.js', 'season3.js', 'season4.js', 'engine.js', 'chars.js', 'ship.js', 'ui.js', 'online.js', 'genes.js', 'cultivo.js', 'school.js', 'test.js'];
 const js = files.map(f => `<script>\n${r('src/' + f)}\n</script>`).join('\n');
 const desc = 'Doc Element: crea elementos, moléculas y polímeros con química real y resuelve los problemas del universo. Juego educativo gratis, sin internet.';
 const icon = 'data:image/png;base64,' + r('assets/favicon.png').toString('base64');

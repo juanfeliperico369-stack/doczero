@@ -18,7 +18,7 @@
 
 ## 3. Estética y personajes
 - Revista EMSAY / INDUSTRY ART (PDF y juego del autor) → banda superior, títulos gigantes condensados, cajas de borde grueso con mayúsculas espaciadas, números en contorno, marco de película, sello "Lab advisory", pies "PAG". Paleta pedida: negro total, bordes morados (`--pur #a42cff`), letra azul (`--ink #39c8ff`); acentos magenta (error), ámbar (pista/estrellas), verde (éxito).
-- **HORIZONTAL primero** (decisión del autor): HUD arriba · navegación vertical a la izquierda · escenario al centro · panel lateral derecho (comunicaciones con personajes + misión + análisis). En teléfonos en vertical aparece "Gira tu dispositivo" (⛶ pantalla completa + bloqueo de orientación, o "seguir en vertical" con diseño apilado).
+- **HORIZONTAL primero** (decisión del autor): HUD arriba · escenario al centro · panel lateral derecho (comunicaciones con personajes + misión + análisis). Desde la v3.0 no hay barra de pestañas: **la nave dibujada es el menú** (ver 7g). En teléfonos en vertical aparece "Gira tu dispositivo" (⛶ pantalla completa + bloqueo de orientación, o "seguir en vertical" con diseño apilado).
 - **DOC** (chars.js, SVG original): tupé asimétrico morado, visor de un ojo, traje de criogenia con el emblema Ouroboros; evoluciona con el rango (0 despierto → 4 ente: bata con manchas, ojos que brillan, aura). Ánimos: neutral, feliz, sorpresa, loco, triste, enojado. NO copiar personajes existentes.
 - **ÉTER**: IA de la nave, un ojo dentro de una serpiente que se muerde la cola; seca y sarcástica (tono de humor tipo ciencia ficción animada, guion original).
 - Fuentes embebidas: "Titulos" (TeX Gyre Heros Cn Bold, GUST) e Inter (OFL). Símbolos Unicode del sistema.
@@ -27,7 +27,8 @@
 ```
 src/data.js    contenido: elementos, valencias, etiquetas, 79 compuestos, 10 polímeros, 37 REACCIONES, DIFF (dificultad por nivel), STORY/DIALOG, 10 niveles × 10 problemas, guía
 src/engine.js  sin DOM: SMILES propio, grafos, hash WL, grupos funcionales (incl. aromático), híbridos, layout2D/blueprint (planos), REACT (ecuaciones), SORT (destilación + solucionador), NUC (forja), BAT (batalla con crítico y propagación), estado
-src/chars.js   retratos SVG de Doc y ÉTER
+src/chars.js   retratos SVG de Doc y ÉTER; Doc de cuerpo entero (body/full)
+src/ship.js    la nave Ouroboros en corte: salas-botón, interiores, Doc, ÉTER y durmientes
 src/ui.js      DOM: portada, historia con retratos, laboratorio guiado, reactor, forja, destilación, frascos, mapa, batalla, panel lateral, menú
 src/test.js    bot: selfTest(), solver() (sigue la guía en niveles guiados), monkey(n)
 tools/build.mjs → index.html (≈300 KB)   tools/bot.mjs → Playwright: móvil horizontal 740×360, PC 1366×768 y móvil vertical
@@ -170,6 +171,25 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Etiquetas `inm` y `eco`; season4.js añade esas etiquetas a compuestos de temporadas anteriores (vitamina C, urea, amoníaco…).
 - Seguridad: los organismos son bloques abstractos. Nada de cultivo, obtención o mejora de patógenos.
 - Temporada 5 (TESIS, 41–50) queda anunciada en el final de la temporada 4.
+
+## 7g. La nave como menú (v3.0, `src/ship.js`)
+- Pidió el autor: dibujar la nave y los personajes, con la interfaz como botones encajados en las partes de la nave, sin quitar funciones.
+- `DE.ship.svg(vm)` dibuja el corte lateral (viewBox 1280×600). Cada sala es `<g class="room" data-act="room" data-arg="id" role="button" tabindex="0">`. Las salas:
+  - Cubierta A: forge (Forja), react (Reactor), lab (Laboratorio), gen (Genética), puente (Puente: mapa de misiones).
+  - Cubierta B: bodega (Frascos), destil (Destilería), eter (menú), cryo (Criogenia: escuela e historia), cult (Cultivo), tx (Transmisiones).
+  - Techo: antena (reto diario y duelos).
+- `vm`: `next` (sala de la siguiente misión: baliza ! y Doc parado ahí), `threat` (la siguiente es batalla: alarma en el Puente), `locks` (Destilería, Genética y Cultivo se abren en el primer nivel que las usa), `newFr`, `nFr`, `lvl`, `mood`, `rank`.
+- ui.js:
+  - `renderHub()` dibuja la nave, la consola "▶ Siguiente misión" (o "◂ Misión en curso") y la lista de salas para vertical.
+  - `openRoom(id)`: sala normal → entra. Sala con la baliza, o sala de un tipo de problema → ficha con "▶ Misión", "Entrar sin misión" y "Repetir".
+  - `ENTER`, `ROOM_OF` (tipo de problema → sala), `roomBar()` (cabecera: ◂ Nave + nombre de sala + puertas a las otras salas del laboratorio).
+  - `#comms` se mueve a `#hubCom` en la nave y vuelve a `#side` en las salas.
+  - Bodega y Transmisiones ocultan el panel lateral (`body.noside`).
+- Laboratorio: panel de instrumentos con iconos y nombre (Deshacer, Quitar, Vaciar, +H; Acercar, Alejar, Centrar), sintetizador CREAR (`#bSyn .t` cambia a Lanzar en batalla con `synT()`), estante de frascos (`#tray .at`).
+- Forja: acelerador (`#accel`) con tres ranuras en las esquinas, tanque de neutrones (`.port.flux`), elemento previsto en el centro (`.ptile`) y animación `fire` al fusionar.
+- Reactor: caldera (`.vat`) y matraces (`.eq .sub`).
+- Historia: Doc aparece de cuerpo entero (`DE.CH.full`).
+- Bot: entra a las salas por clics reales en la nave (`#ship [data-act=room]`). El monkey también abre salas al azar.
 
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.

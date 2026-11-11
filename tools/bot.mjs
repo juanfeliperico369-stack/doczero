@@ -114,8 +114,11 @@ for (const v of views) {
       ui.push('brote por clics: ' + (await ev(() => DE.k.S().prog['33-1'] || 0)) + '★');
       await ev(() => DE.ui.closeModal());
       ui.push('consejos de sala vistos: ' + tips);
-      for (const t of ['fr', 'bt', 'tx', 'lab']) await click(`#nav [data-arg=${t}]`);
-      await click('[data-act=mode][data-arg=forge]'); await click('#forgePane .nuc >> nth=0'); await click('#forgePane .nuc >> nth=1'); await click('[data-act=fuse]');
+      // la nave: cada sala dibujada es un botón; las puertas de la cabecera cambian de sala
+      for (const rm of ['bodega', 'puente', 'tx', 'lab']) { await click('#hud [data-act=nave]'); await click(`#ship [data-act=room][data-arg=${rm}]`); if (await ev(() => !document.getElementById('ov').hidden)) await click('.sheet [data-act=roomin]'); }
+      ui.push('salas de la nave: ' + (await ev(() => DE.ui.TAB() === 'lab' && !!document.querySelector('#hRoom .door'))));
+      await click('#hud [data-act=nave]'); if (shots) await page.screenshot({ path: `${shots}/${v.name}-nave.png` });
+      await click('#ship [data-act=room][data-arg=forge]'); if (await ev(() => !document.getElementById('ov').hidden)) await click('.sheet [data-act=roomin]'); await click('#forgePane .nuc >> nth=0'); await click('#forgePane .nuc >> nth=1'); await click('[data-act=fuse]');
       ui.push('forja p+n: ' + (await ev(() => !!DE.ui.state().nuc.D)));
       await click('[data-act=mode][data-arg=mol]');
       for (const a of ['guide', 'credits', 'settings', 'diag']) { await click('[data-act=menu]'); await click(`.sheet [data-act=${a}]`); await page.waitForTimeout(a === 'diag' ? 1500 : 30); await ev(() => DE.ui.closeModal()); }

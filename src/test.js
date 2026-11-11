@@ -228,7 +228,7 @@ function monkey(n, seed) {
     org: () => { if (!DE.org.active()) { const q = openP('o'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.org.state(), m = g.p.mode; if (r() < .4) DE.org.solve(); else if (m === 'cel') DE.org.part(pickA(Object.keys(ORG.PART))); else if (m === 'ord') DE.org.pick(Math.floor(r() * g.p.items.length)); else if (m === 'cls') DE.org.cat(Math.floor(r() * 3)); else DE.org.cell(Math.floor(r() * (g.g.c.length + 2))); } },
     sort: () => { if (!U.SO()) { const q = openP('s'); if (q) U.startProblem(q[0], q[1]); } else U.sortTap(Math.floor(r() * (U.SO().st.length + 1))); },
     hint: () => U.useHint(),
-    tab: () => U.setTab(pickA(['lab', 'fr', 'bt', 'tx'])), mode: () => U.setMode(pickA(['mol', 'forge', 'react'])),
+    tab: () => U.setTab(pickA(['nave', 'lab', 'fr', 'bt', 'tx'])), room: () => { if (!U.BT()) U.openRoom(pickA(DE.ship.ROOMS).id); }, mode: () => U.setMode(pickA(['mol', 'forge', 'react'])),
     detail: () => { const S = U.state(), ids = [...Object.keys(S.fr), ...Object.keys(S.el).map(s => 'el:' + s)]; if (ids.length) U.detail(pickA(ids)); },
     modal: () => pickA([U.menu, U.guide, U.credits, U.settings, () => U.txLevel(1 + Math.floor(r() * LEVELS.length))])(),
     close: () => U.closeModal(), render: () => U.render(), flee: () => U.flee(), side: () => U.renderSide(),
