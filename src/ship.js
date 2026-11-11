@@ -83,7 +83,7 @@ function svg(vm) {
     rooms += `<g class="room${nx ? ' next' : ''}${lk ? ' lock' : ''}${r.ext ? ' ext' : ''}" data-act="room" data-arg="${r.id}" role="button" tabindex="0" aria-label="${esc(r.n + ': ' + r.s + (lk ? ' (' + lk + ')' : nx ? ' · siguiente misión' : ''))}">${shape}<g class="rin">${IN[r.id](vm)}</g>${plate(r)}${lk ? lock(r, lk) : ''}${nx ? badge(r) : ''}</g>`;
   });
   const spot = (ROOM[vm.next] && ROOM[vm.next].doc && !vm.locks[vm.next] ? ROOM[vm.next] : ROOM.lab).doc;
-  const docG = `<g class="docw" data-act="${vm.next ? 'hubgo' : 'room'}" data-arg="${vm.next ? '' : 'lab'}" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
+  const docG = `<g class="docw" data-act="custom" role="button" tabindex="0" aria-label="Tu personaje: tócalo para cambiar su aspecto" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
   return `<svg id="ship" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid meet" aria-label="Nave Ouroboros">
   <defs><pattern id="haz" width="16" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-40)"><rect width="8" height="8" fill="#ffc23a"/><rect x="8" width="8" height="8" fill="#000"/></pattern>
    <radialGradient id="gcore"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#ffc23a"/><stop offset="1" stop-color="#ff2fb3" stop-opacity="0"/></radialGradient>

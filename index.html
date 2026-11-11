@@ -541,6 +541,28 @@ body.noside #app{grid-template-columns:minmax(0,1fr)}body.noside #side{display:n
 #side>*{flex-shrink:0}
 .hb2{flex:none}#hud>.chip{flex:none}
 @media (orientation:portrait){#hSc{display:none}.brand{font-size:17px}.rname{font-size:15px}.back{padding:0 8px 0 13px;font-size:14px}}
+/* ---------- espejo: personalizar a Doc ---------- */
+input{-webkit-user-select:text;user-select:text}
+.cust{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.cprev{display:flex;flex-direction:column;align-items:center;gap:6px;position:sticky;top:0}
+.cprev .full{width:min(24vw,170px);height:min(44vh,300px)}
+.copts{display:flex;flex-direction:column;gap:9px;min-width:0}
+.cname{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;letter-spacing:.15em;color:var(--amb);text-transform:uppercase}
+.cname input{flex:1;max-width:260px;font-size:16px;font-family:var(--fb);letter-spacing:0;margin:0}
+.crow b{display:block;font-family:var(--fm);font-size:10.5px;letter-spacing:.2em;color:var(--amb);text-transform:uppercase;margin-bottom:4px;font-weight:400}
+.opts2{display:flex;flex-wrap:wrap;gap:7px}
+.swc{width:34px;height:34px;border-radius:50%;background:var(--c);border:3px solid #000;box-shadow:0 0 0 2px var(--pur2);font-size:12px}
+.swc.on{box-shadow:0 0 0 3px var(--amb),0 0 12px var(--amb)}
+.swk{width:64px;display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--pur2);border-radius:10px;padding:3px 2px;background:var(--pn);position:relative}
+.swk .mini{width:50px;height:50px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#1a0636,#000 70%)}
+.swk .mini svg{width:100%;height:100%;display:block}
+.swk small{font-size:10px;color:var(--ink2);white-space:nowrap}
+.swk.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.5)}.swk.on small{color:var(--wht)}
+.swk.lock,.swc.lock{opacity:.45}
+.swk i{position:absolute;top:2px;right:2px;font-style:normal;font-size:9px;background:#000;color:var(--amb);padding:0 3px;border-radius:6px}
+#ship .docw:focus-visible{outline:2px solid var(--amb)}
+@media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
+@media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
 
 </style></head><body><noscript>Doc Element necesita JavaScript activado.</noscript>
 <script>
@@ -561,7 +583,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '3.0.0',
+  VERSION: '3.1.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -2098,7 +2120,7 @@ function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.k
 /* ---------- partida ---------- */
 function newState() {
   return { v: 1, intro: 0, unl: 1, cur: 1, prog: {}, el: { H: 1, O: 1 }, nuc: { p: 1, n: 1 }, fr: {}, hyb: {}, en: 100, sc: 0,
-    set: { snd: 1, mus: 1, vib: 1, sandbox: 0 }, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
+    set: { snd: 1, mus: 1, vib: 1, sandbox: 0 }, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', look: {}, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
 }
 function sanitize(S) {
   const d = newState();
@@ -2259,46 +2281,85 @@ Object.assign(DE, { layout2D, blueprint, REACT, SORT, CFG, ELEMENTS, SYM, CAT, e
 <script>
 /* ============================================================
    DOC ELEMENT · PERSONAJES (SVG original, sin imágenes externas)
-   DOC: tú. Tupé morado asimétrico, visor de un ojo y traje de criogenia; se vuelve más loco con cada rango (0 despierto → 4 ente)
+   DOC: tú. Personalizable (piel, peinado, color de pelo, ojos, traje, accesorio y matraz); por defecto tupé morado,
+   visor de un ojo y traje de criogenia. Se vuelve más loco con cada rango (0 despierto → 4 ente).
    ÉTER: la inteligencia de la Ouroboros, un ojo dentro de una serpiente que se muerde la cola
    ánimos: neutral · feliz · sorpresa · loco · triste · enojado
    ============================================================ */
 'use strict';
 (function () {
 const EYE = { neutral: '#39c8ff', feliz: '#2dffb3', sorpresa: '#ffc23a', loco: '#ff2fb3', triste: '#8fb3ff', enojado: '#ff2fb3' };
-function parts(mood, rank) {
-  mood = mood || 'neutral'; rank = Math.max(0, Math.min(4, rank | 0));
-  const skin = '#d9c3b0', glow = rank >= 3;
-  // tupé asimétrico tipo llama: crece y brilla con el rango
-  const h = 6 + rank * 5, hairC = rank >= 2 ? 'url(#dh)' : '#5b2bd6';
-  const hair = `M29 44 Q27 22 46 18 Q${58 + rank * 2} ${12 - h} ${74 + rank} ${10 - h * .6} Q70 ${20 - h * .2} 72 30 Q74 36 71 44 Q66 30 50 29 Q36 30 29 44Z`;
+/* ---------- opciones del personaje (índices o claves; req = estrellas para desbloquear) ---------- */
+const OPT = {
+  skin: { t: 'Piel', c: ['#f3d6c1', '#d9c3b0', '#c79a78', '#a8775a', '#7d5239', '#573626'], n: ['Muy clara', 'Clara', 'Trigueña', 'Morena', 'Oscura', 'Muy oscura'] },
+  hair: { t: 'Peinado', k: ['tupe', 'corto', 'rizos', 'largo', 'mono', 'cresta', 'calvo'], n: ['Tupé', 'Corto', 'Rizos', 'Largo', 'Moño', 'Cresta', 'Rapado'], req: { cresta: 60 } },
+  hc: { t: 'Color de pelo', c: ['#5b2bd6', '#1f6fd1', '#d61f8c', '#16a36b', '#7a4a22', '#1c1626', '#b8321f', '#e6e6f0', '#e0a91c'], n: ['Morado', 'Azul', 'Rosa', 'Verde', 'Castaño', 'Negro', 'Rojo', 'Plata', 'Dorado'], req: { 8: 140 } },
+  eyes: { t: 'Ojos', k: ['visor', 'gafas', 'antiparras', 'nada'], n: ['Visor', 'Gafas', 'Antiparras', 'Sin nada'] },
+  suit: { t: 'Traje', c: ['#0b2a44', '#2a0b44', '#0b3a2a', '#3a0b1a', '#1c1c24', '#dfe8f7'], n: ['Azul noche', 'Morado', 'Verde', 'Granate', 'Grafito', 'Blanco'] },
+  acc: { t: 'Accesorio', k: ['nada', 'bufanda', 'audifonos', 'insignia', 'medalla'], n: ['Ninguno', 'Bufanda', 'Audífonos', 'Insignia', 'Medalla'], req: { audifonos: 30, medalla: 240 } },
+  fl: { t: 'Matraz', c: ['#ff2fb3', '#2dffb3', '#39c8ff', '#ffc23a'], n: ['Rosa', 'Verde', 'Azul', 'Dorado'] }
+};
+const LOOK0 = { skin: 1, hair: 'tupe', hc: 0, eyes: 'visor', suit: 0, acc: 'nada', fl: 0 };
+let LOOK = Object.assign({}, LOOK0);
+/* deja solo valores válidos (sirve también para partidas guardadas o importadas) */
+function clean(l) {
+  const o = Object.assign({}, LOOK0); if (!l || typeof l !== 'object') return o;
+  for (const k in OPT) { const v = l[k], q = OPT[k]; if (q.k ? q.k.includes(v) : Number.isInteger(v) && v >= 0 && v < q.c.length) o[k] = v; }
+  return o;
+}
+const setLook = l => { LOOK = clean(l); return LOOK; };
+const shade = (hex, f) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.substr(i, 2), 16) * f).toString(16).padStart(2, '0')).join('');
+function hairOf(st, c, rank) {
+  const g = rank >= 2 ? 'url(#dh' + LOOKC.hc + ')' : c, lock = `<path d="M30 46 Q29 40 31 36" stroke="${c}" stroke-width="3" fill="none"/>`;
+  if (st === 'tupe') { const h = 6 + rank * 5; return { b: '', f: `<path d="M29 44 Q27 22 46 18 Q${58 + rank * 2} ${12 - h} ${74 + rank} ${10 - h * .6} Q70 ${20 - h * .2} 72 30 Q74 36 71 44 Q66 30 50 29 Q36 30 29 44Z" fill="${g}"/>` + lock }; }
+  if (st === 'corto') return { b: '', f: `<path d="M29 45 Q27 23 50 22 Q73 23 71 45 Q69 33 60 31 Q50 34 40 31 Q31 33 29 45Z" fill="${g}"/>` + lock };
+  if (st === 'rizos') { let b = ''; for (let a = 190; a <= 350; a += 20) { const r = a * Math.PI / 180; b += `<circle cx="${(50 + 23 * Math.cos(r)).toFixed(1)}" cy="${(41 + 21 * Math.sin(r)).toFixed(1)}" r="${9 + rank * .6}" fill="${g}"/>`; } return { b, f: [36, 44, 52, 60].map((x, i) => `<circle cx="${x + 2}" cy="${27 + (i % 2) * 2}" r="6.5" fill="${g}"/>`).join('') }; }
+  if (st === 'largo') return { b: `<path d="M27 40 Q27 17 50 17 Q73 17 73 40 L76 76 Q70 81 64 76 L63 52 H37 L36 76 Q30 81 24 76Z" fill="${g}"/>`, f: `<path d="M29 45 Q28 21 50 20 Q72 21 71 45 Q65 30 55 32 Q47 26 39 33 Q32 36 29 45Z" fill="${g}"/>` };
+  if (st === 'mono') return { b: `<circle cx="50" cy="${14 - rank}" r="${9 + rank * .5}" fill="${g}"/>`, f: `<path d="M29 45 Q27 23 50 22 Q73 23 71 45 Q66 31 50 30 Q34 31 29 45Z" fill="${g}"/>` };
+  if (st === 'cresta') { const h = rank * 3; return { b: '', f: `<path d="M44 33 Q43 ${14 - h} 50 ${2 - h} Q57 ${14 - h} 56 33 Q50 30 44 33Z" fill="${g}"/><path d="M31 40 Q33 30 42 27 M69 40 Q67 30 58 27" stroke="${c}" stroke-width="1.5" opacity=".5" fill="none"/>` }; }
+  return { b: '', f: '<ellipse cx="43" cy="31" rx="7" ry="3" fill="#fff" opacity=".22"/>' };
+}
+let LOOKC = LOOK;
+function parts(mood, rank, look) {
+  mood = mood || 'neutral'; rank = Math.max(0, Math.min(4, rank | 0)); const L = LOOKC = look ? clean(look) : LOOK;
+  const skin = OPT.skin.c[L.skin], hc = OPT.hc.c[L.hc], suitC = OPT.suit.c[L.suit], glow = rank >= 3, hr = hairOf(L.hair, hc, rank);
   const brows = { neutral: 'M37 38 L45 37 M55 37 L63 38', feliz: 'M37 36 Q41 34 45 36 M55 36 Q59 34 63 36', sorpresa: 'M37 33 Q41 30 45 33 M55 33 Q59 30 63 33', loco: 'M36 39 L45 34 M55 33 L64 37', triste: 'M37 36 L45 39 M55 39 L63 36', enojado: 'M37 35 L46 39 M54 39 L63 35' }[mood];
   const er = mood === 'sorpresa' ? 4.8 : 4, pupil = glow ? '#2dffb3' : '#120a22';
-  const eyeL = mood === 'feliz' ? '<path d="M37 44 Q41 40 45 44" stroke="#120a22" stroke-width="2.2" fill="none" stroke-linecap="round"/>' : `<ellipse cx="41" cy="44" rx="${mood === 'loco' ? 5.4 : er}" ry="${mood === 'loco' ? 5.4 : er}" fill="#fff"/><circle cx="${mood === 'triste' ? 41 : 42}" cy="${mood === 'triste' ? 45.5 : 44}" r="${mood === 'loco' ? 1.3 : 2}" fill="${pupil}"/>`;
-  // visor de un solo ojo (derecho): se vuelve más complejo con el rango
-  const visor = `<path d="M52 38 L68 37 Q71 44 67 50 L53 50 Q50 44 52 38Z" fill="#39c8ff" fill-opacity="${mood === 'loco' ? .75 : .45}" stroke="#a42cff" stroke-width="2"/><path d="M68 41 L76 39" stroke="#a42cff" stroke-width="2"/>` + (rank >= 1 ? '<circle cx="60" cy="44" r="2.4" fill="#ff2fb3"/>' : '') + (rank >= 3 ? '<path d="M54 47 L66 47" stroke="#2dffb3" stroke-width="1"/>' : '');
+  const eye = x => mood === 'feliz' ? `<path d="M${x - 4} 44 Q${x} 40 ${x + 4} 44" stroke="#120a22" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : `<ellipse cx="${x}" cy="44" rx="${mood === 'loco' ? 5.4 : er}" ry="${mood === 'loco' ? 5.4 : er}" fill="#fff"/><circle cx="${mood === 'triste' ? x : x + 1}" cy="${mood === 'triste' ? 45.5 : 44}" r="${mood === 'loco' ? 1.3 : 2}" fill="${pupil}"/>`;
+  // ojos: visor de un ojo (clásico de Doc, crece con el rango), gafas redondas, antiparras de laboratorio o nada
+  const eyes = L.eyes === 'visor' ? eye(41) + `<path d="M52 38 L68 37 Q71 44 67 50 L53 50 Q50 44 52 38Z" fill="#39c8ff" fill-opacity="${mood === 'loco' ? .75 : .45}" stroke="#a42cff" stroke-width="2"/><path d="M68 41 L76 39" stroke="#a42cff" stroke-width="2"/>` + (rank >= 1 ? '<circle cx="60" cy="44" r="2.4" fill="#ff2fb3"/>' : '') + (rank >= 3 ? '<path d="M54 47 L66 47" stroke="#2dffb3" stroke-width="1"/>' : '')
+    : L.eyes === 'gafas' ? eye(41) + eye(59) + '<circle cx="41" cy="44" r="7.5" fill="rgba(57,200,255,.14)" stroke="#a42cff" stroke-width="2"/><circle cx="59" cy="44" r="7.5" fill="rgba(57,200,255,.14)" stroke="#a42cff" stroke-width="2"/><path d="M48.5 43 Q50 41.5 51.5 43 M33.5 42 L30 40 M66.5 42 L70 40" stroke="#a42cff" stroke-width="2" fill="none"/>'
+    : L.eyes === 'antiparras' ? eye(41) + eye(59) + '<path d="M29 42 H33 M67 42 H71" stroke="#2dffb3" stroke-width="3"/><rect x="32" y="36.5" width="17" height="14" rx="6" fill="rgba(45,255,179,.16)" stroke="#2dffb3" stroke-width="2"/><rect x="51" y="36.5" width="17" height="14" rx="6" fill="rgba(45,255,179,.16)" stroke="#2dffb3" stroke-width="2"/><path d="M35 40 l4 -1" stroke="#fff" stroke-width="1.4" opacity=".7"/>'
+    : eye(41) + eye(59);
   const mouth = { neutral: '<path d="M44 58 L56 58" stroke="#5a2a2a" stroke-width="2" stroke-linecap="round"/>', feliz: '<path d="M42 56 Q50 63 58 56" stroke="#5a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>', sorpresa: '<ellipse cx="50" cy="59" rx="3.5" ry="4.5" fill="#3a1520"/>', loco: '<path d="M39 55 Q50 66 61 55 Z" fill="#3a1520"/><path d="M41 56 L59 56 L57 58.5 L43 58.5Z" fill="#fff"/>', triste: '<path d="M43 60 Q50 55 57 60" stroke="#5a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>', enojado: '<path d="M43 59 L57 57" stroke="#5a2a2a" stroke-width="2.4" stroke-linecap="round"/>' }[mood];
+  const browC = L.hair === 'calvo' ? shade(skin, .45) : shade(hc, .7);
+  // accesorios: cabeza (audífonos), cuello (bufanda) y pecho (insignia, medalla), dibujados distinto en retrato y cuerpo
+  const acc = L.acc, ach = acc === 'audifonos' ? '<path d="M27 44 Q27 13 50 13 Q73 13 73 44" stroke="#e9f6ff" stroke-width="3.2" fill="none"/><rect x="22" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/><rect x="69" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/>' : '';
+  const neck = acc === 'bufanda' ? '<path d="M37 64 Q50 73 63 64 L65 72 Q50 81 35 72Z" fill="#ffc23a" stroke="#7a4a00" stroke-width="1"/><path d="M55 73 L60 90 L53 90 L51 75Z" fill="#ffc23a" stroke="#7a4a00" stroke-width="1"/>' : '';
+  const chest = (x, y) => acc === 'insignia' ? `<g transform="translate(${x} ${y})"><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2"/><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2" transform="rotate(60)"/><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2" transform="rotate(-60)"/><circle r="1.6" fill="#ff2fb3"/></g>`
+    : acc === 'medalla' ? `<path d="M${x - 6} ${y - 18} L${x} ${y - 6} L${x + 6} ${y - 18}" stroke="#ff2fb3" stroke-width="3" fill="none"/><circle cx="${x}" cy="${y}" r="6" fill="#ffc23a" stroke="#7a4a00" stroke-width="1.2"/><path d="M${x} ${y - 3} l1 2 2 .3 -1.5 1.4 .4 2.1 -1.9 -1 -1.9 1 .4 -2.1 -1.5 -1.4 2 -.3z" fill="#7a4a00"/>` : '';
   // traje de criogenia con el emblema de la Ouroboros; al subir de rango, bata con manchas
-  const suit = '<path d="M12 100 Q14 76 36 70 L50 78 L64 70 Q86 76 88 100Z" fill="#0b2a44" stroke="#39c8ff" stroke-width="1.5"/><path d="M36 70 L50 78 L64 70" stroke="#2dffb3" stroke-width="2" fill="none"/><circle cx="50" cy="90" r="5" fill="none" stroke="#2dffb3" stroke-width="1.8" stroke-dasharray="24 6"/>' + (rank >= 2 ? '<path d="M12 100 Q14 76 30 71 L36 100Z M88 100 Q86 76 70 71 L64 100Z" fill="#e6eefc" opacity=".92"/><circle cx="24" cy="90" r="2.6" fill="#ff2fb3"/><circle cx="76" cy="86" r="2" fill="#ffc23a"/>' : '');
-  const scar = rank >= 1 ? '<path d="M33 50 L37 56" stroke="#b07a6a" stroke-width="1.3"/>' : '';
+  const suit = `<path d="M12 100 Q14 76 36 70 L50 78 L64 70 Q86 76 88 100Z" fill="${suitC}" stroke="#39c8ff" stroke-width="1.5"/><path d="M36 70 L50 78 L64 70" stroke="#2dffb3" stroke-width="2" fill="none"/><circle cx="50" cy="90" r="5" fill="none" stroke="#2dffb3" stroke-width="1.8" stroke-dasharray="24 6"/>` + (rank >= 2 ? '<path d="M12 100 Q14 76 30 71 L36 100Z M88 100 Q86 76 70 71 L64 100Z" fill="#e6eefc" opacity=".92"/><circle cx="24" cy="90" r="2.6" fill="#ff2fb3"/><circle cx="76" cy="86" r="2" fill="#ffc23a"/>' : '') + chest(acc === 'medalla' ? 50 : 64, acc === 'medalla' ? 90 : 86);
+  const scar = rank >= 1 ? `<path d="M33 50 L37 56" stroke="${shade(skin, .78)}" stroke-width="1.3"/>` : '';
   const aura = rank >= 4 ? '<circle cx="50" cy="50" r="47" fill="none" stroke="#ffc23a" stroke-width="1.5" stroke-dasharray="3 5"/>' : '';
-  const head = `<rect x="44" y="62" width="12" height="10" fill="${skin}"/><ellipse cx="50" cy="47" rx="20" ry="22" fill="${skin}"/><path d="${hair}" fill="${hairC}"/><path d="M30 46 Q29 40 31 36" stroke="#5b2bd6" stroke-width="3" fill="none"/><path d="${brows}" stroke="#3b1f7a" stroke-width="2.4" fill="none" stroke-linecap="round"/>${eyeL}${visor}<path d="M50 47 L48 53 L51 53" stroke="#a88470" stroke-width="1.4" fill="none"/>${mouth}${scar}${glow ? '<circle cx="41" cy="44" r="6" fill="#2dffb3" opacity=".16"/>' : ''}`;
-  return { aura, suit, head };
+  const head = `${hr.b}<rect x="44" y="62" width="12" height="10" fill="${skin}"/><ellipse cx="50" cy="47" rx="20" ry="22" fill="${skin}"/>${hr.f}<path d="${brows}" stroke="${browC}" stroke-width="2.4" fill="none" stroke-linecap="round"/>${eyes}<path d="M50 47 L48 53 L51 53" stroke="${shade(skin, .74)}" stroke-width="1.4" fill="none"/>${mouth}${scar}${glow ? '<circle cx="41" cy="44" r="6" fill="#2dffb3" opacity=".16"/>' : ''}${ach}${neck}`;
+  const defs = `<defs><linearGradient id="dh${L.hc}" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="${hc}"/><stop offset="1" stop-color="#39c8ff"/></linearGradient></defs>`;
+  return { aura, suit, head, defs, skin, suitC, chest, fl: OPT.fl.c[L.fl] };
 }
-const DEFS = '<defs><linearGradient id="dh" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#5b2bd6"/><stop offset="1" stop-color="#39c8ff"/></linearGradient></defs>';
-function doc(mood, rank) { const p = parts(mood, rank); return `<svg viewBox="0 0 100 100" class="pt-doc m-${mood || 'neutral'}" aria-label="Doc">${DEFS}${p.aura}${p.suit}${p.head}</svg>`; }
+function doc(mood, rank, look) { const p = parts(mood, rank, look); return `<svg viewBox="0 0 100 100" class="pt-doc m-${mood || 'neutral'}" aria-label="Doc">${p.defs}${p.aura}${p.suit}${p.head}</svg>`; }
 /* Doc de cuerpo entero (caja 100 × 200, pies en y = 196): traje de criogenia, cinturón de viales y su matraz; con rango 2+ lleva bata */
-const ARM = (d, w) => `<path d="${d}" stroke="#39c8ff" stroke-width="${w + 3}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#0b2a44" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
-const FLASK = (x, y) => `<g transform="translate(${x} ${y})"><path d="M-3 -16 h6 v7 l8 13 q1.5 5 -3.5 5 h-15 q-5 0 -3.5 -5 l8 -13Z" fill="rgba(57,200,255,.14)" stroke="#e9f6ff" stroke-width="1.4"/><path d="M-9.5 1.5 h19 l1.5 2.5 q1 4.5 -3.5 4.5 h-15 q-4.5 0 -3.5 -4.5Z" fill="#ff2fb3"/><circle class="bub" cx="-2" cy="-2" r="1.6" fill="#ffb3e6"/><circle class="bub b2" cx="2" cy="-6" r="1.2" fill="#ffb3e6"/></g>`;
-function body(mood, rank) {
-  mood = mood || 'neutral'; rank = Math.max(0, Math.min(4, rank | 0)); const p = parts(mood, rank), skin = '#d9c3b0', up = mood === 'loco' || mood === 'feliz' || mood === 'sorpresa';
-  let s = DEFS + '<ellipse cx="50" cy="197" rx="27" ry="5" fill="#000" opacity=".6"/>';
-  s += '<path d="M36 128 L34 186 L47 186 L49 132Z M64 128 L66 186 L53 186 L51 132Z" fill="#0b2a44" stroke="#39c8ff" stroke-width="1.5"/><path d="M30 184 h18 v10 h-20 q-1 -7 2 -10Z M70 184 h-18 v10 h20 q1 -7 -2 -10Z" fill="#1a0f2e" stroke="#a42cff" stroke-width="1.5"/>';
-  s += ARM('M31 82 Q19 102 22 124', 9);
-  s += '<path d="M29 78 Q50 70 71 78 L73 132 Q50 139 27 132Z" fill="#0b2a44" stroke="#39c8ff" stroke-width="1.6"/><path d="M38 76 L50 86 L62 76" stroke="#2dffb3" stroke-width="2" fill="none"/><circle cx="50" cy="101" r="6" fill="none" stroke="#2dffb3" stroke-width="1.8" stroke-dasharray="28 6"/><rect x="28" y="119" width="44" height="6" fill="#1a0f2e" stroke="#a42cff" stroke-width="1"/><rect x="33" y="112" width="4" height="10" rx="1.6" fill="#ff2fb3"/><rect x="39" y="112" width="4" height="10" rx="1.6" fill="#ffc23a"/><rect x="58" y="112" width="4" height="10" rx="1.6" fill="#2dffb3"/>';
+const ARM = (d, w, c) => `<path d="${d}" stroke="#39c8ff" stroke-width="${w + 3}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+const FLASK = (x, y, c) => `<g transform="translate(${x} ${y})"><path d="M-3 -16 h6 v7 l8 13 q1.5 5 -3.5 5 h-15 q-5 0 -3.5 -5 l8 -13Z" fill="rgba(57,200,255,.14)" stroke="#e9f6ff" stroke-width="1.4"/><path d="M-9.5 1.5 h19 l1.5 2.5 q1 4.5 -3.5 4.5 h-15 q-4.5 0 -3.5 -4.5Z" fill="${c}"/><circle class="bub" cx="-2" cy="-2" r="1.6" fill="#fff" opacity=".7"/><circle class="bub b2" cx="2" cy="-6" r="1.2" fill="#fff" opacity=".7"/></g>`;
+function body(mood, rank, look) {
+  mood = mood || 'neutral'; rank = Math.max(0, Math.min(4, rank | 0)); const p = parts(mood, rank, look), skin = p.skin, sc = p.suitC, up = mood === 'loco' || mood === 'feliz' || mood === 'sorpresa';
+  let s = p.defs + '<ellipse cx="50" cy="197" rx="27" ry="5" fill="#000" opacity=".6"/>';
+  s += `<path d="M36 128 L34 186 L47 186 L49 132Z M64 128 L66 186 L53 186 L51 132Z" fill="${sc}" stroke="#39c8ff" stroke-width="1.5"/><path d="M30 184 h18 v10 h-20 q-1 -7 2 -10Z M70 184 h-18 v10 h20 q1 -7 -2 -10Z" fill="#1a0f2e" stroke="#a42cff" stroke-width="1.5"/>`;
+  s += ARM('M31 82 Q19 102 22 124', 9, sc);
+  s += `<path d="M29 78 Q50 70 71 78 L73 132 Q50 139 27 132Z" fill="${sc}" stroke="#39c8ff" stroke-width="1.6"/><path d="M38 76 L50 86 L62 76" stroke="#2dffb3" stroke-width="2" fill="none"/><circle cx="50" cy="101" r="6" fill="none" stroke="#2dffb3" stroke-width="1.8" stroke-dasharray="28 6"/><rect x="28" y="119" width="44" height="6" fill="#1a0f2e" stroke="#a42cff" stroke-width="1"/><rect x="33" y="112" width="4" height="10" rx="1.6" fill="#ff2fb3"/><rect x="39" y="112" width="4" height="10" rx="1.6" fill="#ffc23a"/><rect x="58" y="112" width="4" height="10" rx="1.6" fill="#2dffb3"/>`;
   if (rank >= 2) s += '<path d="M29 78 Q25 112 23 152 L40 152 L42 86Z M71 78 Q75 112 77 152 L60 152 L58 86Z" fill="#e6eefc" stroke="#8fb3ff" stroke-width="1"/><circle cx="30" cy="140" r="2.6" fill="#ff2fb3"/><circle cx="71" cy="128" r="2" fill="#ffc23a"/><path d="M33 96 h6" stroke="#8fb3ff" stroke-width="1"/>';
+  s += p.chest(LOOKC.acc === 'medalla' ? 50 : 62, LOOKC.acc === 'medalla' ? 101 : 94);
   s += `<circle cx="22" cy="125" r="4.6" fill="${skin}"/>`;
-  s += up ? ARM('M69 82 Q84 74 86 52', 9) + FLASK(86, 44) + `<circle cx="86" cy="48" r="4.6" fill="${skin}"/>` : ARM('M69 82 Q81 102 78 124', 9) + FLASK(80, 134) + `<circle cx="78" cy="125" r="4.6" fill="${skin}"/>`;
+  s += up ? ARM('M69 82 Q84 74 86 52', 9, sc) + FLASK(86, 44, p.fl) + `<circle cx="86" cy="48" r="4.6" fill="${skin}"/>` : ARM('M69 82 Q81 102 78 124', 9, sc) + FLASK(80, 134, p.fl) + `<circle cx="78" cy="125" r="4.6" fill="${skin}"/>`;
   return s + `<g transform="translate(0 7)">${p.aura}${p.head}</g>`;
 }
 function eter(mood) {
@@ -2307,8 +2368,8 @@ function eter(mood) {
   const iris = mood === 'feliz' ? '' : `<circle cx="50" cy="50" r="${mood === 'sorpresa' ? 14 : 11}" fill="${c}"/><circle cx="50" cy="50" r="${mood === 'sorpresa' ? 4 : 5}" fill="#05010c"/><circle cx="46" cy="46" r="2.4" fill="#fff"/>`;
   return `<svg viewBox="0 0 100 100" class="pt-eter m-${mood}" aria-label="ÉTER"><defs><linearGradient id="eg${mood}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a42cff"/><stop offset="1" stop-color="#39c8ff"/></linearGradient></defs><circle cx="50" cy="50" r="38" fill="#05010c" stroke="url(#eg${mood})" stroke-width="7" stroke-dasharray="200 20" transform="rotate(-62 50 50)"/><path d="M71 15 l9 -3 -3 9z" fill="#39c8ff"/><circle cx="50" cy="50" r="30" fill="none" stroke="${c}" stroke-opacity=".25" stroke-width="1"/><path d="M24 50 Q50 26 76 50 Q50 74 24 50Z" fill="#0b0418" stroke="${c}" stroke-width="2"/>${iris}${lid}</svg>`;
 }
-const full = (mood, rank) => `<svg viewBox="-14 -34 128 236" aria-label="Doc"><g class="docb">${body(mood, rank)}</g></svg>`;
-DE.CH = { doc, eter, body, full };
+const full = (mood, rank, look) => `<svg viewBox="-14 -34 128 236" aria-label="Doc"><g class="docb">${body(mood, rank, look)}</g></svg>`;
+DE.CH = { doc, eter, body, full, OPT, LOOK0, clean, setLook, look: () => LOOK };
 })();
 
 </script>
@@ -2398,7 +2459,7 @@ function svg(vm) {
     rooms += `<g class="room${nx ? ' next' : ''}${lk ? ' lock' : ''}${r.ext ? ' ext' : ''}" data-act="room" data-arg="${r.id}" role="button" tabindex="0" aria-label="${esc(r.n + ': ' + r.s + (lk ? ' (' + lk + ')' : nx ? ' · siguiente misión' : ''))}">${shape}<g class="rin">${IN[r.id](vm)}</g>${plate(r)}${lk ? lock(r, lk) : ''}${nx ? badge(r) : ''}</g>`;
   });
   const spot = (ROOM[vm.next] && ROOM[vm.next].doc && !vm.locks[vm.next] ? ROOM[vm.next] : ROOM.lab).doc;
-  const docG = `<g class="docw" data-act="${vm.next ? 'hubgo' : 'room'}" data-arg="${vm.next ? '' : 'lab'}" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
+  const docG = `<g class="docw" data-act="custom" role="button" tabindex="0" aria-label="Tu personaje: tócalo para cambiar su aspecto" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
   return `<svg id="ship" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid meet" aria-label="Nave Ouroboros">
   <defs><pattern id="haz" width="16" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-40)"><rect width="8" height="8" fill="#ffc23a"/><rect x="8" width="8" height="8" fill="#000"/></pattern>
    <radialGradient id="gcore"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#ffc23a"/><stop offset="1" stop-color="#ff2fb3" stop-opacity="0"/></radialGradient>
@@ -2439,7 +2500,7 @@ const fmtT = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart
 const PT0 = {};
 
 /* ---------- guardado ---------- */
-function load() { try { const raw = localStorage.getItem(KEY); S = D.sanitize(raw ? JSON.parse(raw) : null); } catch (e) { S = D.newState(); } S.seen = S.seen || {}; }
+function load() { try { const raw = localStorage.getItem(KEY); S = D.sanitize(raw ? JSON.parse(raw) : null); } catch (e) { S = D.newState(); } S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); }
 let saveT = 0;
 function save(now) { if (QUIET) return; clearTimeout(saveT); const f = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }; if (now) f(); else saveT = setTimeout(f, 300); }
 
@@ -2487,10 +2548,11 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
 const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
+let LASTL = null;
 function showLine(l) {
-  const [who, mood, text] = l, el = $('#comms'); if (!el) return;
+  const [who, mood, text] = l, el = $('#comms'); if (!el) return; LASTL = l;
   $('#cPor').innerHTML = who === 'doc' ? D.CH.doc(mood, rankN()) : D.CH.eter(mood);
-  $('#cWho').textContent = who === 'doc' ? 'DOC' : 'ÉTER';
+  $('#cWho').textContent = who === 'doc' ? (S.name || 'Doc') : 'ÉTER';
   $('#cTxt').textContent = text; el.className = 'who-' + who;
   $('#cNext').hidden = !TQ.length && !TCB; $('#cNext').textContent = TQ.length ? '▸ ' + TQ.length : '▸';
   el.classList.remove('say'); void el.offsetWidth; el.classList.add('say');
@@ -3293,7 +3355,7 @@ const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '�
 const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente' };
 const KIND_OF = { destil: 's', gen: 'g', cult: 'o' };
 const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
-const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
+const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
 const firstL = k => { const i = LEVELS.findIndex(l => l.P.some(p => p.k === k)); return i < 0 ? 1 : i + 1; };
 function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
 function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: ROOM_OF[p.k] || 'lab' }; }
@@ -3324,12 +3386,45 @@ function openRoom(id) {
 }
 function cryoSheet() {
   const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4]].filter(e => e[2] && STORY[e[0]]);
-  modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button></div></div>
+  modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><div class="row"><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button><button class="btn" data-act="custom">🪞 Espejo: tu personaje</button></div></div></div>
     <div class="sec-t">Recuerdos · la historia hasta ahora</div><div class="row">${eps.map(e => `<button class="btn sm" data-act="story" data-arg="${e[0]}">▶ ${esc(e[1])}</button>`).join('')}</div>`);
 }
 function antenaSheet() {
   const ready = D.levelDone(S, 1);
   modal(`<div class="pag">Ouroboros · techo</div><h2 class="mega">📡 Antena</h2><p>${esc(ROOM_INFO.antena)}</p><div class="row"><button class="btn pri" data-act="daily" ${ready ? '' : 'disabled'}>🔥 Reto diario${S.daily.streak ? ' · racha ' + S.daily.streak : ''}</button><button class="btn" data-act="duel" ${ready ? '' : 'disabled'}>⚔ Duelo LAN / Bluetooth</button></div>${ready ? '' : '<p class="m sm">Se activa al completar el nivel 1.</p>'}`);
+}
+/* ============================================================
+   ESPEJO: personalizar a Doc (aspecto guardado en S.look, nombre en S.name)
+   ============================================================ */
+let CUST_CB = null;
+const lookReq = (k, v) => ((DE.CH.OPT[k] || {}).req || {})[v] || 0;
+const lookLocked = (k, v) => { const r = lookReq(k, v); return r && D.totalStars(S) < r && !S.set.sandbox ? r : 0; };
+function custom(cb) {
+  CUST_CB = cb || null; S.look = DE.CH.setLook(S.look);
+  modal(`<div class="pag">Ouroboros · espejo de la cápsula</div><h2 class="mega">🪞 Tu personaje</h2>
+   <div class="cust"><div class="cprev" id="cPrev"></div><div class="copts"><label class="cname"><span>Nombre</span><input id="lookName" class="inp" maxlength="14" autocomplete="off" spellcheck="false" value="${esc(S.name || 'Doc')}"></label><div id="cRows"></div></div></div>
+   <div class="row sticky"><button class="btn gh" data-act="lookRand">🎲 Al azar</button><button class="btn gh" data-act="lookReset">↺ Original</button><span class="sp"></span><button class="btn pri" data-act="lookDone">${cb ? 'Listo ▸' : 'Listo'}</button></div>`, !cb);
+  lookRender();
+}
+function lookRender() {
+  const O = DE.CH.OPT, L = S.look, rk = rankN(), box = $('#cRows'); if (!box) return;
+  box.innerHTML = Object.keys(O).map(k => { const q = O[k];
+    const items = (q.k || q.c).map((x, i) => { const v = q.k ? x : i, lk = lookLocked(k, v), on = L[k] === v ? ' on' : '', lab = esc(q.t + ': ' + q.n[i] + (lk ? ' · se desbloquea con ★' + lk : ''));
+      return q.k ? `<button class="swk${on}${lk ? ' lock' : ''}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" aria-pressed="${!!on}"><span class="mini">${DE.CH.doc('feliz', rk, Object.assign({}, L, { [k]: v }))}</span><small>${esc(q.n[i])}</small>${lk ? `<i>★${lk}</i>` : ''}</button>`
+        : `<button class="swc${on}${lk ? ' lock' : ''}" style="--c:${x}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" title="${esc(q.n[i])}" aria-pressed="${!!on}">${lk ? '🔒' : ''}</button>`; }).join('');
+    return `<div class="crow"><b>${esc(q.t)}</b><div class="opts2">${items}</div></div>`; }).join('');
+  const pv = $('#cPrev'); if (pv) pv.innerHTML = `<div class="full">${DE.CH.full('feliz', rk)}</div><div class="por big">${D.CH.doc('loco', rk)}</div>`;
+}
+function lookSet(k, v) {
+  const q = DE.CH.OPT[k]; if (!q) return; if (!q.k) v = +v;
+  const lk = lookLocked(k, v); if (lk) { sfx('bad'); return toast('Se desbloquea con ★' + lk + ' (tienes ★' + D.totalStars(S) + ')', 'bad'); }
+  S.look = DE.CH.setLook(Object.assign({}, S.look, { [k]: v })); sfx('tap'); vib(8); lookRender();
+}
+function lookDone() {
+  const inp = $('#lookName'); if (inp) S.name = inp.value.trim().slice(0, 14) || 'Doc';
+  save(); const cb = CUST_CB; CUST_CB = null; closeModal(); sfx('ok');
+  if (LASTL && LASTL[0] === 'doc') showLine(LASTL); hud(); if (TAB === 'nave') renderHub();
+  toast('¡Así te ves, ' + esc(S.name) + '!', 'ok'); cb && cb();
 }
 function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
@@ -3378,10 +3473,10 @@ function endSlides() { const el = $('#story'); if (el) el.remove(); const f = AF
 function levelTalk(L) { if (S.seen['t' + L]) return; S.seen['t' + L] = 1; save(); const t = LEVELS[L - 1].talk; if (t) talk(t); }
 function enterGame() {
   const c = $('#cover'); if (c) c.remove(); hud(); renderTray(); setTab(TAB); requestAnimationFrame(resize);
-  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); }); }
+  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => custom(() => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); })); }
   else { levelTalk(S.cur); if (!TQ.length) say('win'); }
 }
-function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
+function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['custom', '🪞 Tu personaje'], ['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
   modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporadas 1–3: Núcleo, Fármacos y Genes</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
@@ -3428,6 +3523,8 @@ const ACT = {
   close: () => closeModal(), noop() { }, tab: t => { closeModal(); setTab(t); }, mode: m => setMode(m),
   nave: () => { if (BT) return toast('Termina la batalla o huye primero', 'bad'); closeModal(); setTab('nave'); }, room: id => openRoom(id), roomin: id => { closeModal(); const f = ENTER[id]; if (f) f(); },
   resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
+  look: a => { const i = a.indexOf(':'); lookSet(a.slice(0, i), a.slice(i + 1)); }, lookRand: () => { const O = DE.CH.OPT, o = {}; Object.keys(O).forEach(k => { const q = O[k], vs = (q.k || q.c).map((x, i) => q.k ? x : i).filter(v => !lookLocked(k, v)); o[k] = vs[Math.floor(Math.random() * vs.length)]; }); S.look = DE.CH.setLook(o); sfx('tap'); lookRender(); },
+  lookReset: () => { S.look = DE.CH.setLook({}); sfx('tap'); lookRender(); }, lookDone: () => lookDone(), custom: () => custom(),
   hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
@@ -3451,6 +3548,7 @@ const ACT = {
   ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
+document.addEventListener('input', e => { if (e.target.id === 'lookName') { S.name = e.target.value.trim().slice(0, 14) || 'Doc'; save(); } });
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
@@ -3513,8 +3611,8 @@ function boot() {
 DE.k = { win, lose, dOf, S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
   atomRect: id => { const a = A(id), cv = $('#cv'); if (!a || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s(a.x, a.y), r = (rad(a) || 30) * Lab.view.z + 6; return { left: c.left + x - r, top: c.top + y - r, width: 2 * r, height: 2 * r }; },
   bondRect: b => { const p = A(b.a), q = A(b.b), cv = $('#cv'); if (!p || !q || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s((p.x + q.x) / 2, (p.y + q.y) / 2); return { left: c.left + x - 16, top: c.top + y - 16, width: 32, height: 32 }; } };
-DE.ui = { openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
-  guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
+DE.ui = { custom, lookSet, openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
+  guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 

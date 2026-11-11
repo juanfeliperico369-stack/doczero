@@ -366,7 +366,7 @@ function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.k
 /* ---------- partida ---------- */
 function newState() {
   return { v: 1, intro: 0, unl: 1, cur: 1, prog: {}, el: { H: 1, O: 1 }, nuc: { p: 1, n: 1 }, fr: {}, hyb: {}, en: 100, sc: 0,
-    set: { snd: 1, mus: 1, vib: 1, sandbox: 0 }, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
+    set: { snd: 1, mus: 1, vib: 1, sandbox: 0 }, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', look: {}, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
 }
 function sanitize(S) {
   const d = newState();

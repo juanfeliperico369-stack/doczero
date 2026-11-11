@@ -42,7 +42,7 @@ for (const v of views) {
     if (v.quick) {
       ui.push('aviso girar: ' + (await page.locator('#rotate').isVisible()));
       await click('#rotate [data-act=vok]'); ui.push('seguir en vertical: ' + !(await page.locator('#rotate').isVisible()));
-      await click('[data-act=newgame]'); await click('[data-act=sskip]'); await click('#cm [data-act=cmSkip]'); await click('#tray [data-arg=H]'); await click('#tray [data-arg=H]'); await click('#bSyn');
+      await click('[data-act=newgame]'); await click('[data-act=sskip]'); await click('[data-act=lookDone]'); await click('#cm [data-act=cmSkip]'); await click('#tray [data-arg=H]'); await click('#tray [data-arg=H]'); await click('#bSyn');
       ui.push('1-1 en vertical: ' + (await ev(() => DE.ui.state().prog['1-0'] || 0)) + '★');
       if (shots) await page.screenshot({ path: `${shots}/${v.name}.png` });
     } else {
@@ -50,6 +50,12 @@ for (const v of views) {
       await click('[data-act=newgame]');
       if (shots) await page.screenshot({ path: `${shots}/${v.name}-historia.png` });
       await click('[data-act=sskip]');
+      // espejo: personalizar a Doc antes de la escuela
+      await click('.sheet [data-act=look][data-arg="hair:rizos"]'); await click('.sheet [data-act=look][data-arg="hc:3"]'); await click('.sheet [data-act=look][data-arg="eyes:gafas"]'); await page.locator('#lookName').fill('Lumi');
+      if (shots) await page.screenshot({ path: `${shots}/${v.name}-personaje.png` });
+      await click('.sheet [data-act=look][data-arg="acc:medalla"]');
+      ui.push('personaje: ' + (await ev(() => { const S = DE.k.S(); return S.look.hair === 'rizos' && S.look.hc === 3 && S.look.eyes === 'gafas' && S.look.acc === 'nada' && S.name === 'Lumi'; })));
+      await click('[data-act=lookDone]');
       if (shots) { await page.waitForTimeout(300); await page.screenshot({ path: `${shots}/${v.name}-escuela.png` }); }
       const sch = await playSchool();
       ui.push('escuela para bebés: ' + (sch && await page.evaluate(() => { const S = DE.k.S(); return S.seen.school === 1 && !!S.fr.H2O && !!S.fr.O2; })));

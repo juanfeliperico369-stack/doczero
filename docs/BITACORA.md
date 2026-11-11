@@ -1,5 +1,26 @@
 # Bitácora de Doc Element
 
+## v3.1.0 — Personaliza a tu personaje (2026-11-11)
+1. Espejo de la cápsula: personalizas al personaje con vista previa en vivo, de cuerpo entero y en retrato. Se puede cambiar:
+   - Nombre.
+   - Piel (6 tonos).
+   - Peinado (tupé, corto, rizos, largo, moño, cresta, rapado).
+   - Color de pelo (9).
+   - Ojos (visor, gafas, antiparras, sin nada).
+   - Traje (6 colores).
+   - Accesorio (bufanda, audífonos, insignia, medalla).
+   - Color del matraz.
+2. Algunas piezas se desbloquean con estrellas: audífonos ★30, cresta ★60, pelo dorado ★140, medalla ★240.
+3. El aspecto se ve en todo el juego: nave, historia, comunicaciones, victorias, escuela y portada. Sigue cambiando con el rango (bata, cicatriz, ojos que brillan, aura).
+4. Dónde se abre:
+   - En una partida nueva, justo después de despertar.
+   - Tocando al personaje en la nave.
+   - En Criogenia.
+   - En el menú.
+   - Con los botones "🎲 Al azar" y "↺ Original" dentro del espejo.
+5. El nombre aparece en el panel de comunicaciones y en los duelos.
+6. Bot: personaliza por clics reales (peinado, color, ojos, nombre) y comprueba que lo bloqueado no se pueda elegir.
+
 ## v3.0.0 — La nave: menú dibujado y laboratorio rediseñado (2026-11-11)
 1. La nave Ouroboros dibujada en corte es el menú principal. Cada sala es un botón: Forja, Reactor, Laboratorio, Genética, Puente, Bodega, Destilería, ÉTER, Criogenia, Cultivo, Transmisiones y la Antena del techo.
 2. La sala de la siguiente misión brilla con una baliza y Doc espera ahí. La consola de abajo lleva a la misión en un toque y, si hay una a medias, deja volver a ella.

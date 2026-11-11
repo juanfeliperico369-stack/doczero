@@ -191,6 +191,17 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Historia: Doc aparece de cuerpo entero (`DE.CH.full`).
 - Bot: entra a las salas por clics reales en la nave (`#ship [data-act=room]`). El monkey también abre salas al azar.
 
+## 7h. Personaje personalizable (v3.1, `src/chars.js` + espejo en ui.js)
+- `DE.CH.OPT`: piel, peinado, color de pelo, ojos, traje, accesorio y matraz.
+  - Las opciones de color usan `c` (índice); las de forma, `k` (clave).
+  - `req`: estrellas necesarias para desbloquear.
+- `DE.CH.setLook(l)` limpia y fija el aspecto actual. `doc()`, `body()` y `full()` lo usan por defecto, o reciben un `look` como tercer argumento (las miniaturas del espejo).
+- Estado: `S.look` (objeto, validado con `DE.CH.clean` al cargar o importar) y `S.name` (14 caracteres como máximo en el espejo).
+- ui.js: `custom(cb)` abre el espejo; con `cb` no se puede cerrar sin "Listo", como en la partida nueva. También están `lookRender()`, `lookSet(k, v)` y `lookDone()`. Acciones: `look`, `lookRand`, `lookReset`, `lookDone`, `custom`.
+- Peinados nuevos: `hairOf()` devuelve `{ b, f }`, el pelo de detrás y el de delante de la cara.
+- Accesorios de pecho: `chest(x, y)`, con posiciones distintas en el retrato y en el cuerpo.
+- Mantener los diseños originales: no copiar personajes existentes.
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

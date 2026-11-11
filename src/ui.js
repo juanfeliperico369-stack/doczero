@@ -19,7 +19,7 @@ const fmtT = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart
 const PT0 = {};
 
 /* ---------- guardado ---------- */
-function load() { try { const raw = localStorage.getItem(KEY); S = D.sanitize(raw ? JSON.parse(raw) : null); } catch (e) { S = D.newState(); } S.seen = S.seen || {}; }
+function load() { try { const raw = localStorage.getItem(KEY); S = D.sanitize(raw ? JSON.parse(raw) : null); } catch (e) { S = D.newState(); } S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); }
 let saveT = 0;
 function save(now) { if (QUIET) return; clearTimeout(saveT); const f = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }; if (now) f(); else saveT = setTimeout(f, 300); }
 
@@ -67,10 +67,11 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
 const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
+let LASTL = null;
 function showLine(l) {
-  const [who, mood, text] = l, el = $('#comms'); if (!el) return;
+  const [who, mood, text] = l, el = $('#comms'); if (!el) return; LASTL = l;
   $('#cPor').innerHTML = who === 'doc' ? D.CH.doc(mood, rankN()) : D.CH.eter(mood);
-  $('#cWho').textContent = who === 'doc' ? 'DOC' : 'ÉTER';
+  $('#cWho').textContent = who === 'doc' ? (S.name || 'Doc') : 'ÉTER';
   $('#cTxt').textContent = text; el.className = 'who-' + who;
   $('#cNext').hidden = !TQ.length && !TCB; $('#cNext').textContent = TQ.length ? '▸ ' + TQ.length : '▸';
   el.classList.remove('say'); void el.offsetWidth; el.classList.add('say');
@@ -873,7 +874,7 @@ const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '�
 const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente' };
 const KIND_OF = { destil: 's', gen: 'g', cult: 'o' };
 const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
-const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
+const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
 const firstL = k => { const i = LEVELS.findIndex(l => l.P.some(p => p.k === k)); return i < 0 ? 1 : i + 1; };
 function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
 function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: ROOM_OF[p.k] || 'lab' }; }
@@ -904,12 +905,45 @@ function openRoom(id) {
 }
 function cryoSheet() {
   const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4]].filter(e => e[2] && STORY[e[0]]);
-  modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button></div></div>
+  modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><div class="row"><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button><button class="btn" data-act="custom">🪞 Espejo: tu personaje</button></div></div></div>
     <div class="sec-t">Recuerdos · la historia hasta ahora</div><div class="row">${eps.map(e => `<button class="btn sm" data-act="story" data-arg="${e[0]}">▶ ${esc(e[1])}</button>`).join('')}</div>`);
 }
 function antenaSheet() {
   const ready = D.levelDone(S, 1);
   modal(`<div class="pag">Ouroboros · techo</div><h2 class="mega">📡 Antena</h2><p>${esc(ROOM_INFO.antena)}</p><div class="row"><button class="btn pri" data-act="daily" ${ready ? '' : 'disabled'}>🔥 Reto diario${S.daily.streak ? ' · racha ' + S.daily.streak : ''}</button><button class="btn" data-act="duel" ${ready ? '' : 'disabled'}>⚔ Duelo LAN / Bluetooth</button></div>${ready ? '' : '<p class="m sm">Se activa al completar el nivel 1.</p>'}`);
+}
+/* ============================================================
+   ESPEJO: personalizar a Doc (aspecto guardado en S.look, nombre en S.name)
+   ============================================================ */
+let CUST_CB = null;
+const lookReq = (k, v) => ((DE.CH.OPT[k] || {}).req || {})[v] || 0;
+const lookLocked = (k, v) => { const r = lookReq(k, v); return r && D.totalStars(S) < r && !S.set.sandbox ? r : 0; };
+function custom(cb) {
+  CUST_CB = cb || null; S.look = DE.CH.setLook(S.look);
+  modal(`<div class="pag">Ouroboros · espejo de la cápsula</div><h2 class="mega">🪞 Tu personaje</h2>
+   <div class="cust"><div class="cprev" id="cPrev"></div><div class="copts"><label class="cname"><span>Nombre</span><input id="lookName" class="inp" maxlength="14" autocomplete="off" spellcheck="false" value="${esc(S.name || 'Doc')}"></label><div id="cRows"></div></div></div>
+   <div class="row sticky"><button class="btn gh" data-act="lookRand">🎲 Al azar</button><button class="btn gh" data-act="lookReset">↺ Original</button><span class="sp"></span><button class="btn pri" data-act="lookDone">${cb ? 'Listo ▸' : 'Listo'}</button></div>`, !cb);
+  lookRender();
+}
+function lookRender() {
+  const O = DE.CH.OPT, L = S.look, rk = rankN(), box = $('#cRows'); if (!box) return;
+  box.innerHTML = Object.keys(O).map(k => { const q = O[k];
+    const items = (q.k || q.c).map((x, i) => { const v = q.k ? x : i, lk = lookLocked(k, v), on = L[k] === v ? ' on' : '', lab = esc(q.t + ': ' + q.n[i] + (lk ? ' · se desbloquea con ★' + lk : ''));
+      return q.k ? `<button class="swk${on}${lk ? ' lock' : ''}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" aria-pressed="${!!on}"><span class="mini">${DE.CH.doc('feliz', rk, Object.assign({}, L, { [k]: v }))}</span><small>${esc(q.n[i])}</small>${lk ? `<i>★${lk}</i>` : ''}</button>`
+        : `<button class="swc${on}${lk ? ' lock' : ''}" style="--c:${x}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" title="${esc(q.n[i])}" aria-pressed="${!!on}">${lk ? '🔒' : ''}</button>`; }).join('');
+    return `<div class="crow"><b>${esc(q.t)}</b><div class="opts2">${items}</div></div>`; }).join('');
+  const pv = $('#cPrev'); if (pv) pv.innerHTML = `<div class="full">${DE.CH.full('feliz', rk)}</div><div class="por big">${D.CH.doc('loco', rk)}</div>`;
+}
+function lookSet(k, v) {
+  const q = DE.CH.OPT[k]; if (!q) return; if (!q.k) v = +v;
+  const lk = lookLocked(k, v); if (lk) { sfx('bad'); return toast('Se desbloquea con ★' + lk + ' (tienes ★' + D.totalStars(S) + ')', 'bad'); }
+  S.look = DE.CH.setLook(Object.assign({}, S.look, { [k]: v })); sfx('tap'); vib(8); lookRender();
+}
+function lookDone() {
+  const inp = $('#lookName'); if (inp) S.name = inp.value.trim().slice(0, 14) || 'Doc';
+  save(); const cb = CUST_CB; CUST_CB = null; closeModal(); sfx('ok');
+  if (LASTL && LASTL[0] === 'doc') showLine(LASTL); hud(); if (TAB === 'nave') renderHub();
+  toast('¡Así te ves, ' + esc(S.name) + '!', 'ok'); cb && cb();
 }
 function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
@@ -958,10 +992,10 @@ function endSlides() { const el = $('#story'); if (el) el.remove(); const f = AF
 function levelTalk(L) { if (S.seen['t' + L]) return; S.seen['t' + L] = 1; save(); const t = LEVELS[L - 1].talk; if (t) talk(t); }
 function enterGame() {
   const c = $('#cover'); if (c) c.remove(); hud(); renderTray(); setTab(TAB); requestAnimationFrame(resize);
-  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); }); }
+  if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => custom(() => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); })); }
   else { levelTalk(S.cur); if (!TQ.length) say('win'); }
 }
-function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
+function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['custom', '🪞 Tu personaje'], ['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
   modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporadas 1–3: Núcleo, Fármacos y Genes</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
@@ -1008,6 +1042,8 @@ const ACT = {
   close: () => closeModal(), noop() { }, tab: t => { closeModal(); setTab(t); }, mode: m => setMode(m),
   nave: () => { if (BT) return toast('Termina la batalla o huye primero', 'bad'); closeModal(); setTab('nave'); }, room: id => openRoom(id), roomin: id => { closeModal(); const f = ENTER[id]; if (f) f(); },
   resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
+  look: a => { const i = a.indexOf(':'); lookSet(a.slice(0, i), a.slice(i + 1)); }, lookRand: () => { const O = DE.CH.OPT, o = {}; Object.keys(O).forEach(k => { const q = O[k], vs = (q.k || q.c).map((x, i) => q.k ? x : i).filter(v => !lookLocked(k, v)); o[k] = vs[Math.floor(Math.random() * vs.length)]; }); S.look = DE.CH.setLook(o); sfx('tap'); lookRender(); },
+  lookReset: () => { S.look = DE.CH.setLook({}); sfx('tap'); lookRender(); }, lookDone: () => lookDone(), custom: () => custom(),
   hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
@@ -1031,6 +1067,7 @@ const ACT = {
   ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
+document.addEventListener('input', e => { if (e.target.id === 'lookName') { S.name = e.target.value.trim().slice(0, 14) || 'Doc'; save(); } });
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { if (!$('#ov').hidden && modalClose) closeModal(); return; }
@@ -1093,7 +1130,7 @@ function boot() {
 DE.k = { win, lose, dOf, S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
   atomRect: id => { const a = A(id), cv = $('#cv'); if (!a || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s(a.x, a.y), r = (rad(a) || 30) * Lab.view.z + 6; return { left: c.left + x - r, top: c.top + y - r, width: 2 * r, height: 2 * r }; },
   bondRect: b => { const p = A(b.a), q = A(b.b), cv = $('#cv'); if (!p || !q || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s((p.x + q.x) / 2, (p.y + q.y) / 2); return { left: c.left + x - 16, top: c.top + y - 16, width: 32, height: 32 }; } };
-DE.ui = { openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
-  guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
+DE.ui = { custom, lookSet, openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
+  guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

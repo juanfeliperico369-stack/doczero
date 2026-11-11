@@ -530,3 +530,25 @@ body.noside #app{grid-template-columns:minmax(0,1fr)}body.noside #side{display:n
 #side>*{flex-shrink:0}
 .hb2{flex:none}#hud>.chip{flex:none}
 @media (orientation:portrait){#hSc{display:none}.brand{font-size:17px}.rname{font-size:15px}.back{padding:0 8px 0 13px;font-size:14px}}
+/* ---------- espejo: personalizar a Doc ---------- */
+input{-webkit-user-select:text;user-select:text}
+.cust{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.cprev{display:flex;flex-direction:column;align-items:center;gap:6px;position:sticky;top:0}
+.cprev .full{width:min(24vw,170px);height:min(44vh,300px)}
+.copts{display:flex;flex-direction:column;gap:9px;min-width:0}
+.cname{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;letter-spacing:.15em;color:var(--amb);text-transform:uppercase}
+.cname input{flex:1;max-width:260px;font-size:16px;font-family:var(--fb);letter-spacing:0;margin:0}
+.crow b{display:block;font-family:var(--fm);font-size:10.5px;letter-spacing:.2em;color:var(--amb);text-transform:uppercase;margin-bottom:4px;font-weight:400}
+.opts2{display:flex;flex-wrap:wrap;gap:7px}
+.swc{width:34px;height:34px;border-radius:50%;background:var(--c);border:3px solid #000;box-shadow:0 0 0 2px var(--pur2);font-size:12px}
+.swc.on{box-shadow:0 0 0 3px var(--amb),0 0 12px var(--amb)}
+.swk{width:64px;display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--pur2);border-radius:10px;padding:3px 2px;background:var(--pn);position:relative}
+.swk .mini{width:50px;height:50px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 40%,#1a0636,#000 70%)}
+.swk .mini svg{width:100%;height:100%;display:block}
+.swk small{font-size:10px;color:var(--ink2);white-space:nowrap}
+.swk.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.5)}.swk.on small{color:var(--wht)}
+.swk.lock,.swc.lock{opacity:.45}
+.swk i{position:absolute;top:2px;right:2px;font-style:normal;font-size:9px;background:#000;color:var(--amb);padding:0 3px;border-radius:6px}
+#ship .docw:focus-visible{outline:2px solid var(--amb)}
+@media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
+@media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
