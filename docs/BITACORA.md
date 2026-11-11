@@ -1,5 +1,24 @@
 # Bitácora de Doc Element
 
+## v3.2.0 — Temporada 5: TESIS y Observatorio (2026-11-11)
+1. 10 niveles nuevos (41–50) y 100 problemas: orbitales, tabla periódica, luz, estrellas, energía, electricidad, materiales, catálisis, cuántica y el Demonio de Maxwell. El juego llega a 50 niveles y 500 problemas.
+2. Sala nueva: el **Observatorio**, una cúpula en el techo de la nave (`src/obs.js`).
+   - Orbitales: pones electrones en cajas siguiendo las reglas de Aufbau, Hund y Pauli. Cada error explica la regla que se rompió.
+   - Al terminar se ve la configuración (1s² 2s² 2p⁴…) y se une a lo de siempre: los electrones sin pareja son las «manos» del laboratorio.
+   - Espectros: identificas uno o varios elementos por sus líneas de emisión reales (aproximadas, en nm): farolas de sodio, neón, auroras, fuegos artificiales y el Sol.
+3. La forja hace nucleosíntesis real:
+   - Triple alfa: 3 He-4 → C-12.
+   - Captura alfa hasta el neón y quema de carbono y oxígeno hasta el silicio.
+   - Si-28 + Si-28 → Ni-56, que decae a Fe-56.
+   - Oro de kilonova.
+4. 8 compuestos nuevos: naftaleno, cloruro de plata, sulfato de zinc, óxido de litio, LiCoO₂ (baterías), SiCl₄ (chips), TiO₂ y MgB₂ (superconductor).
+5. 8 reacciones nuevas: pila de Daniell, litio-aire, purificación del silicio (proceso Siemens), metanol desde CO₂, fotografía con plata, combustión del titanio y síntesis de MgB₂.
+6. Etiquetas nuevas: ✺ Luminoso y ψ Cuántico.
+7. Jefes finales: la Supernova y el Demonio de Maxwell, que se adapta el doble de rápido y muta. La historia cuenta el experimento mental y su solución real (Landauer).
+8. Ordenar y clasificar ahora sirven en otras salas (`room`, `ic`). Las salas de un tipo de problema muestran «Repetir» según su sala.
+9. Corregido: una sala con contorno curvo y candado rompía el dibujo de la nave en partidas nuevas.
+10. Validación: 0 errores en 500 problemas; 17 batallas ajustadas con el simulador.
+
 ## v3.1.0 — Personaliza a tu personaje (2026-11-11)
 1. Espejo de la cápsula: personalizas al personaje con vista previa en vivo, de cuerpo entero y en retrato. Se puede cambiar:
    - Nombre.

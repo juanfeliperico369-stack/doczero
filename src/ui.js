@@ -65,7 +65,7 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 
 /* ---------- personajes y comunicaciones ---------- */
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
-const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
+const SEASON = L => L > 40 ? ['5', 'Tesis'] : L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
 let LASTL = null;
 function showLine(l) {
@@ -605,6 +605,7 @@ function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
   if (CH) chalEnd(true);
+  if (L === 41 && !S.seen.s5i) { S.seen.s5i = 1; save(); if (!QUIET) { slides(STORY.s5i, () => { levelTalk(41); startProblem(L, i); }); return; } }
   if (L === 31 && !S.seen.s4i) { S.seen.s4i = 1; save(); if (!QUIET) { slides(STORY.s4i, () => { levelTalk(31); startProblem(L, i); }); return; } }
   if (L === 21 && !S.seen.s3i) { S.seen.s3i = 1; save(); if (!QUIET) { slides(STORY.s3i, () => { levelTalk(21); startProblem(L, i); }); return; } }
   if (L === 11 && !S.seen.s2i) { S.seen.s2i = 1; save(); if (!QUIET) { slides(STORY.s2i, () => { levelTalk(11); startProblem(L, i); }); return; } }
@@ -615,6 +616,7 @@ function startProblem(L, i) {
   if (p.k === 's') { startSort(L, i); return; }
   if (p.k === 'g') { DE.genes.start(L, i); return; }
   if (p.k === 'o') { DE.org.start(L, i); return; }
+  if (p.k === 'e') { DE.obs.start(L, i); return; }
   MIS = { L, i, p, t: p.T, T: p.T, hint: false, late: false };
   const g = dOf(L).g;
   setTab('lab');
@@ -867,17 +869,17 @@ function detail(id) {
   }
   modal(html); const m = $('#miniCv'); if (m && lay) drawMini(m, lay);
 }
-const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀' };
+const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀', e: '✺' };
 /* ============================================================
    LA NAVE: cada sala es un botón dibujado (ship.js)
    ============================================================ */
-const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente' };
-const KIND_OF = { destil: 's', gen: 'g', cult: 'o' };
+const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente', e: 'obs' };
+const TYPED = ['destil', 'gen', 'cult', 'obs'], roomOfP = p => p.room || ROOM_OF[p.k] || 'lab';
 const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
-const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
+const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', obs: 'El techo de cristal de la nave: aquí ves los átomos por dentro (orbitales) y la luz de las estrellas (espectros).', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
 const firstL = k => { const i = LEVELS.findIndex(l => l.P.some(p => p.k === k)); return i < 0 ? 1 : i + 1; };
-function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
-function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: ROOM_OF[p.k] || 'lab' }; }
+function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o'], ['obs', 'e']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
+function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: roomOfP(p) }; }
 function renderHub() {
   const box = $('#hub'); if (!box) return; const n = nextInfo(), se = SEASON(n ? n.L : S.cur), RM = DE.ship.ROOM;
   box.innerHTML = DE.ship.svg({ next: n && n.room, threat: n && n.p.k === 'b', locks: roomLocks(), newFr: NEWFR, nFr: Object.keys(S.fr).length, lvl: S.cur, mood: n ? 'feliz' : 'loco', rank: rankN(), eter: n && n.p.k === 'b' ? 'enojado' : 'neutral' });
@@ -895,16 +897,16 @@ function roomBar() {
 function openRoom(id) {
   const r = DE.ship.ROOM[id]; if (!r) return; const lk = roomLocks()[id];
   if (lk) { sfx('bad'); return toast(esc(r.n) + ': ' + esc(lk), 'bad'); }
-  sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = KIND_OF[id];
+  sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = TYPED.includes(id);
   if (!here && !k && ENTER[id]) return ENTER[id]();
-  const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => p.k === k && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
+  const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => roomOfP(p) === id && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
   modal(`<div class="pag">Ouroboros · sala</div><h2 class="mega">${r.ic} ${esc(r.n)}</h2><p class="kick">${esc(r.s)}</p><p>${esc(ROOM_INFO[id] || '')}</p>
     ${here ? `<button class="btn pri wide" data-act="go" data-arg="${n.L},${n.i}">▶ Misión: ${esc(n.p.t)} · nivel ${n.L}</button>` : ''}
     <div class="row" style="margin-top:8px">${ENTER[id] ? `<button class="btn gh" data-act="roomin" data-arg="${id}">Entrar sin misión</button>` : ''}${!here && n ? `<button class="btn gh" data-act="go" data-arg="${n.L},${n.i}">Siguiente misión: ${esc(n.p.t)} (${esc(DE.ship.ROOM[n.room].n)})</button>` : ''}</div>
     ${done.length ? `<div class="sec-t">Repetir</div><div class="row">${done.map(([L, i, p]) => `<button class="btn sm" data-act="go" data-arg="${L},${i}">N${L}·${i + 1} ${esc(p.t)} ${'★'.repeat(S.prog[D.pk(L, i)])}</button>`).join('')}</div>` : k && !here ? '<p class="m sm">Todavía no resuelves problemas de esta sala.</p>' : ''}`);
 }
 function cryoSheet() {
-  const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4]].filter(e => e[2] && STORY[e[0]]);
+  const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4], ['s5i', 'Temporada 5', S.seen.s5i], ['s5e', 'Final de la temporada 5', S.end >= 5]].filter(e => e[2] && STORY[e[0]]);
   modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><div class="row"><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button><button class="btn" data-act="custom">🪞 Espejo: tu personaje</button></div></div></div>
     <div class="sec-t">Recuerdos · la historia hasta ahora</div><div class="row">${eps.map(e => `<button class="btn sm" data-act="story" data-arg="${e[0]}">▶ ${esc(e[1])}</button>`).join('')}</div>`);
 }
@@ -949,18 +951,18 @@ function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
   const pts = lv.P.map((p, i) => [60 + i * 96, 112 + Math.sin(i * 1.3) * 56]);
-  const nodes = lv.P.map((p, i) => { const k = D.pk(L, i), st = S.prog[k] || 0, open = D.problemOpen(S, L, i), nx = open && !st; return `<button class="node ${p.boss ? 'boss' : ''} ${st ? 'done' : ''} ${open ? '' : 'lock'} ${nx ? 'next' : ''}" style="left:${pts[i][0]}px;top:${pts[i][1]}px" data-act="open" data-arg="${L},${i}" aria-label="Problema ${i + 1}"><span class="ic">${p.boss ? '✹' : ICON[p.k]}</span><span class="nn">${i + 1}</span><span class="st">${st ? '★'.repeat(st) : ''}</span></button>`; }).join('');
+  const nodes = lv.P.map((p, i) => { const k = D.pk(L, i), st = S.prog[k] || 0, open = D.problemOpen(S, L, i), nx = open && !st; return `<button class="node ${p.boss ? 'boss' : ''} ${st ? 'done' : ''} ${open ? '' : 'lock'} ${nx ? 'next' : ''}" style="left:${pts[i][0]}px;top:${pts[i][1]}px" data-act="open" data-arg="${L},${i}" aria-label="Problema ${i + 1}"><span class="ic">${p.boss ? '✹' : p.ic || ICON[p.k]}</span><span class="nn">${i + 1}</span><span class="st">${st ? '★'.repeat(st) : ''}</span></button>`; }).join('');
   const d = dOf(L), lvlTag = d.g === 3 ? 'Guiado' : d.g === 2 ? 'Aprendiz' : d.g === 1 ? (d.rg <= 1 ? 'Medio' : 'Difícil') : 'Experto', se = SEASON(L);
   box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada ${se[0]} · ${se[1]} · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
   <div class="map"><div class="mapin"><svg viewBox="0 0 1020 230" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#4d1785" stroke-width="3" stroke-dasharray="8 7"/></svg>${nodes}</div></div>
-  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ✺ observatorio · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
   const lc = $('#lvls .on'); if (lc && lc.scrollIntoView) lc.scrollIntoView({ inline: 'center', block: 'nearest' });
   const map = $('.map', box), nx = $('.node.next', box); if (map && nx) map.scrollLeft = Math.max(0, parseFloat(nx.style.left) - map.clientWidth / 2);
 }
 function openProblem(L, i) {
   const p = LEVELS[L - 1].P[i]; if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior');
-  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: 'Cultivo' }[p.k];
-  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
+  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: p.room === 'obs' ? 'Observatorio' : 'Cultivo', e: 'Observatorio' }[p.k];
+  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : p.k === 'e' ? (p.mode === 'orb' ? 'Llenar los orbitales de ' + esc(D.elem(p.z).name) : 'Identificar ' + (p.mix.length > 1 ? p.mix.length + ' elementos' : 'el elemento') + ' por su espectro') : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
   modal(`<div class="res"><div class="por big">${D.CH.eter(p.k === 'b' ? 'enojado' : 'neutral')}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10${dOf(L).fail ? '' : ' · sin prisa'}</div><div class="boxed spaced">${spaced(kind)}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">${tgt}<br>Tiempo: ${p.T} s</div>${st ? `<div class="stars" style="font-size:22px">${'★'.repeat(st)}</div>` : ''}<div class="row" style="margin-top:10px"><button class="btn pri" data-act="go" data-arg="${L},${i}">${p.k === 'b' ? 'Preparar mazo' : 'Iniciar'} ▸</button><button class="btn gh" data-act="close">Cerrar</button></div></div></div>`);
 }
 function renderTx() {
@@ -976,7 +978,7 @@ function txLevel(L) {
    ============================================================ */
 function cover() {
   const c = document.createElement('div'); c.className = 'cover'; c.id = 'cover'; const has = S.intro || Object.keys(S.prog).length;
-  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–4 · Núcleo, Fármacos, Genes y Organismos</div></div>
+  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–5 · Núcleo, Fármacos, Genes, Organismos y Tesis</div></div>
   <svg class="cship" viewBox="0 0 1280 600" aria-hidden="true">${DE.ship.hull(1)}</svg><div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
   <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button>${has ? '<button class="btn gh" data-act="schoolC">🍼 Química para bebés (1 min)</button>' : ''}</div></div></div>
   <div class="cfoot"><span class="pag">Por: ${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</span><span class="adv">Lab advisory<b>Verídico</b>Contenido seguro</span><span class="mega">El laboratorio más actual</span></div>`;
@@ -1044,7 +1046,7 @@ const ACT = {
   resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
   look: a => { const i = a.indexOf(':'); lookSet(a.slice(0, i), a.slice(i + 1)); }, lookRand: () => { const O = DE.CH.OPT, o = {}; Object.keys(O).forEach(k => { const q = O[k], vs = (q.k || q.c).map((x, i) => q.k ? x : i).filter(v => !lookLocked(k, v)); o[k] = vs[Math.floor(Math.random() * vs.length)]; }); S.look = DE.CH.setLook(o); sfx('tap'); lookRender(); },
   lookReset: () => { S.look = DE.CH.setLook({}); sfx('tap'); lookRender(); }, lookDone: () => lookDone(), custom: () => custom(),
-  hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
+  hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4, s5e: 5 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
   nuc: k => addNuc(k), unslot: i => { Forge.slots[+i] = null; renderForge(); }, flux: d => { Forge.flux = D.clamp(Forge.flux + (+d), 0, 40); renderForge(); }, fuse: () => fuse(), fclear: () => { Forge.slots = [null, null, null]; Forge.flux = 0; renderForge(); },
@@ -1064,7 +1066,7 @@ const ACT = {
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(), schoolC: () => { enterGame(); if (DE.school) DE.school.start(() => renderSide()); },
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
-  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
+  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 5 ? STORY.s5e : +n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('input', e => { if (e.target.id === 'lookName') { S.name = e.target.value.trim().slice(0, 14) || 'Doc'; save(); } });
@@ -1090,6 +1092,7 @@ function tick(dt) {
   if (BT) { BAT.step(BT.b, dt); battleUI(); }
   if (DE.genes) DE.genes.tick(dt);
   if (DE.org) DE.org.tick(dt);
+  if (DE.obs) DE.obs.tick(dt);
   regen += dt; if (regen >= 2) { regen = 0; if (S.en < 100) { S.en++; hud(); } }
 }
 let anaT = 0;
@@ -1117,7 +1120,7 @@ function boot() {
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="obsOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);

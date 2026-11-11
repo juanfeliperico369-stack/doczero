@@ -95,6 +95,8 @@ const TIPS = {
     { t: 'Sala de Genética', p: 'El ADN se escribe con cuatro letras. Las parejas son fijas: <b>A con T</b> y <b>G con C</b> (en el ARN, la T se cambia por <b>U</b>). Toca la letra que falta y la sala te dice si acertaste.', target: '#geneOv .gbody', btn: '¡Vale!' }],
   tip_org: () => [
     { t: 'Sala de Cultivo', p: 'Aquí estudias seres vivos sin tocar ninguno. Lee la pregunta de arriba y toca la respuesta: un círculo <b>?</b>, un botón o una casilla. Si fallas, la sala te explica por qué.', target: '#orgOv .gbody', btn: '¡Vale!' }],
+  tip_obs: () => [
+    { t: 'Observatorio', p: 'Aquí miras los átomos por dentro. <b>Orbitales</b>: toca la caja más baja libre; primero uno por caja y luego en parejas. <b>Espectros</b>: busca el elemento con las mismas rayas de color que la muestra.', target: '#obsOv .gbody', btn: '¡Vale!' }],
   tip_battle: () => [
     { t: 'La batalla', p: 'Este es el problema. La barra <span class="bad">rosada</span> es su vida; la <span class="ok">verde</span>, tu nave. El reloj está en pausa mientras te explico.', target: '#bstrip', btn: 'Entendido' },
     { t: 'Construye', p: 'Arma moléculas aquí, como siempre. Si ves un plano punteado, síguelo: es la molécula que más daño hace.', target: '#cvWrap', btn: 'Entendido' },
@@ -103,7 +105,7 @@ const TIPS = {
 function autoTips() {
   const k = K(); if (!k || k.quiet() || !k.S().seen.school && !k.S().intro) return; const s = k.S().seen;
   if (document.getElementById('cover') || document.getElementById('story') || !document.getElementById('ov').hidden) return;
-  const key = DE.org && DE.org.active() ? 'tip_org' : DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
+  const key = DE.obs && DE.obs.active() ? 'tip_obs' : DE.org && DE.org.active() ? 'tip_org' : DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
   if (key && !s[key] && (key !== 'tip_battle' || $('#bstrip:not([hidden])'))) run(key, TIPS[key](), { skip: 'Cerrar' });
 }
 function skipTips() { const s = K().S().seen; Object.keys(TIPS).forEach(k => s[k] = 1); s.school = 1; if (RUN) finish(false); }

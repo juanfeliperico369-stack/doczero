@@ -4,7 +4,7 @@
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '3.1.0',
+  VERSION: '3.2.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")

@@ -96,6 +96,10 @@ function selfTest() {
         else if (p.mode === 'cls') { if (!p.rule || !p.cats || p.cats.length < 2 || !p.items || !p.items.length || p.items.some(x => !(x[1] >= 0 && x[1] < p.cats.length))) E.push(tag + 'clasificación mal definida'); else if (p.cats.some((_, j) => !p.items.some(x => x[1] === j))) W.push(tag + 'categoría sin ejemplos'); }
         else if (p.mode === 'epi') { const w = p.map && p.map[0].length; if (!p.map || p.map.some(r => r.length !== w || /[^.X#V]/.test(r)) || !(p.per >= 1) || !p.map.join('').includes('X')) E.push(tag + 'brote mal definido'); else { const r = ORG.run(p, ORG.sol(p)); if (r < p.save) E.push(tag + 'la solución del brote salva ' + r + ' de ' + p.save); } }
         else E.push(tag + 'modo de cultivo desconocido');
+      } else if (p.k === 'e') {
+        if (p.mode === 'orb') { if (!(Number.isInteger(p.z) && p.z >= 1 && p.z <= 36) || p.z === 24 || p.z === 29) E.push(tag + 'orbital fuera de rango (1–36, sin Cr ni Cu)'); }
+        else if (p.mode === 'esp') { const SP = DE.obs.SPEC; if (!p.mix || !p.mix.length || !p.opts || p.mix.some(x => !p.opts.includes(x)) || p.opts.some(x => !SP[x]) || new Set(p.opts).size !== p.opts.length) E.push(tag + 'espectro mal definido'); }
+        else E.push(tag + 'modo de observatorio desconocido');
       } else E.push(tag + 'tipo desconocido ' + p.k);
     });
   });
@@ -167,6 +171,8 @@ function solver() {
             fight(U, S, out);
           } else if (p.k === 'g') {
             U.startProblem(L.n, i); if (!DE.genes.active()) throw new Error('no abrió la sala de genética'); DE.genes.solve();
+          } else if (p.k === 'e') {
+            U.startProblem(L.n, i); if (!DE.obs.active()) throw new Error('no abrió el observatorio'); DE.obs.solve(); if (DE.obs.active()) throw new Error('el observatorio no terminó');
           } else if (p.k === 'o') {
             U.startProblem(L.n, i); if (!DE.org.active()) throw new Error('no abrió la sala de cultivo'); DE.org.solve(); if (DE.org.active()) throw new Error('la sala de cultivo no terminó');
           } else if (p.k === 's') {
@@ -225,6 +231,7 @@ function monkey(n, seed) {
     rx: () => { const ids = [...Object.keys(U.state().fr).filter(id => DB.comp[id]), '@Fe', '@Al', '@Na', '@C', '@S', '@Mg']; if (r() < .3) { U.React.L = []; U.React.R = []; } U.rxAdd(pickA(ids)); if (U.React.L.length) U.rxCoef(r() < .5 ? 'L' : 'R', 0, r() < .5 ? 1 : -1); if (r() < .5) U.react(); },
     rxReal: () => { const rx = pickA(Object.values(REACT.rx)); U.React.L = []; U.React.R = []; rx.L.forEach(([, id]) => U.rxAdd(id)); U.React.L = rx.L.map(t => t.slice()); U.React.R = rx.R.map(t => t.slice()); U.react(); },
     gene: () => { if (!DE.genes.active()) { const q = openP('g'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.genes.state(); if (r() < .5) DE.genes.solve(); else if (g.p.mode === 'fix') DE.genes.sel(Math.floor(r() * g.pat.length)); else if (g.p.mode === 'trad') DE.genes.aa(pickA(Object.keys(GENE.AA))); else DE.genes.tap(pickA(['A', 'T', 'G', 'C', 'U'])); } },
+    obs: () => { if (!DE.obs.active()) { const q = openP('e'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.obs.state(); if (r() < .4) DE.obs.solve(); else if (g.p.mode === 'orb') { const s = pickA(g.subs); DE.obs.box(s + ':' + Math.floor(r() * g.box[s].length)); } else if (r() < .7) DE.obs.pick(pickA(g.p.opts)); else DE.obs.check(); } },
     org: () => { if (!DE.org.active()) { const q = openP('o'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.org.state(), m = g.p.mode; if (r() < .4) DE.org.solve(); else if (m === 'cel') DE.org.part(pickA(Object.keys(ORG.PART))); else if (m === 'ord') DE.org.pick(Math.floor(r() * g.p.items.length)); else if (m === 'cls') DE.org.cat(Math.floor(r() * 3)); else DE.org.cell(Math.floor(r() * (g.g.c.length + 2))); } },
     sort: () => { if (!U.SO()) { const q = openP('s'); if (q) U.startProblem(q[0], q[1]); } else U.sortTap(Math.floor(r() * (U.SO().st.length + 1))); },
     hint: () => U.useHint(),
@@ -267,6 +274,7 @@ function monkey(n, seed) {
       if (U.SO()) U.squit();
       if (DE.genes.active()) DE.genes.quit();
       if (DE.org.active()) DE.org.quit();
+      if (DE.obs.active()) DE.obs.quit();
     }
   } catch (e) { errors.push('abortado: ' + e.message); }
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }

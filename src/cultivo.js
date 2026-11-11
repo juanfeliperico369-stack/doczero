@@ -72,7 +72,7 @@ function render() {
       <div class="egrid" style="grid-template-columns:repeat(${g.w},var(--ec))">${g.c.map((v, j) => v === '#' ? '<span class="ec w"></span>' : `<button class="ec ${v === 'X' ? 'x' : v === 'V' ? 'v' : 's'}${OG.fresh.includes(j) ? ' new' : ''}${j === hint ? ' hintc' : ''}" data-act="ogCell" data-arg="${j}" aria-label="${v === 'X' ? 'brote' : v === 'V' ? 'protegida' : 'sana'}">${v === 'V' ? '✚' : ''}</button>`).join('')}</div>
       <div class="m sm"><span class="lg s"></span> sana · <span class="lg v"></span> protegida · <span class="lg x"></span> brote · turno ${OG.turn}</div>`;
   }
-  el.innerHTML = `<div class="bt-top"><span class="mega">❀ ${esc(p.t)}</span><span class="m">Errores ${OG.errs}</span><span class="tm" id="ogT">${Math.ceil(OG.t)}</span><button class="btn gh sm" data-act="ogQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OG.msg ? OG.msg[1] : ''}">${esc(OG.msg ? OG.msg[0] : p.d)}</p>${body}</div>`;
+  el.innerHTML = `<div class="bt-top"><span class="mega">${p.ic || '❀'} ${esc(p.t)}</span><span class="m">Errores ${OG.errs}</span><span class="tm" id="ogT">${Math.ceil(OG.t)}</span><button class="btn gh sm" data-act="ogQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OG.msg ? OG.msg[1] : ''}">${esc(OG.msg ? OG.msg[0] : p.d)}</p>${body}</div>`;
 }
 function wrong(msg) { const k = K(); OG.errs++; OG.t = Math.max(0, OG.t - 3); k.sfx('bad'); k.vib(60); OG.msg = [msg || '', 'bad']; render(); const b = $('#orgOv .gbody'); if (b) b.classList.add('shake'); }
 function right(msg) { const k = K(); k.sfx('bond'); k.vib(10); OG.msg = msg ? [msg, 'ok'] : null; render(); }

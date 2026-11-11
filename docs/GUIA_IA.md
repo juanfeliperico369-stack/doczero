@@ -202,6 +202,16 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Accesorios de pecho: `chest(x, y)`, con posiciones distintas en el retrato y en el cuerpo.
 - Mantener los diseños originales: no copiar personajes existentes.
 
+## 7i. Temporada 5: TESIS (v3.2, `src/season5.js` + `src/obs.js`)
+- Problema `k:'e'` (Observatorio). Su sala en la nave es `obs`, una cúpula en el techo que se abre en el nivel 41.
+  - `mode:'orb'`: `z` (1–36, sin Cr ni Cu por sus excepciones). Se valida por reglas: la subcapa más baja sin llenar; primero un electrón por caja, luego en parejas.
+  - `mode:'esp'`: `mix` (los elementos de la muestra, uno o varios) y `opts`. Las líneas están en `DE.obs.SPEC` (nm, aproximadas).
+- Problemas `k:'o'` con `room:'obs'` e `ic:'✺'` reutilizan ordenar y clasificar de la sala de Cultivo, pero se ven en el Observatorio.
+- `roomOfP(p)` en ui.js: `p.room` o el tipo. Las salas tipadas son `TYPED`.
+- Nuevos `TAGS`: `luz` (✺) y `cuant` (ψ). Los toman elementos (He, Ne, Na, Mg, Si, Ag, Ti) y compuestos.
+- Si una sala con contorno curvo puede quedar bloqueada, debe tener `bb` (caja) para dibujar el candado.
+- La temporada 6 (FASE DIOS, 51–100) queda anunciada en el final de la temporada 5.
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

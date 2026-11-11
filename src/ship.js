@@ -12,14 +12,15 @@ const ROOMS = [
   { id: 'react', n: 'Reactor', s: 'mezclar sustancias', ic: '⇄', r: [310, 126, 160, 170], doc: [438, 296] },
   { id: 'lab', n: 'Laboratorio', s: 'armar moléculas', ic: '⚛', r: [476, 126, 300, 170], doc: [528, 296] },
   { id: 'gen', n: 'Genética', s: 'leer el ADN', ic: '⚭', r: [782, 126, 160, 170], doc: [908, 296] },
-  { id: 'puente', n: 'Puente', s: 'misiones y amenazas', ic: '☣', p: 'M948 126 H1040 C1140 126 1226 204 1243 296 H948Z', t: [958, 156], doc: [990, 296], b: [1192, 196] },
+  { id: 'puente', n: 'Puente', s: 'misiones y amenazas', ic: '☣', p: 'M948 126 H1040 C1140 126 1226 204 1243 296 H948Z', t: [958, 156], doc: [990, 296], b: [1192, 196], bb: [948, 126, 295, 170] },
   { id: 'bodega', n: 'Bodega', s: 'tus frascos', ic: '⚱', r: [124, 304, 180, 170], doc: [272, 474] },
   { id: 'destil', n: 'Destilería', s: 'separar líquidos', ic: '⚗', r: [310, 304, 170, 170], doc: [450, 474] },
   { id: 'eter', n: 'ÉTER', s: 'mente de la nave', ic: '◉', r: [486, 304, 150, 170] },
   { id: 'cryo', n: 'Criogenia', s: 'escuela y memoria', ic: '❄', r: [642, 304, 200, 170], doc: [810, 474] },
   { id: 'cult', n: 'Cultivo', s: 'seres vivos', ic: '❀', r: [848, 304, 170, 170], doc: [988, 474] },
-  { id: 'tx', n: 'Transmisiones', s: 'videos de Doc', ic: '▶', p: 'M1024 304 H1243 C1226 396 1140 474 1040 474 H1024Z', t: [1034, 334], doc: [1124, 466], b: [1196, 336] },
-  { id: 'antena', n: 'Antena', s: 'reto diario y duelos', ic: '📡', p: 'M846 18 H1050 V108 H846Z', t: [958, 52], b: [1036, 32], ext: 1 }
+  { id: 'tx', n: 'Transmisiones', s: 'videos de Doc', ic: '▶', p: 'M1024 304 H1243 C1226 396 1140 474 1040 474 H1024Z', t: [1034, 334], doc: [1124, 466], b: [1196, 336], bb: [1024, 304, 219, 170] },
+  { id: 'obs', n: 'Observatorio', s: 'átomos y luz', ic: '✺', p: 'M596 14 H884 V110 H596Z', bb: [596, 14, 288, 96], t: [602, 56], b: [872, 30], ext: 1 },
+  { id: 'antena', n: 'Antena', s: 'reto diario y duelos', ic: '📡', p: 'M900 18 H1130 V108 H900Z', bb: [900, 18, 230, 90], t: [1004, 52], b: [1114, 32], ext: 1 }
 ];
 const ROOM = {}; ROOMS.forEach(r => ROOM[r.id] = r);
 const esc = s => DE.esc(s);
@@ -55,8 +56,10 @@ const IN = {
     <ellipse cx="902" cy="466" rx="44" ry="6" class="k1"/>${rect(856, 466, 92, 6, 'bench')}`,
   tx: () => `${rect(1036, 360, 74, 46, 'f0 k1 thick')}<path d="M1066 372 L1084 383 L1066 394Z" fill="#ffc23a"/><path d="M1046 410 H1100 M1073 406 V418" class="k2"/>
     <circle cx="1180" cy="362" r="18" class="k2"/><circle cx="1180" cy="362" r="4" fill="#a42cff"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="1180" cy="351" r="3.5" class="f1" transform="rotate(${a} 1180 362)"/>`).join('')}`,
-  antena: () => `<path d="M884 108 V74" class="k2 thick"/><path d="M856 44 Q872 84 912 76" class="k1 thick f0"/><path d="M872 60 L896 40" class="k1"/><circle cx="898" cy="38" r="4" fill="#ffc23a"/>
-    <g class="wave"><path d="M908 30 Q918 38 912 50" class="k3"/><path d="M916 22 Q932 38 920 58" class="k3" opacity=".6"/></g>`
+  antena: () => `<path d="M934 108 V74" class="k2 thick"/><path d="M906 44 Q922 84 962 76" class="k1 thick f0"/><path d="M922 60 L946 40" class="k1"/><circle cx="948" cy="38" r="4" fill="#ffc23a"/>
+    <g class="wave"><path d="M958 30 Q968 38 962 50" class="k3"/><path d="M966 22 Q982 38 970 58" class="k3" opacity=".6"/></g>`,
+  obs: () => `<path d="M748 112 A62 58 0 0 1 872 112Z" fill="rgba(57,200,255,.1)" class="k1 thick"/><path d="M768 112 A42 40 0 0 1 852 112 M810 54 V112" class="k1" opacity=".45"/>${STARS(754, 64, 110, 44, 9, 11)}
+    <g transform="rotate(-28 810 100)"><rect x="800" y="52" width="20" height="50" rx="4" class="f1 k3"/><rect x="796" y="48" width="28" height="10" rx="3" class="f1 k3"/></g><circle cx="810" cy="104" r="6" fill="#ffc23a"/>`
 };
 /* estrellas con semilla (siempre iguales) */
 function STARS(x, y, w, h, n, seed) { const r = DE.mulberry(seed); let s = ''; for (let i = 0; i < n; i++) { const a = r(); s += `<circle cx="${(x + r() * w).toFixed(1)}" cy="${(y + r() * h).toFixed(1)}" r="${(.6 + a * 1.4).toFixed(1)}" class="${a > .8 ? 'tw' : 'st'}"/>`; } return s; }
@@ -72,7 +75,7 @@ function plate(r) {
 }
 function badge(r) { const [bx, by] = r.b || [r.r[0] + r.r[2] - 20, r.r[1] + 22]; return `<g class="bdg"><circle cx="${bx}" cy="${by}" r="15"/><text x="${bx}" y="${by + 7}" class="badge">!</text></g>`; }
 function lock(r, why) {
-  const [x, y, w, h] = r.r, cx = x + w / 2, cy = y + h / 2 + 8;
+  const [x, y, w, h] = r.r || r.bb, cx = x + w / 2, cy = y + h / 2 + 8;
   return `${rect(x, y, w, h, 'shade')}<rect x="${cx - 13}" y="${cy - 8}" width="26" height="20" rx="3" class="f1 k3"/><path d="M${cx - 8} ${cy - 8} V${cy - 15} A8 8 0 0 1 ${cx + 8} ${cy - 15} V${cy - 8}" class="k3 thick"/><text x="${cx}" y="${cy + 34}" class="rs mid">${esc(why)}</text>`;
 }
 function svg(vm) {

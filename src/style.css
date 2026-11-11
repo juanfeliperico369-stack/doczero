@@ -214,8 +214,8 @@ body.hub #app{grid-template-columns:minmax(0,1fr)}body.hub #side{display:none}
 .stext{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .stext .film{font-size:clamp(13px,2.4vh,18px);width:100%}
 /* ---------- batalla / destilación ---------- */
-#battle,#sortOv,#geneOv,#orgOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
-#battle[hidden],#sortOv[hidden],#geneOv[hidden],#orgOv[hidden]{display:none}
+#battle,#sortOv,#geneOv,#orgOv,#obsOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
+#battle[hidden],#sortOv[hidden],#geneOv[hidden],#orgOv[hidden],#obsOv[hidden]{display:none}
 .bt-top{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:3px solid var(--pur);flex:none}
 .bt-top .mega{font-size:24px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt-top .tm{font-size:28px}
@@ -552,3 +552,29 @@ input{-webkit-user-select:text;user-select:text}
 #ship .docw:focus-visible{outline:2px solid var(--amb)}
 @media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
 @media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
+/* ---------- observatorio (temporada 5) ---------- */
+.orb{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;width:min(100%,760px)}
+.ladder{display:flex;flex-direction:column;gap:5px;border-left:3px solid var(--pur);padding:4px 0 4px 10px;position:relative}
+.ladder .lbl{position:absolute;left:-26px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left top;white-space:nowrap}
+.orow{display:flex;align-items:center;gap:8px}
+.orow b{font-family:var(--fd);font-size:20px;color:var(--amb);min-width:34px;text-align:right;font-weight:400}
+.obx{display:flex;gap:4px}
+.ob{width:40px;height:36px;border:2px solid var(--ink);border-radius:6px;background:#05010b;font-size:20px;color:var(--wht);font-family:var(--fd);letter-spacing:-.05em}
+.ob.f1{background:rgba(57,200,255,.18)}.ob.f2{background:rgba(45,255,179,.22);border-color:var(--grn)}
+.ob:active{transform:translateY(1px)}
+.oinfo{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.oinfo .ptile{width:84px;height:84px}
+.conf{font-family:var(--fm);font-size:16px;color:var(--grn);min-height:22px}
+.rules{display:flex;flex-wrap:wrap;gap:5px}.rules span{border:1px solid var(--pur2);border-radius:12px;padding:2px 9px;font-size:11.5px;color:var(--ink2)}
+.spec{position:relative;height:22px;width:min(100%,640px);background:#000;border:1px solid #2a1050;border-radius:3px;overflow:hidden}
+.spec i{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px}
+.spec.big{height:46px;border-color:var(--pur)}
+.spec.rule{height:8px;background:linear-gradient(90deg,#6a00a8,#3b28ff 15%,#00a2ff 27%,#00ffa0 38%,#46ff00 48%,#e8ff00 55%,#ffb000 63%,#ff3c00 72%,#d00000 85%,#600000)}
+.specnm{display:flex;justify-content:space-between;width:min(100%,640px);font-family:var(--fm);font-size:10px;color:var(--dim)}
+.sopts{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;width:min(100%,760px)}
+.sopt{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:2px 8px;align-items:center;text-align:left;border:2px solid var(--pur2);border-radius:8px;padding:6px 8px;background:var(--pn)}
+.sopt b{grid-row:span 2;font-family:var(--fd);font-size:26px;color:var(--wht);font-weight:400;min-width:34px}
+.sopt small{font-size:11px;color:var(--ink2)}.sopt .spec{height:14px}
+.sopt.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.45)}
+@media (max-height:520px){.ob{width:34px;height:28px;font-size:16px}.orow b{font-size:17px}.ladder{gap:3px}.oinfo .ptile{width:62px;height:62px}.spec.big{height:34px}.sopt{padding:4px 6px}.sopt b{font-size:21px}}
+@media (orientation:portrait){.orb{grid-template-columns:1fr}}
