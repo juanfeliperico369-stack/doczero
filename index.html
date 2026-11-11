@@ -236,8 +236,8 @@ body.hub #app{grid-template-columns:minmax(0,1fr)}body.hub #side{display:none}
 .stext{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .stext .film{font-size:clamp(13px,2.4vh,18px);width:100%}
 /* ---------- batalla / destilación ---------- */
-#battle,#sortOv,#geneOv,#orgOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
-#battle[hidden],#sortOv[hidden],#geneOv[hidden],#orgOv[hidden]{display:none}
+#battle,#sortOv,#geneOv,#orgOv,#obsOv{position:fixed;inset:0;z-index:45;background:#000;display:flex;flex-direction:column}
+#battle[hidden],#sortOv[hidden],#geneOv[hidden],#orgOv[hidden],#obsOv[hidden]{display:none}
 .bt-top{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:3px solid var(--pur);flex:none}
 .bt-top .mega{font-size:24px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt-top .tm{font-size:28px}
@@ -574,6 +574,32 @@ input{-webkit-user-select:text;user-select:text}
 #ship .docw:focus-visible{outline:2px solid var(--amb)}
 @media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
 @media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
+/* ---------- observatorio (temporada 5) ---------- */
+.orb{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;width:min(100%,760px)}
+.ladder{display:flex;flex-direction:column;gap:5px;border-left:3px solid var(--pur);padding:4px 0 4px 10px;position:relative}
+.ladder .lbl{position:absolute;left:-26px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left top;white-space:nowrap}
+.orow{display:flex;align-items:center;gap:8px}
+.orow b{font-family:var(--fd);font-size:20px;color:var(--amb);min-width:34px;text-align:right;font-weight:400}
+.obx{display:flex;gap:4px}
+.ob{width:40px;height:36px;border:2px solid var(--ink);border-radius:6px;background:#05010b;font-size:20px;color:var(--wht);font-family:var(--fd);letter-spacing:-.05em}
+.ob.f1{background:rgba(57,200,255,.18)}.ob.f2{background:rgba(45,255,179,.22);border-color:var(--grn)}
+.ob:active{transform:translateY(1px)}
+.oinfo{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.oinfo .ptile{width:84px;height:84px}
+.conf{font-family:var(--fm);font-size:16px;color:var(--grn);min-height:22px}
+.rules{display:flex;flex-wrap:wrap;gap:5px}.rules span{border:1px solid var(--pur2);border-radius:12px;padding:2px 9px;font-size:11.5px;color:var(--ink2)}
+.spec{position:relative;height:22px;width:min(100%,640px);background:#000;border:1px solid #2a1050;border-radius:3px;overflow:hidden}
+.spec i{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px}
+.spec.big{height:46px;border-color:var(--pur)}
+.spec.rule{height:8px;background:linear-gradient(90deg,#6a00a8,#3b28ff 15%,#00a2ff 27%,#00ffa0 38%,#46ff00 48%,#e8ff00 55%,#ffb000 63%,#ff3c00 72%,#d00000 85%,#600000)}
+.specnm{display:flex;justify-content:space-between;width:min(100%,640px);font-family:var(--fm);font-size:10px;color:var(--dim)}
+.sopts{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;width:min(100%,760px)}
+.sopt{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:2px 8px;align-items:center;text-align:left;border:2px solid var(--pur2);border-radius:8px;padding:6px 8px;background:var(--pn)}
+.sopt b{grid-row:span 2;font-family:var(--fd);font-size:26px;color:var(--wht);font-weight:400;min-width:34px}
+.sopt small{font-size:11px;color:var(--ink2)}.sopt .spec{height:14px}
+.sopt.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.45)}
+@media (max-height:520px){.ob{width:34px;height:28px;font-size:16px}.orow b{font-size:17px}.ladder{gap:3px}.oinfo .ptile{width:62px;height:62px}.spec.big{height:34px}.sopt{padding:4px 6px}.sopt b{font-size:21px}}
+@media (orientation:portrait){.orb{grid-template-columns:1fr}}
 
 </style></head><body><noscript>Doc Element necesita JavaScript activado.</noscript>
 <script>
@@ -594,7 +620,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '3.1.0',
+  VERSION: '3.2.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -1764,6 +1790,231 @@ LEVELS.push(
 </script>
 <script>
 /* ============================================================
+   DOC ELEMENT · TEMPORADA 5: TESIS (niveles 41–50)
+   Orbitales, tabla periódica, luz y espectros, estrellas, energía, electricidad, materiales,
+   catálisis, cuántica y el Demonio de Maxwell (experimento mental). Sala nueva: Observatorio (obs.js).
+   ============================================================ */
+'use strict';
+TAGS.luz = ['Luminoso', '✺'];
+TAGS.cuant = ['Cuántico', 'ψ'];
+Object.assign(ELTAGS, { He: 'inert2,cool1,cuant2', Ne: 'inert2,luz2', Na: (ELTAGS.Na || 'fuel1,cond1') + ',luz1', Mg: (ELTAGS.Mg || 'fuel2,struct1') + ',luz2', Si: (ELTAGS.Si || 'struct1,cond1') + ',cuant2', Ag: 'cond3,luz1,anti1', Ti: 'struct3,luz1' });
+(function () {
+  const add = (id, t) => { const c = COMPOUNDS.find(c => c[0] === id); if (c) c[4] += ',' + t; };
+  [['CaO', 'luz2'], ['C2H2', 'luz1'], ['ZNO', 'luz1'], ['C6H6', 'cuant2'], ['H2', 'cuant1'], ['C8H8', 'cuant1'], ['SiH4', 'cuant1'], ['ADE', 'cuant1']].forEach(([id, t]) => add(id, t));
+})();
+COMPOUNDS.push(
+ ['NAFT','C10H8','Naftaleno','C1=CC=C2C=CC=CC2=C1','org2,cuant2','Dos anillos de benceno unidos por un lado. Sus electrones se reparten por las dos «rosquillas».'],
+ ['AGCL','AgCl','Cloruro de plata','[Ag]Cl','luz2,anti1','Se oscurece con la luz: la base de la fotografía en blanco y negro durante más de un siglo.'],
+ ['ZNSO4','ZnSO4','Sulfato de zinc','[Zn]1OS(=O)(=O)O1','cond2,salt1','Lo que queda disuelto en la pila de Daniell cuando el zinc suelta sus electrones.'],
+ ['LI2O','Li2O','Óxido de litio','[Li]O[Li]','cond1,base1','El producto de las baterías experimentales de litio-aire.'],
+ ['LICOO2','LiCoO2','Óxido de litio y cobalto','[Li]O[Co]=O','cond2,nrg2','El polo positivo de muchas baterías de teléfonos y portátiles.'],
+ ['SICL4','SiCl4','Tetracloruro de silicio','Cl[Si](Cl)(Cl)Cl','cond1,struct1','Paso intermedio para purificar el silicio de los chips.'],
+ ['TIO2','TiO2','Dióxido de titanio','O=[Ti]=O','luz2,struct1,shield1,cuant1','El blanco de la pintura y de muchos protectores solares. Con luz ultravioleta descompone suciedad.'],
+ ['MGB2','MgB2','Diboruro de magnesio','[Mg]1B=B1','cond3,cuant2','Superconductor descubierto en 2001: por debajo de −234 °C conduce la electricidad sin ninguna resistencia.']
+);
+REACTIONS.push(
+ ['R_DAN','Pila de Daniell','@Zn+CuSO4=ZNSO4+@Cu',-217,'El zinc cede electrones al cobre a través de un cable: así fluye la corriente.'],
+ ['R_LIAIR','Batería de litio-aire','4@Li+O2=2LI2O',-1196,'El litio «respira» oxígeno y libera mucha energía: una batería del futuro.'],
+ ['R_SICL','Silicio a cloruro','@Si+2Cl2=SICL4',-657,'El silicio impuro se convierte en un líquido que se destila hasta quedar purísimo.'],
+ ['R_SIEM','Proceso Siemens','SICL4+2H2=@Si+4HCl',240,'El hidrógeno devuelve el silicio, ahora con una impureza en mil millones.'],
+ ['R_MEOH','Metanol desde CO₂','CO2+3H2=CH3OH+H2O',-49,'Un catalizador de cobre y zinc convierte CO₂ en combustible líquido.'],
+ ['R_AGCL','Fotografía','2AGCL=2@Ag+Cl2',254,'La luz rompe el cloruro de plata: aparecen granos de plata oscura, la imagen.'],
+ ['R_TIO2','Titanio en llamas','@Ti+O2=TIO2',-944,'El titanio arde con luz blanca muy brillante.'],
+ ['R_MGB2','Superconductor','@Mg+2@B=MGB2',-92,'Magnesio y boro forman un material sin resistencia eléctrica cuando se enfría mucho.']
+);
+DIFF.push(
+ {g:1,fail:1,ah:9,bal:0,crit:1,rg:1.2},{g:1,fail:1,ah:9,bal:0,crit:1,rg:1.3},{g:1,fail:1,ah:9,bal:0,crit:1,rg:1.4},{g:0,fail:1,ah:9,bal:0,crit:1,rg:1.5},{g:0,fail:1,ah:9,bal:0,crit:1,rg:1.6},
+ {g:0,fail:1,ah:10,bal:0,crit:1,rg:1.7},{g:0,fail:1,ah:10,bal:0,crit:1,rg:1.8},{g:0,fail:1,ah:10,bal:0,crit:1,rg:1.9},{g:0,fail:1,ah:10,bal:0,crit:1,rg:2},{g:0,fail:1,ah:10,bal:0,crit:1,rg:2}
+);
+STORY.s5i = [
+  ['doc','loco','MI TESIS','Forjé elementos, curé mentes, leí genes y creé vida. Ahora voy a escribir la teoría de todo.'],
+  ['eter','neutral','LAS REGLAS','Para dominar la realidad primero tienes que conocer sus reglas: electrones, luz y energía.'],
+  ['eter','enojado','EL OBSERVATORIO','Abrí el observatorio del techo. Allí verás los átomos por dentro y la luz de las estrellas.'],
+  ['doc','sorpresa','TEMPORADA 5: TESIS','Orbitales, espectros, estrellas, energía, electricidad… y un demonio que no respeta las leyes.']
+];
+STORY.s5e = [
+  ['eter','sorpresa','SEGUNDA LEY','El demonio cerró su compuerta: para elegir tenía que recordar, y recordar cuesta energía.'],
+  ['doc','feliz','TESIS APROBADA','No dominé la realidad. Aprendí sus reglas, que es casi mejor.'],
+  ['eter','neutral','FASE DIOS','Ahora quieres crear especies, elementos y universos. Niveles 51–100… cuidado con lo que deseas, Doc.']
+];
+const e = (mode, x) => Object.assign({ k: 'e', mode }, x);
+const ob = (mode, x) => Object.assign({ k: 'o', mode, room: 'obs', ic: '✺' }, x);
+LEVELS.push(
+{ n:41, t:'ORBITALES', s:'El edificio de los electrones', gift:[],
+  talk:[['doc','loco','Mi tesis empieza por dentro del átomo.'],['eter','neutral','Los electrones viven en pisos y cajas. Cómo se acomodan decide cuántas manos tiene cada átomo en tu laboratorio.']],
+  tx:{ teo:'Los electrones se ordenan en capas y subcapas (s, p, d) llamadas orbitales. Llenan primero lo de menor energía (Aufbau), se reparten uno por caja antes de emparejarse (regla de Hund) y en cada caja caben dos con giros opuestos (principio de Pauli). Los electrones sin pareja explican cuántos enlaces forma un átomo.',
+       dato:'El orden de llenado tiene sorpresas: el 4s se llena antes que el 3d porque tiene un poco menos de energía.',
+       fic:'Dibujé el oxígeno como un edificio de dos pisos. Le sobraban dos inquilinos solos: sus dos manos.' },
+  P:[
+   e('orb',{z:3,t:'Litio',d:'Toca la caja vacía más baja para poner cada electrón.',T:70}),
+   e('orb',{z:6,t:'Carbono',d:'Seis electrones. En el piso 2p, uno por caja.',T:80}),
+   e('orb',{z:8,t:'Oxígeno',d:'Ocho electrones: ¿cuántos quedan sin pareja?',T:80}),
+   ob('ord',{rule:'Orden de llenado (de menor a mayor energía)',items:['1s','2s','2p','3s','3p','4s','3d','4p'],t:'La escalera',d:'Toca los pisos en el orden en que se llenan.',T:80}),
+   e('orb',{z:7,t:'Nitrógeno',d:'Tres electrones solos en el 2p: tres manos.',T:80}),
+   {k:'b',t:'Chispa estática',d:'Los electrones se acumulan en la alfombra de la cubierta.',sc:'Electrones acumulados · descargas',w:'cond2,inert1',h:'fuel1',hp:330,T:60,dps:1.6},
+   e('orb',{z:11,t:'Sodio',d:'Un electrón solitario en el piso 3s.',T:90}),
+   {k:'m',id:'NAFT',t:'Naftaleno',d:'Dos anillos de benceno pegados por un lado: diez carbonos.',T:320},
+   e('orb',{z:16,t:'Azufre',d:'Dieciséis electrones.',T:100}),
+   {k:'b',boss:1,t:'El electrón fantasma',d:'Un electrón que parece estar en todas partes a la vez… hasta que lo miras.',sc:'Nube de probabilidad',w:'cuant2,cond1',h:'nrg1',hp:340,T:90,dps:1.6,ph2:{d:'Se esconde en otro orbital',w:'cond2,luz1',h:'nrg1'}}
+  ]},
+{ n:42, t:'TABLA PERIÓDICA', s:'Un mapa, no una lista', gift:[],
+  talk:[['eter','neutral','Cada fila de la tabla es un piso nuevo de electrones. Cada columna tiene los mismos electrones sueltos: por eso sus átomos se parecen.'],['doc','sorpresa','¡Por eso el sodio y el potasio explotan igual en el agua!']],
+  tx:{ teo:'Mendeléyev ordenó los elementos en 1869 y dejó huecos para elementos que aún no se conocían. Hoy sabemos por qué funciona: los elementos de una misma columna tienen igual número de electrones en su última capa y se comportan parecido.',
+       dato:'Mendeléyev predijo el «eka-silicio» con 15 años de anticipación: se descubrió en 1886 y se llamó germanio.',
+       fic:'Pegué la tabla periódica en la pared del laboratorio. ÉTER me corrigió: la había colgado de cabeza.' },
+  P:[
+   ob('cls',{rule:'Misma columna, mismas manos',cats:['1 mano','2 manos','0 manos (gas noble)'],items:[['Litio',0],['Sodio',0],['Cloro',0],['Magnesio',1],['Oxígeno',1],['Azufre',1],['Neón',2],['Argón',2],['Calcio',1]],t:'Familias',d:'¿Cuántas manos tiene cada elemento?',T:90}),
+   e('orb',{z:12,t:'Magnesio',d:'Doce electrones: dos en el 3s.',T:90}),
+   e('orb',{z:9,t:'Flúor',d:'Le falta uno para llenar su piso: por eso es tan reactivo.',T:90}),
+   {k:'m',id:'MgO',t:'Flash de magnesio',d:'Óxido de magnesio: lo que queda de la luz blanca del flash.',T:200},
+   e('orb',{z:19,t:'Potasio',d:'Atento: el 4s va antes que el 3d.',T:110}),
+   {k:'b',t:'Metal alcalino en el agua',d:'Un trozo de potasio cae en el tanque de agua.',sc:'Hidrógeno y llamas violetas',w:'inert2,seal1',h:'solv2',hp:330,T:60,dps:1.6},
+   {k:'r',id:'R_KCL',t:'Alcalino y halógeno',d:'Potasio + cloro → cloruro de potasio. Columna 1 con columna 17.',T:150},
+   e('orb',{z:20,t:'Calcio',d:'Veinte electrones.',T:110}),
+   ob('ord',{rule:'Mendeléyev: ordena por masa atómica',items:['Hidrógeno','Helio','Litio','Berilio','Boro','Carbono','Nitrógeno'],t:'Como en 1869',d:'Del más liviano al más pesado.',T:80}),
+   {k:'b',boss:1,t:'El hueco de la tabla',d:'Un elemento sin descubrir reclama su casilla.',sc:'Casilla vacía · elemento desconocido',w:'cuant2,struct1',h:'nrg1',hp:370,T:90,dps:1.6,ph2:{d:'Cambia de columna',w:'cond2,luz1',h:'nrg1'}}
+  ]},
+{ n:43, t:'LUZ', s:'Cada átomo tiene su color', gift:['Ag'],
+  talk:[['eter','neutral','Cuando un electrón baja de un piso alto a uno bajo, suelta luz de un color exacto. Cada elemento tiene su código de barras de colores.'],['doc','feliz','¡Un DNI de luz!']],
+  tx:{ teo:'Al calentar un elemento, sus electrones saltan a pisos altos y al bajar emiten luz de longitudes de onda exactas: su espectro de emisión. Así se identifican elementos a distancia y así funcionan las pruebas de llama y los fuegos artificiales.',
+       dato:'El helio se descubrió en 1868 en el espectro del Sol, 27 años antes de encontrarlo en la Tierra. Su nombre viene de Helios, el Sol.',
+       fic:'Quemé sal en el mechero y la llama se puso amarilla. ÉTER: «Sodio. Lo sabría con los ojos cerrados».' },
+  P:[
+   e('esp',{mix:['Na'],opts:['Na','H','Ne','Hg'],t:'Farola amarilla',d:'Las farolas antiguas brillan de un amarillo puro.',T:60}),
+   e('esp',{mix:['H'],opts:['He','H','Li','Ca'],t:'El gas más simple',d:'Cuatro rayas: rojo, celeste, azul y violeta.',T:60}),
+   {k:'m',id:'AGCL',t:'Cloruro de plata',d:'Plata y cloro: el químico de las fotos antiguas.',T:120},
+   {k:'r',id:'R_AGCL',t:'Fotografía',d:'La luz rompe el cloruro de plata: plata oscura + cloro.',T:150},
+   e('esp',{mix:['Ne'],opts:['Ne','Na','Hg','Sr'],t:'Letrero de neón',d:'Muchas rayas rojas y naranjas.',T:70}),
+   {k:'b',t:'Apagón total',d:'Las luces de la nave se apagan.',sc:'Oscuridad · pánico en las cubiertas',w:'luz2,nrg1',h:'cool1',hp:300,T:60,dps:1.6},
+   e('esp',{mix:['Cu'],opts:['Ba','Cu','Mg','Fe'],t:'Llama verde',d:'Dos elementos dan llama verde. ¿Cuál es este?',T:70}),
+   e('esp',{mix:['Sr','Na'],opts:['Sr','Li','Na','K','Cu'],t:'Fuegos artificiales',d:'Rojo y amarillo en el cielo: dos elementos.',T:100}),
+   e('esp',{mix:['O'],opts:['O','Hg','Cu','Ne'],t:'Aurora',d:'El verde de las auroras viene de un gas del aire.',T:80}),
+   {k:'b',boss:1,t:'El eclipse',d:'Algo se come la luz de la nave.',sc:'Absorbe todos los colores',w:'luz2,shield1',h:'nrg1',hp:320,T:90,dps:1.6,ph2:{d:'Solo deja pasar el infrarrojo',w:'luz1,cool2',h:'fuel1'}}
+  ]},
+{ n:44, t:'ESTRELLAS', s:'Fábricas de elementos', gift:[],
+  talk:[['doc','sorpresa','¿De dónde salió el carbono de mi cuerpo?'],['eter','neutral','De una estrella que explotó antes de que existiera el Sol. Vamos a repetir su receta en la forja.']],
+  tx:{ teo:'Las estrellas fusionan hidrógeno en helio. Al envejecer, unen tres núcleos de helio en carbono (proceso triple alfa) y siguen con oxígeno, neón, magnesio y silicio hasta llegar al hierro. Los elementos más pesados nacen en explosiones de estrellas y en choques de estrellas de neutrones.',
+       dato:'En 2017 se observó el choque de dos estrellas de neutrones (GW170817): fabricó varias veces la masa de la Tierra en oro y platino.',
+       fic:'Recreé el corazón de una estrella en la forja. ÉTER bajó la potencia antes de que fuera demasiado realista.' },
+  P:[
+   {k:'f',z:6,a:12,t:'Triple alfa',d:'Tres núcleos de helio-4 → carbono-12, como en las gigantes rojas.',r:'He4+He4+He4',T:150},
+   {k:'f',z:8,a:16,t:'Oxígeno estelar',d:'Carbono-12 + helio-4.',r:'C12+He4',T:140},
+   e('esp',{mix:['H','He'],opts:['H','He','Li','Na','Ne'],t:'Estrella joven',d:'Casi toda estrella es hidrógeno y helio.',T:100}),
+   {k:'f',z:10,a:20,t:'Neón estelar',d:'Oxígeno-16 + helio-4.',r:'O16+He4',T:140},
+   {k:'f',z:14,a:28,t:'Silicio de las estrellas',d:'Oxígeno-16 + carbono-12.',r:'O16+C12',T:150},
+   {k:'b',t:'Viento solar',d:'Una tormenta de partículas golpea el casco.',sc:'Partículas cargadas · tormenta',w:'shield2,cond1',h:'nrg1',hp:300,T:60,dps:1.6},
+   {k:'f',z:26,a:56,t:'El final: hierro',d:'Dos silicios dan níquel-56, que decae dos veces hasta hierro-56. Ahí se detienen las estrellas.',r:'Si28+Si28',T:160},
+   e('esp',{mix:['H','He','Na','Fe'],opts:['H','He','Na','Fe','Ne','Cu'],t:'Nuestro Sol',d:'Cuatro elementos se ven en la luz del Sol. Márcalos todos.',T:130}),
+   {k:'f',z:79,a:197,t:'Kilonova: oro',d:'Hierro + rutenio + flúor + 20 neutrones: oro, como en el choque de dos estrellas de neutrones.',r:'Fe56+Ru102+F19+20n',T:170},
+   {k:'b',boss:1,t:'Supernova',d:'Una estrella cercana estalla.',sc:'Onda de choque · radiación',w:'shield3,struct1',h:'nrg2',hp:320,T:90,dps:1.6,ph2:{d:'Llega la radiación',w:'shield2,antid1',h:'rad1'}}
+  ]},
+{ n:45, t:'ENERGÍA', s:'Nada se crea, nada se destruye', gift:[],
+  talk:[['eter','neutral','La energía no se crea ni se destruye: se transforma. Y siempre se escapa un poco como calor.'],['doc','loco','¡Haré una máquina que no pierda nada!'],['eter','enojado','Eso dijeron miles antes que tú.']],
+  tx:{ teo:'Primera ley de la termodinámica: la energía se conserva. Segunda ley: en cada transformación una parte se dispersa como calor y el desorden (entropía) del universo aumenta. Por eso no existe el movimiento perpetuo.',
+       dato:'Tus músculos aprovechan cerca del 25 % de la energía de la comida para moverse; el resto se vuelve calor. Por eso sudas al hacer ejercicio.',
+       fic:'Construí mi máquina de movimiento perpetuo. Se detuvo a los 4 minutos. ÉTER cronometró cada segundo.' },
+  P:[
+   {k:'r',id:'R_CH4',t:'Combustión',d:'Metano + oxígeno: la energía química se vuelve calor y luz.',T:140},
+   ob('cls',{rule:'¿Libera o absorbe calor?',cats:['Libera calor (exotérmica)','Absorbe calor (endotérmica)'],items:[['Quemar madera',0],['Derretir hielo',1],['Fotosíntesis',1],['Respiración',0],['Cocinar un huevo',1],['Calentador de manos de hierro',0],['Evaporar agua',1]],t:'Calor que entra y sale',d:'Clasifica cada proceso.',T:90}),
+   {k:'m',id:'UREA',t:'Compresa fría',d:'La urea, al disolverse en agua, absorbe calor: así funcionan algunas compresas frías.',T:200},
+   {k:'b',t:'Fuga de calor',d:'Una compuerta se abre al espacio.',sc:'La cubierta se enfría · −40 °C',w:'fuel2,nrg1',h:'cool2',hp:330,T:60,dps:1.6},
+   {k:'r',id:'R_FE',t:'Calentador de manos',d:'El hierro en polvo se oxida despacio y calienta tus manos.',T:140},
+   ob('ord',{rule:'Del más frío al más caliente',items:['Cero absoluto (−273 °C)','Nitrógeno líquido (−196 °C)','Hielo seco (−78 °C)','Agua congelándose (0 °C)','Cuerpo humano (37 °C)','Agua hirviendo (100 °C)','Llama de vela (1000 °C)','Superficie del Sol (5500 °C)'],t:'Termómetro cósmico',d:'Ordena las temperaturas.',T:90}),
+   {k:'r',id:'R_MEOH',t:'Combustible desde CO₂',d:'CO₂ + 3 H₂ → metanol + agua: una forma real de reciclar CO₂.',T:160},
+   {k:'s',n:7,mix:['CH3OH','C2H5OH','H2O','ACET','C3H6O','ETER','CH3COOH'],t:'Destilación fraccionada',d:'Cada líquido hierve a su propia temperatura.',T:200},
+   {k:'b',t:'Máquina de movimiento perpetuo',d:'Doc la encendió de todas formas.',sc:'Imposible · se recalienta',w:'cool2,seal1',h:'nrg2',hp:330,T:60,dps:1.6},
+   {k:'b',boss:1,t:'La muerte térmica',d:'Todo tiende al desorden: la nave se enfría por partes.',sc:'Entropía máxima',w:'nrg2,fuel1',h:'cool1',hp:410,T:90,dps:1.6,ph2:{d:'El calor se reparte por igual',w:'fuel2,oxi1',h:'cool1'}}
+  ]},
+{ n:46, t:'ELECTRICIDAD', s:'Electrones en movimiento', gift:[],
+  talk:[['doc','loco','¡Voy a encender la nave con un limón!'],['eter','neutral','Un limón da menos de un voltio. Pero la idea es correcta: dos metales distintos y un líquido.']],
+  tx:{ teo:'Una pila convierte energía química en eléctrica: un metal suelta electrones (se oxida) y otro los recibe (se reduce) a través de un cable. En la pila de Daniell el zinc se disuelve y el cobre se deposita. Las baterías de litio de tu teléfono mueven iones de litio entre dos polos.',
+       dato:'Alessandro Volta construyó la primera pila en 1800 apilando discos de zinc y cobre separados por cartón con agua salada. De su nombre viene el «voltio».',
+       fic:'Conecté cien limones en serie. Encendí una bombilla diminuta y ÉTER aplaudió, por primera vez sin sarcasmo.' },
+  P:[
+   {k:'r',id:'R_DAN',t:'Pila de Daniell',d:'Zinc + sulfato de cobre → sulfato de zinc + cobre.',T:150},
+   {k:'m',id:'ZNSO4',t:'Sulfato de zinc',d:'Un zinc unido a dos oxígenos de un sulfato.',T:140},
+   ob('cls',{rule:'¿Deja pasar la electricidad?',cats:['Conductor','Semiconductor','Aislante'],items:[['Cobre',0],['Silicio',1],['Plástico',2],['Agua salada',0],['Vidrio',2],['Germanio',1],['Oro',0],['Caucho',2]],t:'Conductores',d:'Clasifica cada material.',T:90}),
+   {k:'r',id:'R_ELEC',t:'Electrólisis',d:'La electricidad rompe el agua: lo contrario de una pila.',T:140},
+   {k:'m',id:'LI2O',t:'Óxido de litio',d:'Dos litios y un oxígeno.',T:120},
+   {k:'b',t:'Cortocircuito',d:'Dos cables pelados se tocan.',sc:'Chispas · cables derretidos',w:'seal2,inert1',h:'cond2',hp:330,T:60,dps:1.6},
+   {k:'r',id:'R_LIAIR',t:'Batería de litio-aire',d:'Litio + oxígeno → óxido de litio. Balancea.',T:160},
+   {k:'m',id:'LICOO2',t:'Polo de batería',d:'Litio, cobalto y dos oxígenos: está dentro de tu teléfono.',T:200},
+   {k:'b',t:'Batería hinchada',d:'Una batería se calentó demasiado.',sc:'Litio sobrecalentado · riesgo de fuego',w:'cool2,inert1',h:'fuel1,oxi1',hp:330,T:60,dps:1.6},
+   {k:'b',boss:1,t:'Tormenta eléctrica',d:'Un rayo cae sobre el casco de la nave.',sc:'Mil millones de voltios',w:'cond3,seal1',h:'nrg2',hp:450,T:90,dps:1.6,ph2:{d:'La corriente corre por los cables',w:'seal2,inert1',h:'cond1'}}
+  ]},
+{ n:47, t:'MATERIALES', s:'Cosas que no existían', gift:['Ti','B'],
+  talk:[['eter','neutral','El silicio de los chips se purifica hasta tener una impureza en mil millones.'],['doc','feliz','¡Más puro que mis intenciones!']],
+  tx:{ teo:'Los semiconductores como el silicio conducen solo un poco, y esa conducción se puede controlar: así se fabrican los transistores de todos los chips. El titanio es ligero y fuerte, y algunos compuestos dejan de oponer resistencia a la electricidad cuando se enfrían mucho: son superconductores.',
+       dato:'Un chip moderno tiene miles de millones de transistores, cada uno miles de veces más delgado que un cabello.',
+       fic:'Purifiqué silicio para fabricarle a ÉTER un cerebro nuevo. Lo rechazó: dijo que el suyo era de colección.' },
+  P:[
+   {k:'r',id:'R_SICL',t:'Silicio a cloruro',d:'Silicio + 2 Cl₂ → SiCl₄, un líquido fácil de purificar.',T:150},
+   {k:'r',id:'R_SIEM',t:'Proceso Siemens',d:'SiCl₄ + 2 H₂ → silicio puro + 4 HCl.',T:160},
+   {k:'m',id:'TIO2',t:'Dióxido de titanio',d:'Un titanio con dos dobles enlaces a oxígeno: el blanco de la pintura.',T:120},
+   {k:'r',id:'R_TIO2',t:'Titanio en llamas',d:'Titanio + oxígeno → dióxido de titanio.',T:140},
+   {k:'m',id:'MGB2',t:'Superconductor',d:'Un magnesio unido a dos boros, que a su vez tienen un doble enlace entre ellos.',T:160},
+   {k:'b',t:'Fatiga del metal',d:'Aparecen grietas microscópicas en el casco.',sc:'Grietas en el casco',w:'struct3',h:'acid1',hp:330,T:60,dps:1.6},
+   {k:'r',id:'R_MGB2',t:'Horno de superconductores',d:'Magnesio + 2 boros → diboruro de magnesio.',T:150},
+   {k:'s',n:7,mix:['SiO2','SICL4','TIO2','Al2O3','Fe2O3','CuO','ZNO'],t:'Separar minerales',d:'Siete materiales en polvo mezclados.',T:200},
+   {k:'b',t:'Chip sobrecalentado',d:'El procesador central de ÉTER se recalienta.',sc:'Procesador a 120 °C',w:'cool2,cond1',h:'fuel1',hp:300,T:60,dps:1.6},
+   {k:'b',boss:1,t:'El material imposible',d:'ÉTER diseñó un material que se repara solo… y ahora no deja de crecer.',sc:'Material autorreplicante (ficción)',w:'struct2,cuant1',h:'bio1',hp:450,T:90,dps:1.6,ph2:{d:'Absorbe los metales del casco',w:'acid2,oxi1',h:'struct1'}}
+  ]},
+{ n:48, t:'CATÁLISIS', s:'Atajos químicos', gift:[],
+  talk:[['eter','neutral','Un catalizador acelera una reacción sin gastarse. Tus enzimas son catalizadores.'],['doc','loco','¡Un atajo! Eso es lo mío.']],
+  tx:{ teo:'Un catalizador ofrece un camino que necesita menos energía para empezar: la reacción va más rápido y él sale intacto. El hierro acelera la síntesis del amoníaco (Haber-Bosch), el platino limpia los gases de los autos y las enzimas aceleran millones de veces las reacciones de tu cuerpo.',
+       dato:'Cerca de la mitad del nitrógeno de tu cuerpo pasó por una fábrica de amoníaco de Haber-Bosch: está en los fertilizantes de lo que comes.',
+       fic:'Le puse un catalizador a mi café. ÉTER dijo que eso no existe. El café se enfrió igual de rápido.' },
+  P:[
+   {k:'r',id:'R_HABER',t:'Haber-Bosch',d:'Nitrógeno + hidrógeno → amoníaco, con hierro como catalizador.',T:150},
+   {k:'r',id:'R_H2O2',t:'Catalasa',d:'Una enzima de tu hígado rompe el agua oxigenada a toda velocidad.',T:130},
+   ob('ord',{rule:'Cómo actúa un catalizador',items:['Las moléculas llegan','Se pegan al catalizador','Sus enlaces se debilitan','Se forma el producto','El producto se suelta','El catalizador queda libre otra vez'],t:'El atajo',d:'Ordena los pasos.',T:90}),
+   {k:'r',id:'R_SO3',t:'Proceso de contacto',d:'2 SO₂ + O₂ → 2 SO₃, con óxido de vanadio como catalizador.',T:150},
+   {k:'b',t:'Reacción descontrolada',d:'Un catalizador equivocado acelera todo.',sc:'Temperatura en aumento',w:'cool2,inert1',h:'fuel1',hp:330,T:60,dps:1.6},
+   {k:'r',id:'R_METG',t:'Reacción de Sabatier',d:'En la Estación Espacial convierten CO₂ en metano y agua con un catalizador.',T:160},
+   {k:'m',id:'NH3',t:'Amoníaco experto',d:'Sin plano ni fórmula.',T:100},
+   ob('cls',{rule:'¿Se gasta o no se gasta?',cats:['Catalizador (no se gasta)','Reactivo (se gasta)'],items:[['Enzima catalasa',0],['Agua oxigenada',1],['Hierro de Haber-Bosch',0],['Nitrógeno de Haber-Bosch',1],['Platino del auto',0],['Gasolina',1]],t:'Catalizador o reactivo',d:'Clasifica cada sustancia.',T:90}),
+   {k:'b',t:'Catalizador envenenado',d:'El azufre bloquea el catalizador de la planta de aire.',sc:'Azufre en el catalizador',w:'oxi2,base1',h:'acid1',hp:280,T:60,dps:1.6},
+   {k:'b',boss:1,t:'La enzima loca',d:'Una enzima acelera todas las reacciones de la nave al mismo tiempo.',sc:'Reacciones un millón de veces más rápidas',w:'cool2,antid1',h:'nrg1',hp:250,T:90,dps:1.6,ph2:{d:'Ahora digiere los plásticos',w:'antid2,inert1',h:'seal1'}}
+  ]},
+{ n:49, t:'CUÁNTICA', s:'Lo pequeño es raro', gift:[],
+  talk:[['doc','sorpresa','Si lo miro, cambia. Si no lo miro, ¿qué hace?'],['eter','neutral','Bienvenido a la mecánica cuántica. Nadie la entiende del todo, pero funciona.']],
+  tx:{ teo:'A escala atómica la energía viene en paquetes (cuantos), los electrones se comportan a la vez como partícula y como onda, y solo se puede calcular la probabilidad de dónde están. Gracias a eso existen los láseres, los LED, los chips y la resonancia magnética.',
+       dato:'El color de un LED depende de su material. El LED azul eficiente, clave para la luz LED blanca, ganó el Nobel de Física de 2014.',
+       fic:'Metí un gato en una caja para un experimento mental. ÉTER me recordó que el experimento era mental. El gato está bien.' },
+  P:[
+   e('orb',{z:26,t:'Hierro',d:'Seis electrones en el 3d: primero uno por caja.',T:140}),
+   e('orb',{z:30,t:'Zinc',d:'El 3d completo.',T:150}),
+   e('esp',{mix:['Hg'],opts:['Hg','Ne','Na','H','Ba'],t:'Tubo fluorescente',d:'Muchas lámparas tienen un poco de este metal líquido.',T:80}),
+   {k:'m',id:'C6H6',t:'Benceno cuántico',d:'Sus electrones no están en un enlace fijo: se reparten por todo el anillo.',T:120},
+   ob('ord',{rule:'De menor a mayor energía',items:['Ondas de radio','Microondas','Infrarrojo','Luz visible','Ultravioleta','Rayos X','Rayos gamma'],t:'La luz invisible',d:'Ordena los tipos de luz.',T:80}),
+   {k:'b',t:'Efecto túnel',d:'Partículas atraviesan las paredes del reactor.',sc:'Fugas imposibles',w:'cuant2,shield1',h:'struct1',hp:220,T:60,dps:1.6},
+   e('orb',{z:35,t:'Bromo',d:'Treinta y cinco electrones.',T:160}),
+   e('esp',{mix:['H','He','Ca'],opts:['H','He','Ca','K','Sr','Li'],t:'Estrella lejana',d:'Tres elementos en su luz.',T:120}),
+   {k:'b',mut:10,t:'El gato de Schrödinger',d:'Experimento mental: su debilidad cambia cada 10 s.',sc:'Superposición',w:'cuant2,luz1',h:'nrg1',hp:330,T:60,dps:1.6,ph2:{d:'Lo miraste y cambió',w:'cond2,shield1',h:'nrg1'}},
+   {k:'b',boss:1,mut:12,t:'Ruido cuántico',d:'El ordenador de la nave da respuestas al azar. Su debilidad cambia cada 12 s.',sc:'Bits que son 0 y 1 a la vez',w:'cuant2,cond1',h:'nrg1',hp:350,T:90,dps:1.6,ph2:{d:'Se entrelaza con ÉTER',w:'luz2,shield1',h:'nrg1'}}
+  ]},
+{ n:50, t:'EL DEMONIO DE MAXWELL', s:'La defensa de la tesis', gift:[],
+  talk:[['eter','enojado','Un demonio ordena moléculas sin gastar energía. Si lo logra, tu tesis no vale nada.'],['doc','sorpresa','Eso rompería la segunda ley.'],['eter','neutral','Exacto. Defiende tu tesis.']],
+  tx:{ teo:'El demonio de Maxwell es un experimento mental de 1867: un ser diminuto abre una compuerta solo a las moléculas rápidas y separa lo caliente de lo frío sin gastar energía. Se resolvió más de un siglo después: para elegir, el demonio tiene que medir y borrar información, y eso cuesta energía. La segunda ley sigue en pie.',
+       dato:'En 1961 Rolf Landauer demostró que borrar un bit de información desprende un mínimo de calor. En 2012 se midió en el laboratorio.',
+       fic:'El demonio era ficción; mi tesis, no. La defendí ante ÉTER, que me puso un 10… «para no tener que volver a escucharla».' },
+  P:[
+   {k:'b',t:'Primera compuerta',d:'Las moléculas rápidas se van todas a un lado.',sc:'Un lado caliente, otro frío',w:'cool2,nrg1',h:'fuel1',hp:280,T:60,dps:1.6},
+   e('orb',{z:32,t:'Germanio',d:'El elemento que Mendeléyev predijo.',T:160}),
+   e('esp',{mix:['Ne','Hg','Na'],opts:['Ne','Hg','Na','H','He','Cu'],t:'Ciudad de noche',d:'Neones, tubos y farolas: tres elementos.',T:140}),
+   {k:'f',z:20,a:40,t:'Calcio estelar',d:'Silicio-28 + carbono-12.',r:'Si28+C12',T:150},
+   {k:'b',t:'El demonio separa',d:'Un lado de la nave hierve y el otro se congela.',sc:'Calor separado del frío',w:'cool1,fuel1,inert1',h:'cond1',hp:240,T:60,dps:1.6},
+   {k:'r',id:'R_DAN',t:'Batería de emergencia',d:'Una pila de Daniell para el sistema de respaldo.',T:150},
+   {k:'s',n:8,mix:['ZNSO4','LI2O','LICOO2','SICL4','TIO2','AGCL','NAFT','MGB2'],t:'Ordenar el caos',d:'Ocho sustancias de tu tesis, todas mezcladas.',T:220},
+   {k:'b',fat:2,t:'Demonio adaptativo',d:'Recuerda lo que lanzas: la resistencia crece el doble de rápido.',sc:'Memoria del demonio',w:'cuant2,cond1',h:'luz1',hp:260,T:60,dps:1.6},
+   e('orb',{z:36,t:'Kriptón',d:'Un gas noble: todos sus pisos llenos.',T:170}),
+   {k:'b',boss:1,fat:2,mut:12,t:'EL DEMONIO DE MAXWELL',d:'Mide cada molécula que lanzas y abre la compuerta solo a las que le convienen. Varía, mira el escáner y no te repitas.',sc:'Rompe la segunda ley (ficción)',w:'cuant2,nrg1,luz1',h:'cool1',hp:260,T:90,dps:1.6,ph2:{d:'Borra su memoria para seguir midiendo',w:'cool2,cond1',h:'nrg1'}}
+  ]}
+);
+
+</script>
+<script>
+/* ============================================================
    DOC ELEMENT · ENGINE  (química, núcleos, batalla, partida)
    Sin DOM: se puede probar en Node o en el bot.
    ============================================================ */
@@ -2399,14 +2650,15 @@ const ROOMS = [
   { id: 'react', n: 'Reactor', s: 'mezclar sustancias', ic: '⇄', r: [310, 126, 160, 170], doc: [438, 296] },
   { id: 'lab', n: 'Laboratorio', s: 'armar moléculas', ic: '⚛', r: [476, 126, 300, 170], doc: [528, 296] },
   { id: 'gen', n: 'Genética', s: 'leer el ADN', ic: '⚭', r: [782, 126, 160, 170], doc: [908, 296] },
-  { id: 'puente', n: 'Puente', s: 'misiones y amenazas', ic: '☣', p: 'M948 126 H1040 C1140 126 1226 204 1243 296 H948Z', t: [958, 156], doc: [990, 296], b: [1192, 196] },
+  { id: 'puente', n: 'Puente', s: 'misiones y amenazas', ic: '☣', p: 'M948 126 H1040 C1140 126 1226 204 1243 296 H948Z', t: [958, 156], doc: [990, 296], b: [1192, 196], bb: [948, 126, 295, 170] },
   { id: 'bodega', n: 'Bodega', s: 'tus frascos', ic: '⚱', r: [124, 304, 180, 170], doc: [272, 474] },
   { id: 'destil', n: 'Destilería', s: 'separar líquidos', ic: '⚗', r: [310, 304, 170, 170], doc: [450, 474] },
   { id: 'eter', n: 'ÉTER', s: 'mente de la nave', ic: '◉', r: [486, 304, 150, 170] },
   { id: 'cryo', n: 'Criogenia', s: 'escuela y memoria', ic: '❄', r: [642, 304, 200, 170], doc: [810, 474] },
   { id: 'cult', n: 'Cultivo', s: 'seres vivos', ic: '❀', r: [848, 304, 170, 170], doc: [988, 474] },
-  { id: 'tx', n: 'Transmisiones', s: 'videos de Doc', ic: '▶', p: 'M1024 304 H1243 C1226 396 1140 474 1040 474 H1024Z', t: [1034, 334], doc: [1124, 466], b: [1196, 336] },
-  { id: 'antena', n: 'Antena', s: 'reto diario y duelos', ic: '📡', p: 'M846 18 H1050 V108 H846Z', t: [958, 52], b: [1036, 32], ext: 1 }
+  { id: 'tx', n: 'Transmisiones', s: 'videos de Doc', ic: '▶', p: 'M1024 304 H1243 C1226 396 1140 474 1040 474 H1024Z', t: [1034, 334], doc: [1124, 466], b: [1196, 336], bb: [1024, 304, 219, 170] },
+  { id: 'obs', n: 'Observatorio', s: 'átomos y luz', ic: '✺', p: 'M596 14 H884 V110 H596Z', bb: [596, 14, 288, 96], t: [602, 56], b: [872, 30], ext: 1 },
+  { id: 'antena', n: 'Antena', s: 'reto diario y duelos', ic: '📡', p: 'M900 18 H1130 V108 H900Z', bb: [900, 18, 230, 90], t: [1004, 52], b: [1114, 32], ext: 1 }
 ];
 const ROOM = {}; ROOMS.forEach(r => ROOM[r.id] = r);
 const esc = s => DE.esc(s);
@@ -2442,8 +2694,10 @@ const IN = {
     <ellipse cx="902" cy="466" rx="44" ry="6" class="k1"/>${rect(856, 466, 92, 6, 'bench')}`,
   tx: () => `${rect(1036, 360, 74, 46, 'f0 k1 thick')}<path d="M1066 372 L1084 383 L1066 394Z" fill="#ffc23a"/><path d="M1046 410 H1100 M1073 406 V418" class="k2"/>
     <circle cx="1180" cy="362" r="18" class="k2"/><circle cx="1180" cy="362" r="4" fill="#a42cff"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="1180" cy="351" r="3.5" class="f1" transform="rotate(${a} 1180 362)"/>`).join('')}`,
-  antena: () => `<path d="M884 108 V74" class="k2 thick"/><path d="M856 44 Q872 84 912 76" class="k1 thick f0"/><path d="M872 60 L896 40" class="k1"/><circle cx="898" cy="38" r="4" fill="#ffc23a"/>
-    <g class="wave"><path d="M908 30 Q918 38 912 50" class="k3"/><path d="M916 22 Q932 38 920 58" class="k3" opacity=".6"/></g>`
+  antena: () => `<path d="M934 108 V74" class="k2 thick"/><path d="M906 44 Q922 84 962 76" class="k1 thick f0"/><path d="M922 60 L946 40" class="k1"/><circle cx="948" cy="38" r="4" fill="#ffc23a"/>
+    <g class="wave"><path d="M958 30 Q968 38 962 50" class="k3"/><path d="M966 22 Q982 38 970 58" class="k3" opacity=".6"/></g>`,
+  obs: () => `<path d="M748 112 A62 58 0 0 1 872 112Z" fill="rgba(57,200,255,.1)" class="k1 thick"/><path d="M768 112 A42 40 0 0 1 852 112 M810 54 V112" class="k1" opacity=".45"/>${STARS(754, 64, 110, 44, 9, 11)}
+    <g transform="rotate(-28 810 100)"><rect x="800" y="52" width="20" height="50" rx="4" class="f1 k3"/><rect x="796" y="48" width="28" height="10" rx="3" class="f1 k3"/></g><circle cx="810" cy="104" r="6" fill="#ffc23a"/>`
 };
 /* estrellas con semilla (siempre iguales) */
 function STARS(x, y, w, h, n, seed) { const r = DE.mulberry(seed); let s = ''; for (let i = 0; i < n; i++) { const a = r(); s += `<circle cx="${(x + r() * w).toFixed(1)}" cy="${(y + r() * h).toFixed(1)}" r="${(.6 + a * 1.4).toFixed(1)}" class="${a > .8 ? 'tw' : 'st'}"/>`; } return s; }
@@ -2459,7 +2713,7 @@ function plate(r) {
 }
 function badge(r) { const [bx, by] = r.b || [r.r[0] + r.r[2] - 20, r.r[1] + 22]; return `<g class="bdg"><circle cx="${bx}" cy="${by}" r="15"/><text x="${bx}" y="${by + 7}" class="badge">!</text></g>`; }
 function lock(r, why) {
-  const [x, y, w, h] = r.r, cx = x + w / 2, cy = y + h / 2 + 8;
+  const [x, y, w, h] = r.r || r.bb, cx = x + w / 2, cy = y + h / 2 + 8;
   return `${rect(x, y, w, h, 'shade')}<rect x="${cx - 13}" y="${cy - 8}" width="26" height="20" rx="3" class="f1 k3"/><path d="M${cx - 8} ${cy - 8} V${cy - 15} A8 8 0 0 1 ${cx + 8} ${cy - 15} V${cy - 8}" class="k3 thick"/><text x="${cx}" y="${cy + 34}" class="rs mid">${esc(why)}</text>`;
 }
 function svg(vm) {
@@ -2557,7 +2811,7 @@ const ADS = { on: () => CFG.ADS && CFG.EDITION !== 'pro', inter(cb) { cb(); } };
 
 /* ---------- personajes y comunicaciones ---------- */
 const rankN = () => { const s = D.totalStars(S); return s >= 420 ? 4 : s >= 240 ? 3 : s >= 140 ? 2 : s >= 30 ? 1 : 0; };
-const SEASON = L => L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
+const SEASON = L => L > 40 ? ['5', 'Tesis'] : L > 30 ? ['4', 'Organismos'] : L > 20 ? ['3', 'Genes'] : L > 10 ? ['2', 'Fármacos'] : ['1', 'Núcleo'];
 let TQ = [], TCB = null;
 let LASTL = null;
 function showLine(l) {
@@ -3097,6 +3351,7 @@ function startProblem(L, i) {
   closeModal(); const p = LEVELS[L - 1].P[i]; if (!p) return;
   if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior', 'bad');
   if (CH) chalEnd(true);
+  if (L === 41 && !S.seen.s5i) { S.seen.s5i = 1; save(); if (!QUIET) { slides(STORY.s5i, () => { levelTalk(41); startProblem(L, i); }); return; } }
   if (L === 31 && !S.seen.s4i) { S.seen.s4i = 1; save(); if (!QUIET) { slides(STORY.s4i, () => { levelTalk(31); startProblem(L, i); }); return; } }
   if (L === 21 && !S.seen.s3i) { S.seen.s3i = 1; save(); if (!QUIET) { slides(STORY.s3i, () => { levelTalk(21); startProblem(L, i); }); return; } }
   if (L === 11 && !S.seen.s2i) { S.seen.s2i = 1; save(); if (!QUIET) { slides(STORY.s2i, () => { levelTalk(11); startProblem(L, i); }); return; } }
@@ -3107,6 +3362,7 @@ function startProblem(L, i) {
   if (p.k === 's') { startSort(L, i); return; }
   if (p.k === 'g') { DE.genes.start(L, i); return; }
   if (p.k === 'o') { DE.org.start(L, i); return; }
+  if (p.k === 'e') { DE.obs.start(L, i); return; }
   MIS = { L, i, p, t: p.T, T: p.T, hint: false, late: false };
   const g = dOf(L).g;
   setTab('lab');
@@ -3359,17 +3615,17 @@ function detail(id) {
   }
   modal(html); const m = $('#miniCv'); if (m && lay) drawMini(m, lay);
 }
-const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀' };
+const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '⚭', o: '❀', e: '✺' };
 /* ============================================================
    LA NAVE: cada sala es un botón dibujado (ship.js)
    ============================================================ */
-const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente' };
-const KIND_OF = { destil: 's', gen: 'g', cult: 'o' };
+const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente', e: 'obs' };
+const TYPED = ['destil', 'gen', 'cult', 'obs'], roomOfP = p => p.room || ROOM_OF[p.k] || 'lab';
 const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
-const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
+const ROOM_INFO = { lab: 'Arrastra átomos al centro y únelos por sus manos. Cuando ninguna mano quede libre, pulsa CREAR.', react: 'Mezcla sustancias de tus frascos y balancea la receta: los átomos de los dos lados deben ser iguales.', forge: 'Une núcleos en el acelerador: los protones (Z) dicen qué elemento sale. Así nacen los elementos nuevos.', destil: 'Separa líquidos: vierte capa por capa hasta dejar un solo color por tubo.', gen: 'El ADN se escribe con A, T, G y C. Aquí lo copias, lo traduces y lo reparas.', cult: 'Estudia seres vivos sin tocarlos: partes de la célula, microbios, defensas y brotes.', obs: 'El techo de cristal de la nave: aquí ves los átomos por dentro (orbitales) y la luz de las estrellas (espectros).', puente: 'El mapa de misiones y amenazas de cada nivel.', bodega: 'Todo lo que has creado: elementos, compuestos, polímeros e híbridos.', tx: 'Los guiones de video que narra Doc, uno por nivel.', eter: 'La mente de la nave: guía, ajustes, créditos y más.', cryo: 'Aquí despertaste. Los demás durmientes siguen en sus cápsulas. En el espejo de tu cápsula puedes cambiar tu aspecto.', antena: 'Reto diario y duelos con amigos por LAN o Bluetooth.' };
 const firstL = k => { const i = LEVELS.findIndex(l => l.P.some(p => p.k === k)); return i < 0 ? 1 : i + 1; };
-function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
-function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: ROOM_OF[p.k] || 'lab' }; }
+function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', 'o'], ['obs', 'e']].forEach(([id, k]) => { const n = firstL(k); if (S.unl < n && !S.set.sandbox) lk[id] = 'Se abre en el nivel ' + n; }); return lk; }
+function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: roomOfP(p) }; }
 function renderHub() {
   const box = $('#hub'); if (!box) return; const n = nextInfo(), se = SEASON(n ? n.L : S.cur), RM = DE.ship.ROOM;
   box.innerHTML = DE.ship.svg({ next: n && n.room, threat: n && n.p.k === 'b', locks: roomLocks(), newFr: NEWFR, nFr: Object.keys(S.fr).length, lvl: S.cur, mood: n ? 'feliz' : 'loco', rank: rankN(), eter: n && n.p.k === 'b' ? 'enojado' : 'neutral' });
@@ -3387,16 +3643,16 @@ function roomBar() {
 function openRoom(id) {
   const r = DE.ship.ROOM[id]; if (!r) return; const lk = roomLocks()[id];
   if (lk) { sfx('bad'); return toast(esc(r.n) + ': ' + esc(lk), 'bad'); }
-  sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = KIND_OF[id];
+  sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = TYPED.includes(id);
   if (!here && !k && ENTER[id]) return ENTER[id]();
-  const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => p.k === k && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
+  const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => roomOfP(p) === id && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
   modal(`<div class="pag">Ouroboros · sala</div><h2 class="mega">${r.ic} ${esc(r.n)}</h2><p class="kick">${esc(r.s)}</p><p>${esc(ROOM_INFO[id] || '')}</p>
     ${here ? `<button class="btn pri wide" data-act="go" data-arg="${n.L},${n.i}">▶ Misión: ${esc(n.p.t)} · nivel ${n.L}</button>` : ''}
     <div class="row" style="margin-top:8px">${ENTER[id] ? `<button class="btn gh" data-act="roomin" data-arg="${id}">Entrar sin misión</button>` : ''}${!here && n ? `<button class="btn gh" data-act="go" data-arg="${n.L},${n.i}">Siguiente misión: ${esc(n.p.t)} (${esc(DE.ship.ROOM[n.room].n)})</button>` : ''}</div>
     ${done.length ? `<div class="sec-t">Repetir</div><div class="row">${done.map(([L, i, p]) => `<button class="btn sm" data-act="go" data-arg="${L},${i}">N${L}·${i + 1} ${esc(p.t)} ${'★'.repeat(S.prog[D.pk(L, i)])}</button>`).join('')}</div>` : k && !here ? '<p class="m sm">Todavía no resuelves problemas de esta sala.</p>' : ''}`);
 }
 function cryoSheet() {
-  const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4]].filter(e => e[2] && STORY[e[0]]);
+  const eps = [['intro', 'El despertar', 1], ['ending', 'Final de la temporada 1', S.end >= 1], ['s2i', 'Temporada 2', S.seen.s2i], ['s2e', 'Final de la temporada 2', S.end >= 2], ['s3i', 'Temporada 3', S.seen.s3i], ['s3e', 'Final de la temporada 3', S.end >= 3], ['s4i', 'Temporada 4', S.seen.s4i], ['s4e', 'Final de la temporada 4', S.end >= 4], ['s5i', 'Temporada 5', S.seen.s5i], ['s5e', 'Final de la temporada 5', S.end >= 5]].filter(e => e[2] && STORY[e[0]]);
   modal(`<div class="res"><div class="por big">${D.CH.doc('triste', rankN())}</div><div><div class="pag">Ouroboros · cubierta B</div><h2 class="mega">❄ Criogenia</h2><p>${esc(ROOM_INFO.cryo)}</p><div class="row"><button class="btn pri" data-act="school">🍼 Química para bebés (1 min)</button><button class="btn" data-act="custom">🪞 Espejo: tu personaje</button></div></div></div>
     <div class="sec-t">Recuerdos · la historia hasta ahora</div><div class="row">${eps.map(e => `<button class="btn sm" data-act="story" data-arg="${e[0]}">▶ ${esc(e[1])}</button>`).join('')}</div>`);
 }
@@ -3441,18 +3697,18 @@ function renderMap() {
   const box = $('#mapBody'); if (!box) return; const L = S.cur, lv = LEVELS[L - 1];
   $('#lvls').innerHTML = LEVELS.map(l => `<button class="${l.n === L ? 'on' : ''} ${D.levelDone(S, l.n) ? 'done' : ''} ${l.n > S.unl ? 'lock' : ''}" data-act="lvl" data-arg="${l.n}" aria-label="Nivel ${l.n}">${l.n > S.unl ? '·' : l.n}</button>`).join('');
   const pts = lv.P.map((p, i) => [60 + i * 96, 112 + Math.sin(i * 1.3) * 56]);
-  const nodes = lv.P.map((p, i) => { const k = D.pk(L, i), st = S.prog[k] || 0, open = D.problemOpen(S, L, i), nx = open && !st; return `<button class="node ${p.boss ? 'boss' : ''} ${st ? 'done' : ''} ${open ? '' : 'lock'} ${nx ? 'next' : ''}" style="left:${pts[i][0]}px;top:${pts[i][1]}px" data-act="open" data-arg="${L},${i}" aria-label="Problema ${i + 1}"><span class="ic">${p.boss ? '✹' : ICON[p.k]}</span><span class="nn">${i + 1}</span><span class="st">${st ? '★'.repeat(st) : ''}</span></button>`; }).join('');
+  const nodes = lv.P.map((p, i) => { const k = D.pk(L, i), st = S.prog[k] || 0, open = D.problemOpen(S, L, i), nx = open && !st; return `<button class="node ${p.boss ? 'boss' : ''} ${st ? 'done' : ''} ${open ? '' : 'lock'} ${nx ? 'next' : ''}" style="left:${pts[i][0]}px;top:${pts[i][1]}px" data-act="open" data-arg="${L},${i}" aria-label="Problema ${i + 1}"><span class="ic">${p.boss ? '✹' : p.ic || ICON[p.k]}</span><span class="nn">${i + 1}</span><span class="st">${st ? '★'.repeat(st) : ''}</span></button>`; }).join('');
   const d = dOf(L), lvlTag = d.g === 3 ? 'Guiado' : d.g === 2 ? 'Aprendiz' : d.g === 1 ? (d.rg <= 1 ? 'Medio' : 'Difícil') : 'Experto', se = SEASON(L);
   box.innerHTML = `<div class="sect"><span class="outline">${L}</span><div><div class="pag">Temporada ${se[0]} · ${se[1]} · ${D.starsOf(S, L)}/30 ★ · dificultad: ${lvlTag}</div><h2 class="mega">${esc(lv.t)}</h2><p class="kick">${esc(lv.s)}</p></div></div>
   <div class="map"><div class="mapin"><svg viewBox="0 0 1020 230" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#4d1785" stroke-width="3" stroke-dasharray="8 7"/></svg>${nodes}</div></div>
-  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
+  <div class="row" style="margin-top:8px"><button class="btn" data-act="txl" data-arg="${L}">▶ Transmisión ${L}</button><span class="m sm">⚗ síntesis · ⇄ reacción · ⛓ polímero · ☢ forja · ⚱ destilación · ⚭ genética · ❀ cultivo · ✺ observatorio · ☣ batalla · ✹ jefe · ayudas: ${['solo nombre', 'lista de átomos', 'plano sin H', 'plano completo'][d.g]}</span></div>`;
   const lc = $('#lvls .on'); if (lc && lc.scrollIntoView) lc.scrollIntoView({ inline: 'center', block: 'nearest' });
   const map = $('.map', box), nx = $('.node.next', box); if (map && nx) map.scrollLeft = Math.max(0, parseFloat(nx.style.left) - map.clientWidth / 2);
 }
 function openProblem(L, i) {
   const p = LEVELS[L - 1].P[i]; if (!D.problemOpen(S, L, i)) return toast('Resuelve primero el problema anterior');
-  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: 'Cultivo' }[p.k];
-  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
+  const st = S.prog[D.pk(L, i)] || 0, kind = p.boss ? 'Jefe' : { m: 'Síntesis', p: 'Polímero', f: 'Forja', b: 'Batalla', r: 'Reacción', s: 'Destilación', g: 'Genética', o: p.room === 'obs' ? 'Observatorio' : 'Cultivo', e: 'Observatorio' }[p.k];
+  const tgt = p.k === 'b' ? `Escáner: ${esc(p.sc)}<br>Amenaza ${p.hp}` : p.k === 'f' ? `Objetivo: Z = ${p.z}${p.a ? ' · A = ' + p.a : ''} · ${esc(D.elem(p.z).name)}${p.det ? ' (basta detectarlo)' : ''}` : p.k === 'r' ? `Reacción: ${esc(REACT.rx[p.id].name)}` : p.k === 's' ? `${p.n} sustancias · ${p.n + 2} tubos` : p.k === 'g' ? { pair: 'Completar la doble hélice', rna: 'Transcribir el ADN a ARN', fix: p.tgt ? 'Editar el gen hacia el objetivo' : 'Encontrar y corregir la mutación', trad: 'Traducir los codones a proteína' }[p.mode] : p.k === 'o' ? { cel: 'Señalar las partes de: ' + esc(ORG.CELL[p.cel || 'bact'][0]), ord: 'Ordenar: ' + esc(p.rule || ''), cls: 'Clasificar: ' + esc(p.rule || ''), epi: 'Contener el brote · a salvo ' + p.save + ' o más' }[p.mode] : p.k === 'e' ? (p.mode === 'orb' ? 'Llenar los orbitales de ' + esc(D.elem(p.z).name) : 'Identificar ' + (p.mix.length > 1 ? p.mix.length + ' elementos' : 'el elemento') + ' por su espectro') : `Objetivo: ${dOf(L).g ? nameOf(p.id).html : esc(nameOf(p.id).name)}`;
   modal(`<div class="res"><div class="por big">${D.CH.eter(p.k === 'b' ? 'enojado' : 'neutral')}</div><div><div class="pag">Nivel ${L} · Problema ${i + 1} / 10${dOf(L).fail ? '' : ' · sin prisa'}</div><div class="boxed spaced">${spaced(kind)}</div><h2 class="mega">${esc(p.t)}</h2><p>${esc(p.d)}</p><div class="film">${tgt}<br>Tiempo: ${p.T} s</div>${st ? `<div class="stars" style="font-size:22px">${'★'.repeat(st)}</div>` : ''}<div class="row" style="margin-top:10px"><button class="btn pri" data-act="go" data-arg="${L},${i}">${p.k === 'b' ? 'Preparar mazo' : 'Iniciar'} ▸</button><button class="btn gh" data-act="close">Cerrar</button></div></div></div>`);
 }
 function renderTx() {
@@ -3468,7 +3724,7 @@ function txLevel(L) {
    ============================================================ */
 function cover() {
   const c = document.createElement('div'); c.className = 'cover'; c.id = 'cover'; const has = S.intro || Object.keys(S.prog).length;
-  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–4 · Núcleo, Fármacos, Genes y Organismos</div></div>
+  c.innerHTML = `<div class="cband"><div>${esc(CFG.STUDIO)}</div><div>Temporadas 1–5 · Núcleo, Fármacos, Genes, Organismos y Tesis</div></div>
   <svg class="cship" viewBox="0 0 1280 600" aria-hidden="true">${DE.ship.hull(1)}</svg><div class="cgrid"><div class="ctitle"><div class="srf">Química real, núcleos, polímeros, vida, ficción y más</div><h1 class="mega">Doc</h1><h1 class="mega b2">Element</h1><span class="kick">¿Sabes de qué está hecho todo?</span></div>
   <div class="cside"><div class="cpor"><div class="por">${D.CH.doc('loco', 2)}</div><div class="por">${D.CH.eter('feliz')}</div></div><div class="ctag">Crea elementos.<br>Resuelve el universo.</div><div class="cbtns">${has ? '<button class="btn pri" data-act="cont">Continuar ▸</button>' : ''}<button class="btn ${has ? 'gh' : 'pri'}" data-act="newgame">${has ? 'Nueva partida' : 'Despertar ▸'}</button>${has ? '<button class="btn gh" data-act="schoolC">🍼 Química para bebés (1 min)</button>' : ''}</div></div></div>
   <div class="cfoot"><span class="pag">Por: ${esc(CFG.STUDIO)} · ${esc(CFG.PUBLISHER)}</span><span class="adv">Lab advisory<b>Verídico</b>Contenido seguro</span><span class="mega">El laboratorio más actual</span></div>`;
@@ -3536,7 +3792,7 @@ const ACT = {
   resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
   look: a => { const i = a.indexOf(':'); lookSet(a.slice(0, i), a.slice(i + 1)); }, lookRand: () => { const O = DE.CH.OPT, o = {}; Object.keys(O).forEach(k => { const q = O[k], vs = (q.k || q.c).map((x, i) => q.k ? x : i).filter(v => !lookLocked(k, v)); o[k] = vs[Math.floor(Math.random() * vs.length)]; }); S.look = DE.CH.setLook(o); sfx('tap'); lookRender(); },
   lookReset: () => { S.look = DE.CH.setLook({}); sfx('tap'); lookRender(); }, lookDone: () => lookDone(), custom: () => custom(),
-  hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
+  hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4, s5e: 5 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
   nuc: k => addNuc(k), unslot: i => { Forge.slots[+i] = null; renderForge(); }, flux: d => { Forge.flux = D.clamp(Forge.flux + (+d), 0, 40); renderForge(); }, fuse: () => fuse(), fclear: () => { Forge.slots = [null, null, null]; Forge.flux = 0; renderForge(); },
@@ -3556,7 +3812,7 @@ const ACT = {
   tocover: () => { closeModal(); cover(); }, cont: () => enterGame(), schoolC: () => { enterGame(); if (DE.school) DE.school.start(() => renderSide()); },
   newgame: () => { if ((S.intro || Object.keys(S.prog).length) && !confirm('¿Empezar de cero? Se borrará tu partida actual.')) return; S = D.newState(); S.seen = {}; save(true); clearLab(true); Forge.log = []; enterGame(); },
   snext: () => { if (SI < SLIDES.length - 1) { SI++; slide(); } else endSlides(); }, sskip: () => endSlides(),
-  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
+  ending: n => { closeModal(); S.end = Math.max(S.end || 0, +n || 1); save(); slides(+n === 5 ? STORY.s5e : +n === 4 ? STORY.s4e : +n === 3 ? STORY.s3e : +n === 2 ? STORY.s2e : STORY.ending, () => credits()); }
 };
 document.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b) { if (e.target.id === 'ov' && modalClose) closeModal(); return; } const f = ACT[b.dataset.act] || (DE.ACTX && DE.ACTX[b.dataset.act]); if (f) f(b.dataset.arg, b, e); });
 document.addEventListener('input', e => { if (e.target.id === 'lookName') { S.name = e.target.value.trim().slice(0, 14) || 'Doc'; save(); } });
@@ -3582,6 +3838,7 @@ function tick(dt) {
   if (BT) { BAT.step(BT.b, dt); battleUI(); }
   if (DE.genes) DE.genes.tick(dt);
   if (DE.org) DE.org.tick(dt);
+  if (DE.obs) DE.obs.tick(dt);
   regen += dt; if (regen >= 2) { regen = 0; if (S.en < 100) { S.en++; hud(); } }
 }
 let anaT = 0;
@@ -3609,7 +3866,7 @@ function boot() {
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
   <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
-  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="toast" aria-live="polite"></div>
+  <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="obsOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
@@ -3937,7 +4194,7 @@ function render() {
       <div class="egrid" style="grid-template-columns:repeat(${g.w},var(--ec))">${g.c.map((v, j) => v === '#' ? '<span class="ec w"></span>' : `<button class="ec ${v === 'X' ? 'x' : v === 'V' ? 'v' : 's'}${OG.fresh.includes(j) ? ' new' : ''}${j === hint ? ' hintc' : ''}" data-act="ogCell" data-arg="${j}" aria-label="${v === 'X' ? 'brote' : v === 'V' ? 'protegida' : 'sana'}">${v === 'V' ? '✚' : ''}</button>`).join('')}</div>
       <div class="m sm"><span class="lg s"></span> sana · <span class="lg v"></span> protegida · <span class="lg x"></span> brote · turno ${OG.turn}</div>`;
   }
-  el.innerHTML = `<div class="bt-top"><span class="mega">❀ ${esc(p.t)}</span><span class="m">Errores ${OG.errs}</span><span class="tm" id="ogT">${Math.ceil(OG.t)}</span><button class="btn gh sm" data-act="ogQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OG.msg ? OG.msg[1] : ''}">${esc(OG.msg ? OG.msg[0] : p.d)}</p>${body}</div>`;
+  el.innerHTML = `<div class="bt-top"><span class="mega">${p.ic || '❀'} ${esc(p.t)}</span><span class="m">Errores ${OG.errs}</span><span class="tm" id="ogT">${Math.ceil(OG.t)}</span><button class="btn gh sm" data-act="ogQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OG.msg ? OG.msg[1] : ''}">${esc(OG.msg ? OG.msg[0] : p.d)}</p>${body}</div>`;
 }
 function wrong(msg) { const k = K(); OG.errs++; OG.t = Math.max(0, OG.t - 3); k.sfx('bad'); k.vib(60); OG.msg = [msg || '', 'bad']; render(); const b = $('#orgOv .gbody'); if (b) b.classList.add('shake'); }
 function right(msg) { const k = K(); k.sfx('bond'); k.vib(10); OG.msg = msg ? [msg, 'ok'] : null; render(); }
@@ -3989,6 +4246,117 @@ function solve() {
 DE.ACTX = DE.ACTX || {};
 Object.assign(DE.ACTX, { ogPart: x => part(x), ogPick: x => pick(x), ogCat: x => cat(x), ogCell: x => cell(x), ogQuit: () => quit() });
 DE.org = { start, tick, solve, part, pick, cat, cell, quit, active: () => !!OG, state: () => OG, DRAW };
+})();
+
+</script>
+<script>
+/* ============================================================
+   DOC ELEMENT · OBSERVATORIO (Temporada 5)
+   orb: llenar los orbitales de un átomo (Aufbau, Hund y Pauli) → explica las "manos" del laboratorio
+   esp: identificar elementos por su espectro de emisión (líneas reales en nm, aproximadas)
+   ============================================================ */
+'use strict';
+(function () {
+const K = () => DE.k, $ = s => document.querySelector(s), esc = DE.esc;
+/* ---------- orbitales ---------- */
+const SUB = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p', '5s', '4d', '5p'];
+const CAP = { s: 1, p: 3, d: 5 };
+const SUP = n => String(n).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('');
+/* subcapas que necesita Z (más una vacía de distractor) */
+function subsFor(z) { const out = []; let left = z; for (const s of SUB) { out.push(s); left -= 2 * CAP[s[1]]; if (left <= 0) break; } const i = SUB.indexOf(out[out.length - 1]); if (SUB[i + 1]) out.push(SUB[i + 1]); return out; }
+/* reparto correcto (para validar, resolver y mostrar la configuración) */
+function fill(z) { const o = {}; let left = z; for (const s of SUB) { const n = CAP[s[1]], e = Math.max(0, Math.min(left, 2 * n)); o[s] = Array.from({ length: n }, (_, i) => e > i ? (e > n + i ? 2 : 1) : 0); left -= e; if (left <= 0) break; } return o; }
+const confOf = b => SUB.filter(s => b[s] && b[s].some(x => x)).map(s => s + SUP(b[s].reduce((a, x) => a + x, 0))).join(' ');
+const unpaired = b => Object.values(b).flat().filter(x => x === 1).length;
+/* ---------- espectros: líneas de emisión visibles más fuertes (nm, aproximadas) ---------- */
+const SPEC = {
+  H: [410.2, 434.0, 486.1, 656.3], He: [447.1, 471.3, 492.2, 501.6, 587.6, 667.8, 706.5], Li: [460.3, 610.4, 670.8], Na: [589.0, 589.6],
+  K: [404.4, 766.5, 769.9], Ca: [393.4, 396.8, 422.7], Cu: [510.6, 515.3, 521.8], Ba: [455.4, 493.4, 553.5], Sr: [407.8, 421.6, 460.7],
+  Ne: [585.2, 588.2, 594.5, 603.0, 609.6, 614.3, 621.7, 626.6, 633.4, 640.2, 650.7, 659.9, 692.9, 703.2], Hg: [404.7, 435.8, 546.1, 577.0, 579.1],
+  Fe: [404.6, 432.6, 438.4, 440.5, 495.8, 527.0, 532.8], Mg: [516.7, 517.3, 518.4], O: [557.7, 630.0, 636.4]
+};
+const SPN = { H: 'Hidrógeno', He: 'Helio', Li: 'Litio', Na: 'Sodio', K: 'Potasio', Ca: 'Calcio', Cu: 'Cobre', Ba: 'Bario', Sr: 'Estroncio', Ne: 'Neón', Hg: 'Mercurio', Fe: 'Hierro', Mg: 'Magnesio', O: 'Oxígeno' };
+function wl(nm) { // longitud de onda → color aproximado
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = (440 - nm) / 60; b = 1; } else if (nm < 490) { g = (nm - 440) / 50; b = 1; } else if (nm < 510) { g = 1; b = (510 - nm) / 20; } else if (nm < 580) { r = (nm - 510) / 70; g = 1; } else if (nm < 645) { r = 1; g = (645 - nm) / 65; } else r = 1;
+  const f = nm < 420 ? .35 + .65 * (nm - 380) / 40 : nm > 700 ? .35 + .65 * (780 - nm) / 80 : 1, c = v => Math.round(255 * Math.pow(Math.max(0, v) * f, .8));
+  return `rgb(${c(r)},${c(g)},${c(b)})`;
+}
+const X = nm => ((nm - 380) / 400 * 100).toFixed(2);
+const bar = (lines, cls) => `<div class="spec ${cls || ''}">${lines.map(n => `<i style="left:${X(n)}%;background:${wl(n)};box-shadow:0 0 6px ${wl(n)}"></i>`).join('')}</div>`;
+const ruler = `<div class="spec rule"></div><div class="specnm"><span>400 nm</span><span>500</span><span>600</span><span>700 nm</span></div>`;
+let OB = null;
+function start(L, i) {
+  const p = LEVELS[L - 1].P[i], k = K(), st = { L, i, p, t: p.T, T: p.T, errs: 0 };
+  if (p.mode === 'orb') { st.subs = subsFor(p.z); st.goal = fill(p.z); st.box = {}; st.subs.forEach(s => st.box[s] = Array(CAP[s[1]]).fill(0)); st.n = 0; }
+  else { st.mix = p.mix.slice(); st.sel = []; st.lines = [...new Set(p.mix.flatMap(e => SPEC[e]))].sort((a, b) => a - b); }
+  OB = st; $('#obsOv').hidden = false; render(); k.sfx('tap');
+}
+function render() {
+  if (!OB) return; const p = OB.p; let body = '';
+  if (p.mode === 'orb') {
+    const e = D().elem(p.z);
+    const rows = OB.subs.slice().reverse().map(s => `<div class="orow"><b>${s}</b><span class="obx">${OB.box[s].map((c, j) => `<button class="ob${c ? ' f' + c : ''}" data-act="obBox" data-arg="${s}:${j}" aria-label="Caja ${j + 1} de ${s}">${c === 2 ? '↑↓' : c ? '↑' : ''}</button>`).join('')}</span></div>`).join('');
+    body = `<div class="orb"><div class="ladder"><div class="lbl">Energía ↑</div>${rows}</div>
+      <div class="oinfo"><div class="ptile" style="--c:var(--ink)"><small>${p.z}</small><b>${e.sym}</b><span>${esc(e.name)}</span></div>
+      <div class="m">Electrones: <b class="w">${OB.n}</b> / ${p.z}</div><div class="conf">${confOf(OB.box) || '—'}</div>
+      <div class="rules"><span>① Abajo primero</span><span>② Uno en cada caja antes de emparejar</span><span>③ Máximo 2 por caja (↑↓)</span></div></div></div>`;
+  } else {
+    const multi = OB.mix.length > 1;
+    body = `<div class="rule">${multi ? `Esta luz mezcla <b>${OB.mix.length}</b> elementos: marca todos y pulsa Comprobar.` : 'Compara las rayas de colores: cada elemento tiene su «código de barras».'}</div>
+      <div class="lbl">Muestra misteriosa</div>${bar(OB.lines, 'big')}${ruler}
+      <div class="sopts">${p.opts.map(x => `<button class="sopt${OB.sel.includes(x) ? ' on' : ''}" data-act="obPick" data-arg="${x}"><b>${x}</b><small>${esc(SPN[x])}</small>${bar(SPEC[x])}</button>`).join('')}</div>
+      ${multi ? `<button class="btn pri" data-act="obCheck" ${OB.sel.length ? '' : 'disabled'}>Comprobar (${OB.sel.length})</button>` : ''}`;
+  }
+  $('#obsOv').innerHTML = `<div class="bt-top"><span class="mega">✺ ${esc(p.t)}</span><span class="m">Errores ${OB.errs}</span><span class="tm" id="obT">${Math.ceil(OB.t)}</span><button class="btn gh sm" data-act="obQuit">Salir</button></div><div class="gbody"><p class="m sm fbk ${OB.msg ? OB.msg[1] : ''}">${esc(OB.msg ? OB.msg[0] : p.d)}</p>${body}</div>`;
+}
+const D = () => DE;
+function wrong(msg) { const k = K(); OB.errs++; OB.t = Math.max(0, OB.t - 3); k.sfx('bad'); k.vib(60); OB.msg = [msg, 'bad']; render(); const b = $('#obsOv .gbody'); if (b) b.classList.add('shake'); }
+function right(msg) { const k = K(); k.sfx('bond'); k.vib(10); OB.msg = msg ? [msg, 'ok'] : null; render(); }
+function done(extra) {
+  const g = OB, k = K(); OB = null; $('#obsOv').hidden = true; const used = 1 - Math.max(0, g.t) / g.T;
+  const stars = g.late ? 1 : g.errs === 0 && used <= .45 ? 3 : used <= .75 && g.errs <= 2 ? 2 : 1;
+  if (extra) k.toast(extra, 'ok'); k.say('win'); k.win(g.L, g.i, stars, Math.max(0, Math.round(g.t)) * 2);
+}
+/* el siguiente electrón: la subcapa más baja sin llenar; primero uno por caja, después se emparejan */
+function want() { for (const s of OB.subs) { const g = OB.goal[s], b = OB.box[s]; if (!g) return null; const have = b.reduce((a, x) => a + x, 0), need = g.reduce((a, x) => a + x, 0); if (have < need) return { s, single: have < b.length }; } return null; }
+function box(arg) {
+  if (!OB || OB.p.mode !== 'orb') return; const [s, j] = arg.split(':'), b = OB.box[s], w = want(); if (!b || !w) return; const c = b[+j];
+  if (c >= 2) return wrong('Esa caja ya tiene dos electrones (↑↓). En una caja caben como máximo dos, girando al revés.');
+  if (SUB.indexOf(s) > SUB.indexOf(w.s)) return wrong(`Primero el piso de abajo: falta llenar ${w.s}. Los electrones ocupan primero la energía más baja.`);
+  if (SUB.indexOf(s) < SUB.indexOf(w.s)) return wrong('Ese piso ya está lleno.');
+  if (w.single && c === 1) return wrong('Regla de Hund: un electrón en cada caja del piso antes de emparejar.');
+  b[+j]++; OB.n++;
+  if (OB.n >= OB.p.z) { const e = DE.elem(OB.p.z), u = unpaired(OB.box), v = DE.valence(e.sym); return done(`${e.name}: ${confOf(OB.box)} · ${u} sin pareja${u && v.includes(u) ? ' = ' + u + ' mano' + (u > 1 ? 's' : '') + ' en el laboratorio' : ''}`); }
+  right();
+}
+function pick(x) {
+  if (!OB || OB.p.mode !== 'esp') return;
+  if (OB.mix.length > 1) { OB.sel = OB.sel.includes(x) ? OB.sel.filter(y => y !== x) : OB.sel.concat(x); K().sfx('tap'); OB.msg = null; return render(); }
+  if (x === OB.mix[0]) return done(`¡Es ${SPN[x]}! Sus rayas coinciden una por una.`);
+  wrong(`${SPN[x]} tiene otras rayas. Busca un elemento con una raya en cada lugar donde la muestra brilla.`);
+}
+function check() {
+  if (!OB || OB.p.mode !== 'esp') return; const miss = OB.mix.filter(x => !OB.sel.includes(x)), extra = OB.sel.filter(x => !OB.mix.includes(x));
+  if (!miss.length && !extra.length) return done('¡Análisis correcto! ' + OB.mix.map(x => SPN[x]).join(', ') + '.');
+  wrong(extra.length ? `Sobra ${SPN[extra[0]]}: sus rayas no están en la muestra.` : `Falta uno: quedan rayas de la muestra sin explicar.`);
+}
+function tick(dt) {
+  if (!OB) return; OB.t -= dt; const e = $('#obT'); if (e) { e.textContent = Math.max(0, Math.ceil(OB.t)); e.classList.toggle('low', OB.t < 10); }
+  if (OB.t <= 0 && !OB.late) { const k = K(); if (k.dOf(OB.L).fail) { const g = OB; OB = null; $('#obsOv').hidden = true; k.lose(g.L, g.i, 'Se acabó el tiempo.', 'Orbitales: abajo primero, uno por caja y luego en parejas. Espectros: cada raya de la muestra debe tener dueño.'); } else OB.late = true; }
+}
+function quit() { if (!OB) return; const g = OB, k = K(); OB = null; $('#obsOv').hidden = true; k.lose(g.L, g.i, 'Saliste del observatorio.', 'Ve despacio: un electrón o una raya a la vez.'); }
+/* solución automática (para el bot y el validador) */
+function solve() {
+  let n = 0;
+  while (OB && n++ < 200) {
+    if (OB.p.mode === 'orb') { const w = want(); if (!w) break; const j = OB.box[w.s].findIndex(c => w.single ? c === 0 : c === 1); box(w.s + ':' + j); }
+    else if (OB.mix.length > 1) { OB.sel = OB.mix.slice(); check(); } else pick(OB.mix[0]);
+  }
+}
+DE.ACTX = DE.ACTX || {};
+Object.assign(DE.ACTX, { obBox: a => box(a), obPick: x => pick(x), obCheck: () => check(), obQuit: () => quit() });
+DE.obs = { start, tick, solve, box, pick, check, quit, active: () => !!OB, state: () => OB, SPEC, fill, subsFor, confOf, want: () => OB && want() };
 })();
 
 </script>
@@ -4090,6 +4458,8 @@ const TIPS = {
     { t: 'Sala de Genética', p: 'El ADN se escribe con cuatro letras. Las parejas son fijas: <b>A con T</b> y <b>G con C</b> (en el ARN, la T se cambia por <b>U</b>). Toca la letra que falta y la sala te dice si acertaste.', target: '#geneOv .gbody', btn: '¡Vale!' }],
   tip_org: () => [
     { t: 'Sala de Cultivo', p: 'Aquí estudias seres vivos sin tocar ninguno. Lee la pregunta de arriba y toca la respuesta: un círculo <b>?</b>, un botón o una casilla. Si fallas, la sala te explica por qué.', target: '#orgOv .gbody', btn: '¡Vale!' }],
+  tip_obs: () => [
+    { t: 'Observatorio', p: 'Aquí miras los átomos por dentro. <b>Orbitales</b>: toca la caja más baja libre; primero uno por caja y luego en parejas. <b>Espectros</b>: busca el elemento con las mismas rayas de color que la muestra.', target: '#obsOv .gbody', btn: '¡Vale!' }],
   tip_battle: () => [
     { t: 'La batalla', p: 'Este es el problema. La barra <span class="bad">rosada</span> es su vida; la <span class="ok">verde</span>, tu nave. El reloj está en pausa mientras te explico.', target: '#bstrip', btn: 'Entendido' },
     { t: 'Construye', p: 'Arma moléculas aquí, como siempre. Si ves un plano punteado, síguelo: es la molécula que más daño hace.', target: '#cvWrap', btn: 'Entendido' },
@@ -4098,7 +4468,7 @@ const TIPS = {
 function autoTips() {
   const k = K(); if (!k || k.quiet() || !k.S().seen.school && !k.S().intro) return; const s = k.S().seen;
   if (document.getElementById('cover') || document.getElementById('story') || !document.getElementById('ov').hidden) return;
-  const key = DE.org && DE.org.active() ? 'tip_org' : DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
+  const key = DE.obs && DE.obs.active() ? 'tip_obs' : DE.org && DE.org.active() ? 'tip_org' : DE.genes && DE.genes.active() ? 'tip_gene' : k.BT() ? 'tip_battle' : k.SO() ? 'tip_sort' : k.TAB() === 'lab' && k.Lab.mode === 'react' ? 'tip_react' : k.TAB() === 'lab' && k.Lab.mode === 'forge' ? 'tip_forge' : null;
   if (key && !s[key] && (key !== 'tip_battle' || $('#bstrip:not([hidden])'))) run(key, TIPS[key](), { skip: 'Cerrar' });
 }
 function skipTips() { const s = K().S().seen; Object.keys(TIPS).forEach(k => s[k] = 1); s.school = 1; if (RUN) finish(false); }
@@ -4209,6 +4579,10 @@ function selfTest() {
         else if (p.mode === 'cls') { if (!p.rule || !p.cats || p.cats.length < 2 || !p.items || !p.items.length || p.items.some(x => !(x[1] >= 0 && x[1] < p.cats.length))) E.push(tag + 'clasificación mal definida'); else if (p.cats.some((_, j) => !p.items.some(x => x[1] === j))) W.push(tag + 'categoría sin ejemplos'); }
         else if (p.mode === 'epi') { const w = p.map && p.map[0].length; if (!p.map || p.map.some(r => r.length !== w || /[^.X#V]/.test(r)) || !(p.per >= 1) || !p.map.join('').includes('X')) E.push(tag + 'brote mal definido'); else { const r = ORG.run(p, ORG.sol(p)); if (r < p.save) E.push(tag + 'la solución del brote salva ' + r + ' de ' + p.save); } }
         else E.push(tag + 'modo de cultivo desconocido');
+      } else if (p.k === 'e') {
+        if (p.mode === 'orb') { if (!(Number.isInteger(p.z) && p.z >= 1 && p.z <= 36) || p.z === 24 || p.z === 29) E.push(tag + 'orbital fuera de rango (1–36, sin Cr ni Cu)'); }
+        else if (p.mode === 'esp') { const SP = DE.obs.SPEC; if (!p.mix || !p.mix.length || !p.opts || p.mix.some(x => !p.opts.includes(x)) || p.opts.some(x => !SP[x]) || new Set(p.opts).size !== p.opts.length) E.push(tag + 'espectro mal definido'); }
+        else E.push(tag + 'modo de observatorio desconocido');
       } else E.push(tag + 'tipo desconocido ' + p.k);
     });
   });
@@ -4280,6 +4654,8 @@ function solver() {
             fight(U, S, out);
           } else if (p.k === 'g') {
             U.startProblem(L.n, i); if (!DE.genes.active()) throw new Error('no abrió la sala de genética'); DE.genes.solve();
+          } else if (p.k === 'e') {
+            U.startProblem(L.n, i); if (!DE.obs.active()) throw new Error('no abrió el observatorio'); DE.obs.solve(); if (DE.obs.active()) throw new Error('el observatorio no terminó');
           } else if (p.k === 'o') {
             U.startProblem(L.n, i); if (!DE.org.active()) throw new Error('no abrió la sala de cultivo'); DE.org.solve(); if (DE.org.active()) throw new Error('la sala de cultivo no terminó');
           } else if (p.k === 's') {
@@ -4338,6 +4714,7 @@ function monkey(n, seed) {
     rx: () => { const ids = [...Object.keys(U.state().fr).filter(id => DB.comp[id]), '@Fe', '@Al', '@Na', '@C', '@S', '@Mg']; if (r() < .3) { U.React.L = []; U.React.R = []; } U.rxAdd(pickA(ids)); if (U.React.L.length) U.rxCoef(r() < .5 ? 'L' : 'R', 0, r() < .5 ? 1 : -1); if (r() < .5) U.react(); },
     rxReal: () => { const rx = pickA(Object.values(REACT.rx)); U.React.L = []; U.React.R = []; rx.L.forEach(([, id]) => U.rxAdd(id)); U.React.L = rx.L.map(t => t.slice()); U.React.R = rx.R.map(t => t.slice()); U.react(); },
     gene: () => { if (!DE.genes.active()) { const q = openP('g'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.genes.state(); if (r() < .5) DE.genes.solve(); else if (g.p.mode === 'fix') DE.genes.sel(Math.floor(r() * g.pat.length)); else if (g.p.mode === 'trad') DE.genes.aa(pickA(Object.keys(GENE.AA))); else DE.genes.tap(pickA(['A', 'T', 'G', 'C', 'U'])); } },
+    obs: () => { if (!DE.obs.active()) { const q = openP('e'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.obs.state(); if (r() < .4) DE.obs.solve(); else if (g.p.mode === 'orb') { const s = pickA(g.subs); DE.obs.box(s + ':' + Math.floor(r() * g.box[s].length)); } else if (r() < .7) DE.obs.pick(pickA(g.p.opts)); else DE.obs.check(); } },
     org: () => { if (!DE.org.active()) { const q = openP('o'); if (q) U.startProblem(q[0], q[1]); } else { const g = DE.org.state(), m = g.p.mode; if (r() < .4) DE.org.solve(); else if (m === 'cel') DE.org.part(pickA(Object.keys(ORG.PART))); else if (m === 'ord') DE.org.pick(Math.floor(r() * g.p.items.length)); else if (m === 'cls') DE.org.cat(Math.floor(r() * 3)); else DE.org.cell(Math.floor(r() * (g.g.c.length + 2))); } },
     sort: () => { if (!U.SO()) { const q = openP('s'); if (q) U.startProblem(q[0], q[1]); } else U.sortTap(Math.floor(r() * (U.SO().st.length + 1))); },
     hint: () => U.useHint(),
@@ -4380,6 +4757,7 @@ function monkey(n, seed) {
       if (U.SO()) U.squit();
       if (DE.genes.active()) DE.genes.quit();
       if (DE.org.active()) DE.org.quit();
+      if (DE.obs.active()) DE.obs.quit();
     }
   } catch (e) { errors.push('abortado: ' + e.message); }
   finally { U.quiet(false); U.setState(JSON.parse(keep)); U.clearLab(true); U.closeModal(); }
