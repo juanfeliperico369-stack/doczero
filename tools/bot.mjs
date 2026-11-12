@@ -125,6 +125,9 @@ for (const v of views) {
       for (let q = 0; q < 8; q++) { const w = await ev(() => { const s = DE.obs.state(), w = DE.obs.want(); if (!w) return null; return w.s + ':' + s.box[w.s].findIndex(c => w.single ? c === 0 : c === 1); }); if (!w) break; if (q === 4 && shots) await page.screenshot({ path: `${shots}/${v.name}-orbitales.png` }); await click(`#obsOv [data-act=obBox][data-arg="${w}"]`); }
       ui.push('orbitales por clics: ' + (await ev(() => DE.k.S().prog['41-1'] || 0)) + '★');
       await ev(() => DE.ui.closeModal());
+      // logros y tripulación
+      await click('[data-act=menu]'); await click('.sheet [data-act=logros]'); ui.push('logros: ' + (await ev(() => document.querySelectorAll('.sheet .ach').length === DE.ui.ACH.length && !!DE.k.S().ach.enlace)));
+      await ev(() => DE.ui.closeModal());
       ui.push('consejos de sala vistos: ' + tips);
       // la nave: cada sala dibujada es un botón; las puertas de la cabecera cambian de sala
       for (const rm of ['bodega', 'puente', 'tx', 'lab']) { await click('#hud [data-act=nave]'); await click(`#ship [data-act=room][data-arg=${rm}]`); if (await ev(() => !document.getElementById('ov').hidden)) await click('.sheet [data-act=roomin]'); }

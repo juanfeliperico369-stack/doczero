@@ -1,5 +1,20 @@
 # Bitácora de Doc Element
 
+## v3.3.0 — La tripulación: logros, tripulantes y voz (2026-11-12)
+1. Tripulación: al terminar cada temporada despierta un tripulante con su propio aspecto. Se queda en su sala de la nave y, si lo tocas, da un consejo por el intercomunicador.
+   - Temporada 1: Ingeniera Vega (Forja).
+   - Temporada 2: Farmacéutico Ibarra (Bodega).
+   - Temporada 3: Bióloga Nakamura (Genética).
+   - Temporada 4: Doctor Adeyemi (Cultivo).
+   - Temporada 5: Astrónoma Ríos (Observatorio).
+   - En Criogenia se ven las cápsulas abiertas y la cuenta de despiertos.
+2. Logros: 19 medallas con barra de progreso (moléculas, fusiones, híbridos, colección, 3 estrellas, escuela, estilo, explorador, racha, orbitales, Eternio, temporadas, rango).
+   - Se abren desde el menú o tocando el rango en la cabecera.
+   - Al ganar uno, avisa.
+3. Premios de logros en el espejo: Casco de forja (Forjador), Órbitas (Cuántico) y Traje dorado (Tesis aprobada).
+4. Voz: en Ajustes, «Leer en voz alta» usa el sintetizador del dispositivo para leer a ÉTER, a Doc, a la tripulación y los pasos de la Escuela. Cada personaje tiene su tono. El botón 🔊 del intercomunicador repite la frase actual aunque la voz esté apagada.
+5. Al importar una partida, también se carga el aspecto del personaje.
+
 ## v3.2.0 — Temporada 5: TESIS y Observatorio (2026-11-11)
 1. 10 niveles nuevos (41–50) y 100 problemas: orbitales, tabla periódica, luz, estrellas, energía, electricidad, materiales, catálisis, cuántica y el Demonio de Maxwell. El juego llega a 50 niveles y 500 problemas.
 2. Sala nueva: el **Observatorio**, una cúpula en el techo de la nave (`src/obs.js`).

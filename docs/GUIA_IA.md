@@ -212,6 +212,14 @@ Adelantos de la temporada 2 ya incluidos como descubrimientos ocultos: cafeína 
 - Si una sala con contorno curvo puede quedar bloqueada, debe tener `bb` (caja) para dibujar el candado.
 - La temporada 6 (FASE DIOS, 51–100) queda anunciada en el final de la temporada 5.
 
+## 7j. Tripulación, logros y voz (v3.3, ui.js)
+- `CREW`: `{ n, s (temporada), at [x, piso] en la nave, look, tips }`. Aparece si `seasonDone(s)`. Toca → `showLine(['crew', ánimo, consejo, look, nombre])`.
+- `ACH`: `[id, icono, nombre, descripción, condición, progreso?, premio?]`.
+  - `checkAch()` corre en `hud()`; guarda en `S.ach[id]` la fecha.
+  - Los premios del espejo se declaran en `DE.CH.OPT[k].ach = { valor: idLogro }`.
+- `VOZ.say(texto, quién, forzar)` usa speechSynthesis (es). No suena en pruebas ni en modo silencioso. `S.set.voz` lo activa. La Escuela llama a `K().voz`.
+- Para clics de prueba sobre personajes animados de la nave, usar `force: true` (se mueven).
+
 ## 8. Cómo agregar contenido
 - **Compuesto:** fila en `COMPOUNDS`: `[id, fórmula, nombre, SMILES (alternativas separadas por espacio), 'etiq3,etiq1', descripción, 'M' si es monómero]`. El bot verifica que el SMILES dé la fórmula y que la clave no se repita.
 - **Problema:** objeto en `LEVELS[n].P`. El bot verifica que tenga solución con lo que el jugador puede tener en ese momento: elementos regalados, forjados antes y compuestos posibles.

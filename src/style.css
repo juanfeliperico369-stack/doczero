@@ -549,7 +549,7 @@ input{-webkit-user-select:text;user-select:text}
 .swk.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.5)}.swk.on small{color:var(--wht)}
 .swk.lock,.swc.lock{opacity:.45}
 .swk i{position:absolute;top:2px;right:2px;font-style:normal;font-size:9px;background:#000;color:var(--amb);padding:0 3px;border-radius:6px}
-#ship .docw:focus-visible{outline:2px solid var(--amb)}
+
 @media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
 @media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
 /* ---------- observatorio (temporada 5) ---------- */
@@ -578,3 +578,17 @@ input{-webkit-user-select:text;user-select:text}
 .sopt.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.45)}
 @media (max-height:520px){.ob{width:34px;height:28px;font-size:16px}.orow b{font-size:17px}.ladder{gap:3px}.oinfo .ptile{width:62px;height:62px}.spec.big{height:34px}.sopt{padding:4px 6px}.sopt b{font-size:21px}}
 @media (orientation:portrait){.orb{grid-template-columns:1fr}}
+/* ---------- logros, tripulación y voz ---------- */
+#hRk{cursor:pointer}
+#cVoz{position:absolute;right:6px;top:5px;width:26px;height:24px;border:1px solid var(--pur2);border-radius:12px;font-size:12px;line-height:1;z-index:1;background:#05010b}
+#ship .crew{cursor:pointer}#ship .crew,#ship .docw{outline:none}
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:7px}
+.ach{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;border:2px solid var(--pur2);border-radius:10px;padding:7px 9px;background:var(--pn);opacity:.7}
+.ach.ok{opacity:1;border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.25)}
+.ach>i{font-style:normal;font-size:22px;text-align:center;color:var(--amb)}
+.ach b{display:block;font-family:var(--fd);font-size:17px;color:var(--wht);font-weight:400;text-transform:uppercase}
+.ach small{display:block;font-size:11px;color:var(--ink2)}
+.ach em{display:block;font-style:normal;font-size:11px;color:var(--grn)}
+.ach .tbar{display:block;margin-top:3px}
+.crewc{display:flex;flex-direction:column;align-items:center;gap:3px;width:86px;text-align:center}
+.crewc .por{width:62px;height:62px}.crewc small{font-size:10.5px;color:var(--ink2)}.crewc.off .por{opacity:.25;background:#05010b}

@@ -23,7 +23,7 @@ function rectOf(t) { if (!t) return null; if (typeof t === 'function') return t(
 function render() {
   const c = ensure(), st = RUN.steps[RUN.i]; c.hidden = false;
   c.querySelector('.cm-por').innerHTML = st.who === 'doc' ? DE.CH.doc(st.mood || 'feliz', 1) : DE.CH.eter(st.mood || 'feliz');
-  c.querySelector('.cm-t').textContent = st.t; c.querySelector('.cm-p').innerHTML = st.p;
+  c.querySelector('.cm-t').textContent = st.t; c.querySelector('.cm-p').innerHTML = st.p; if (K().voz) K().voz(st.t + '. ' + st.p, st.who || 'eter');
   c.querySelector('.cm-row').innerHTML = (st.btn ? `<button class="btn pri sm" data-act="cmNext">${st.btn}</button>` : '<span class="m sm">Hazlo y sigo solo ✨</span>') + (RUN.skip ? `<button class="btn gh sm" data-act="cmSkip">${RUN.skip}</button>` : '') + `<span class="cm-n">${RUN.i + 1}/${RUN.steps.length}</span>`;
   place(performance.now());
 }

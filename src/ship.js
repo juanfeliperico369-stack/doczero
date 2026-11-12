@@ -51,7 +51,7 @@ const IN = {
     <path d="M330 376 Q350 360 370 376 T410 376" class="k2"/>`,
   eter: vm => `${[[492, 352, 528, 380], [630, 352, 594, 380], [492, 450, 526, 424], [630, 450, 596, 424]].map(([a, b, c, d]) => `<path d="M${a} ${b} Q${(a + c) / 2} ${b + 20} ${c} ${d}" class="k2"/>`).join('')}
     <circle cx="561" cy="402" r="58" class="k2 dash spin" style="transform-origin:561px 402px"/>${DE.CH.eter(vm.eter || 'neutral').replace('<svg ', '<svg x="511" y="352" width="100" height="100" ')}`,
-  cryo: () => `${[650, 694, 738].map((x, i) => `<g><rect x="${x}" y="356" width="38" height="112" rx="19" class="${i ? 'pod' : 'pod open'}"/>${i ? `<circle cx="${x + 19}" cy="384" r="8" fill="#8fb3ff" opacity=".5"/><path d="M${x + 7} 420 Q${x + 19} 396 ${x + 31} 420 V452 H${x + 7}Z" fill="#8fb3ff" opacity=".35"/>` : `<path d="M${x + 38} 360 L${x + 50} 368 V460 L${x + 38} 466" class="k1"/>`}<circle class="led l${i}" cx="${x + 19}" cy="364" r="3"/></g>`).join('')}`,
+  cryo: vm => `<text x="812" y="404" class="mono">${vm.awake || 0}/5</text><text x="812" y="422" class="rs mid">despiertos</text>${[650, 694, 738].map((x, i) => `<g><rect x="${x}" y="356" width="38" height="112" rx="19" class="${i && i > (vm.awake || 0) ? 'pod' : 'pod open'}"/>${i && i > (vm.awake || 0) ? `<circle cx="${x + 19}" cy="384" r="8" fill="#8fb3ff" opacity=".5"/><path d="M${x + 7} 420 Q${x + 19} 396 ${x + 31} 420 V452 H${x + 7}Z" fill="#8fb3ff" opacity=".35"/>` : `<path d="M${x + 38} 360 L${x + 50} 368 V460 L${x + 38} 466" class="k1"/>`}<circle class="led l${i}" cx="${x + 19}" cy="364" r="3"/></g>`).join('')}`,
   cult: () => `<path d="M862 462 Q862 392 902 392 Q942 392 942 462Z" class="k5 f0" opacity=".9"/><path d="M902 462 V420 M902 432 Q886 420 880 428 Q890 440 902 436 M902 424 Q918 410 926 420 Q914 432 902 428" class="k5"/>
     <ellipse cx="902" cy="466" rx="44" ry="6" class="k1"/>${rect(856, 466, 92, 6, 'bench')}`,
   tx: () => `${rect(1036, 360, 74, 46, 'f0 k1 thick')}<path d="M1066 372 L1084 383 L1066 394Z" fill="#ffc23a"/><path d="M1046 410 H1100 M1073 406 V418" class="k2"/>
@@ -86,6 +86,7 @@ function svg(vm) {
     rooms += `<g class="room${nx ? ' next' : ''}${lk ? ' lock' : ''}${r.ext ? ' ext' : ''}" data-act="room" data-arg="${r.id}" role="button" tabindex="0" aria-label="${esc(r.n + ': ' + r.s + (lk ? ' (' + lk + ')' : nx ? ' · siguiente misión' : ''))}">${shape}<g class="rin">${IN[r.id](vm)}</g>${plate(r)}${lk ? lock(r, lk) : ''}${nx ? badge(r) : ''}</g>`;
   });
   const spot = (ROOM[vm.next] && ROOM[vm.next].doc && !vm.locks[vm.next] ? ROOM[vm.next] : ROOM.lab).doc;
+  const crew = (vm.crew || []).map((c, i) => `<g class="crew" data-act="crew" data-arg="${c.i}" role="button" tabindex="0" aria-label="${esc(c.n)}: tócalo para un consejo" transform="translate(${c.at[0] - 22} ${c.at[1] - 91}) scale(.45)"><g class="docb" style="animation-delay:-${i * .7}s">${DE.CH.body(c.mood || 'neutral', 0, c.look)}</g></g>`).join('');
   const docG = `<g class="docw" data-act="custom" role="button" tabindex="0" aria-label="Tu personaje: tócalo para cambiar su aspecto" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
   return `<svg id="ship" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid meet" aria-label="Nave Ouroboros">
   <defs><pattern id="haz" width="16" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-40)"><rect width="8" height="8" fill="#ffc23a"/><rect x="8" width="8" height="8" fill="#000"/></pattern>
@@ -97,7 +98,7 @@ function svg(vm) {
   <path d="M124 126 H1040 C1140 126 1226 204 1244 300 C1226 396 1140 474 1040 474 H124Z" class="inner"/>
   ${rooms}
   ${rect(124, 296, 1120, 8, 'deck')}
-  ${docG}
+  ${crew}${docG}
   <text x="214" y="520" class="stencil">OUROBOROS</text>
   </svg>`;
 }
