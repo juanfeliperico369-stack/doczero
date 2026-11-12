@@ -571,7 +571,7 @@ input{-webkit-user-select:text;user-select:text}
 .swk.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.5)}.swk.on small{color:var(--wht)}
 .swk.lock,.swc.lock{opacity:.45}
 .swk i{position:absolute;top:2px;right:2px;font-style:normal;font-size:9px;background:#000;color:var(--amb);padding:0 3px;border-radius:6px}
-#ship .docw:focus-visible{outline:2px solid var(--amb)}
+
 @media (max-height:520px){.cprev .full{height:min(56vh,190px);width:104px}.cprev .por.big{display:none}.swk{width:54px}.swk .mini{width:40px;height:40px}.swc{width:30px;height:30px}.sheet .cust+.row{margin-top:6px}}
 @media (orientation:portrait){.cust{grid-template-columns:1fr}.cprev{position:relative;flex-direction:row;justify-content:center}}
 /* ---------- observatorio (temporada 5) ---------- */
@@ -600,6 +600,20 @@ input{-webkit-user-select:text;user-select:text}
 .sopt.on{border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.45)}
 @media (max-height:520px){.ob{width:34px;height:28px;font-size:16px}.orow b{font-size:17px}.ladder{gap:3px}.oinfo .ptile{width:62px;height:62px}.spec.big{height:34px}.sopt{padding:4px 6px}.sopt b{font-size:21px}}
 @media (orientation:portrait){.orb{grid-template-columns:1fr}}
+/* ---------- logros, tripulación y voz ---------- */
+#hRk{cursor:pointer}
+#cVoz{position:absolute;right:6px;top:5px;width:26px;height:24px;border:1px solid var(--pur2);border-radius:12px;font-size:12px;line-height:1;z-index:1;background:#05010b}
+#ship .crew{cursor:pointer}#ship .crew,#ship .docw{outline:none}
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:7px}
+.ach{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;border:2px solid var(--pur2);border-radius:10px;padding:7px 9px;background:var(--pn);opacity:.7}
+.ach.ok{opacity:1;border-color:var(--amb);box-shadow:0 0 10px rgba(255,194,58,.25)}
+.ach>i{font-style:normal;font-size:22px;text-align:center;color:var(--amb)}
+.ach b{display:block;font-family:var(--fd);font-size:17px;color:var(--wht);font-weight:400;text-transform:uppercase}
+.ach small{display:block;font-size:11px;color:var(--ink2)}
+.ach em{display:block;font-style:normal;font-size:11px;color:var(--grn)}
+.ach .tbar{display:block;margin-top:3px}
+.crewc{display:flex;flex-direction:column;align-items:center;gap:3px;width:86px;text-align:center}
+.crewc .por{width:62px;height:62px}.crewc small{font-size:10.5px;color:var(--ink2)}.crewc.off .por{opacity:.25;background:#05010b}
 
 </style></head><body><noscript>Doc Element necesita JavaScript activado.</noscript>
 <script>
@@ -620,7 +634,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    ============================================================ */
 'use strict';
 const CFG = {
-  VERSION: '3.2.0',
+  VERSION: '3.3.0',
   URL: 'https://juanfeliperico369-stack.github.io/doczero/',
   EDITION: 'free',          // 'free' = con anuncios · 'pro' = sin anuncios (3 USD en tiendas)
   DONATE_URL: '',           // Página Oficial → donaciones (vacío = "próximamente")
@@ -2382,7 +2396,7 @@ function cardPow(c) { return c.kind === 'el' ? 1 : c.kind === 'poly' ? 1.6 : c.k
 /* ---------- partida ---------- */
 function newState() {
   return { v: 1, intro: 0, unl: 1, cur: 1, prog: {}, el: { H: 1, O: 1 }, nuc: { p: 1, n: 1 }, fr: {}, hyb: {}, en: 100, sc: 0,
-    set: { snd: 1, mus: 1, vib: 1, sandbox: 0 }, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', look: {}, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
+    set: { snd: 1, mus: 1, vib: 1, sandbox: 0, voz: 0 }, ach: {}, seen: {}, pt: {}, daily: { last: '', streak: 0, best: {} }, name: 'Doc', look: {}, eternio: 0, end: 0, st: { synth: 0, fuse: 0, win: 0, fail: 0, hyb: 0 } };
 }
 function sanitize(S) {
   const d = newState();
@@ -2557,8 +2571,8 @@ const OPT = {
   hair: { t: 'Peinado', k: ['tupe', 'corto', 'rizos', 'largo', 'mono', 'cresta', 'calvo'], n: ['Tupé', 'Corto', 'Rizos', 'Largo', 'Moño', 'Cresta', 'Rapado'], req: { cresta: 60 } },
   hc: { t: 'Color de pelo', c: ['#5b2bd6', '#1f6fd1', '#d61f8c', '#16a36b', '#7a4a22', '#1c1626', '#b8321f', '#e6e6f0', '#e0a91c'], n: ['Morado', 'Azul', 'Rosa', 'Verde', 'Castaño', 'Negro', 'Rojo', 'Plata', 'Dorado'], req: { 8: 140 } },
   eyes: { t: 'Ojos', k: ['visor', 'gafas', 'antiparras', 'nada'], n: ['Visor', 'Gafas', 'Antiparras', 'Sin nada'] },
-  suit: { t: 'Traje', c: ['#0b2a44', '#2a0b44', '#0b3a2a', '#3a0b1a', '#1c1c24', '#dfe8f7'], n: ['Azul noche', 'Morado', 'Verde', 'Granate', 'Grafito', 'Blanco'] },
-  acc: { t: 'Accesorio', k: ['nada', 'bufanda', 'audifonos', 'insignia', 'medalla'], n: ['Ninguno', 'Bufanda', 'Audífonos', 'Insignia', 'Medalla'], req: { audifonos: 30, medalla: 240 } },
+  suit: { t: 'Traje', c: ['#0b2a44', '#2a0b44', '#0b3a2a', '#3a0b1a', '#1c1c24', '#dfe8f7', '#7a5a12'], n: ['Azul noche', 'Morado', 'Verde', 'Granate', 'Grafito', 'Blanco', 'Dorado'], ach: { 6: 't5' } },
+  acc: { t: 'Accesorio', k: ['nada', 'bufanda', 'audifonos', 'insignia', 'medalla', 'casco', 'orbitas'], n: ['Ninguno', 'Bufanda', 'Audífonos', 'Insignia', 'Medalla', 'Casco de forja', 'Órbitas'], req: { audifonos: 30, medalla: 240 }, ach: { casco: 'forja', orbitas: 'cuantico' } },
   fl: { t: 'Matraz', c: ['#ff2fb3', '#2dffb3', '#39c8ff', '#ffc23a'], n: ['Rosa', 'Verde', 'Azul', 'Dorado'] }
 };
 const LOOK0 = { skin: 1, hair: 'tupe', hc: 0, eyes: 'visor', suit: 0, acc: 'nada', fl: 0 };
@@ -2596,7 +2610,9 @@ function parts(mood, rank, look) {
   const mouth = { neutral: '<path d="M44 58 L56 58" stroke="#5a2a2a" stroke-width="2" stroke-linecap="round"/>', feliz: '<path d="M42 56 Q50 63 58 56" stroke="#5a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>', sorpresa: '<ellipse cx="50" cy="59" rx="3.5" ry="4.5" fill="#3a1520"/>', loco: '<path d="M39 55 Q50 66 61 55 Z" fill="#3a1520"/><path d="M41 56 L59 56 L57 58.5 L43 58.5Z" fill="#fff"/>', triste: '<path d="M43 60 Q50 55 57 60" stroke="#5a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>', enojado: '<path d="M43 59 L57 57" stroke="#5a2a2a" stroke-width="2.4" stroke-linecap="round"/>' }[mood];
   const browC = L.hair === 'calvo' ? shade(skin, .45) : shade(hc, .7);
   // accesorios: cabeza (audífonos), cuello (bufanda) y pecho (insignia, medalla), dibujados distinto en retrato y cuerpo
-  const acc = L.acc, ach = acc === 'audifonos' ? '<path d="M27 44 Q27 13 50 13 Q73 13 73 44" stroke="#e9f6ff" stroke-width="3.2" fill="none"/><rect x="22" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/><rect x="69" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/>' : '';
+  const acc = L.acc, ach = acc === 'casco' ? '<path d="M27 35 Q28 9 50 8 Q72 9 73 35Z" fill="#ffc23a" stroke="#7a4a00" stroke-width="1.4"/><path d="M50 8 V35 M38 12 Q36 22 37 35 M62 12 Q64 22 63 35" stroke="#c7741a" stroke-width="1.4" fill="none"/><rect x="23" y="33" width="54" height="6" rx="3" fill="#e0a91c" stroke="#7a4a00" stroke-width="1"/>'
+    : acc === 'orbitas' ? '<g fill="none" stroke="#39c8ff" stroke-width="1.4" opacity=".85"><ellipse cx="50" cy="34" rx="34" ry="9" transform="rotate(-18 50 34)"/><ellipse cx="50" cy="34" rx="34" ry="9" transform="rotate(18 50 34)"/></g><circle cx="19" cy="43" r="2.6" fill="#2dffb3"/><circle cx="81" cy="43" r="2.6" fill="#ff2fb3"/><circle cx="50" cy="25" r="2.2" fill="#ffc23a"/>'
+    : acc === 'audifonos' ? '<path d="M27 44 Q27 13 50 13 Q73 13 73 44" stroke="#e9f6ff" stroke-width="3.2" fill="none"/><rect x="22" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/><rect x="69" y="38" width="9" height="15" rx="4" fill="#ff2fb3" stroke="#000" stroke-width="1"/>' : '';
   const neck = acc === 'bufanda' ? '<path d="M37 64 Q50 73 63 64 L65 72 Q50 81 35 72Z" fill="#ffc23a" stroke="#7a4a00" stroke-width="1"/><path d="M55 73 L60 90 L53 90 L51 75Z" fill="#ffc23a" stroke="#7a4a00" stroke-width="1"/>' : '';
   const chest = (x, y) => acc === 'insignia' ? `<g transform="translate(${x} ${y})"><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2"/><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2" transform="rotate(60)"/><ellipse rx="6" ry="2.4" fill="none" stroke="#ffc23a" stroke-width="1.2" transform="rotate(-60)"/><circle r="1.6" fill="#ff2fb3"/></g>`
     : acc === 'medalla' ? `<path d="M${x - 6} ${y - 18} L${x} ${y - 6} L${x + 6} ${y - 18}" stroke="#ff2fb3" stroke-width="3" fill="none"/><circle cx="${x}" cy="${y}" r="6" fill="#ffc23a" stroke="#7a4a00" stroke-width="1.2"/><path d="M${x} ${y - 3} l1 2 2 .3 -1.5 1.4 .4 2.1 -1.9 -1 -1.9 1 .4 -2.1 -1.5 -1.4 2 -.3z" fill="#7a4a00"/>` : '';
@@ -2689,7 +2705,7 @@ const IN = {
     <path d="M330 376 Q350 360 370 376 T410 376" class="k2"/>`,
   eter: vm => `${[[492, 352, 528, 380], [630, 352, 594, 380], [492, 450, 526, 424], [630, 450, 596, 424]].map(([a, b, c, d]) => `<path d="M${a} ${b} Q${(a + c) / 2} ${b + 20} ${c} ${d}" class="k2"/>`).join('')}
     <circle cx="561" cy="402" r="58" class="k2 dash spin" style="transform-origin:561px 402px"/>${DE.CH.eter(vm.eter || 'neutral').replace('<svg ', '<svg x="511" y="352" width="100" height="100" ')}`,
-  cryo: () => `${[650, 694, 738].map((x, i) => `<g><rect x="${x}" y="356" width="38" height="112" rx="19" class="${i ? 'pod' : 'pod open'}"/>${i ? `<circle cx="${x + 19}" cy="384" r="8" fill="#8fb3ff" opacity=".5"/><path d="M${x + 7} 420 Q${x + 19} 396 ${x + 31} 420 V452 H${x + 7}Z" fill="#8fb3ff" opacity=".35"/>` : `<path d="M${x + 38} 360 L${x + 50} 368 V460 L${x + 38} 466" class="k1"/>`}<circle class="led l${i}" cx="${x + 19}" cy="364" r="3"/></g>`).join('')}`,
+  cryo: vm => `<text x="812" y="404" class="mono">${vm.awake || 0}/5</text><text x="812" y="422" class="rs mid">despiertos</text>${[650, 694, 738].map((x, i) => `<g><rect x="${x}" y="356" width="38" height="112" rx="19" class="${i && i > (vm.awake || 0) ? 'pod' : 'pod open'}"/>${i && i > (vm.awake || 0) ? `<circle cx="${x + 19}" cy="384" r="8" fill="#8fb3ff" opacity=".5"/><path d="M${x + 7} 420 Q${x + 19} 396 ${x + 31} 420 V452 H${x + 7}Z" fill="#8fb3ff" opacity=".35"/>` : `<path d="M${x + 38} 360 L${x + 50} 368 V460 L${x + 38} 466" class="k1"/>`}<circle class="led l${i}" cx="${x + 19}" cy="364" r="3"/></g>`).join('')}`,
   cult: () => `<path d="M862 462 Q862 392 902 392 Q942 392 942 462Z" class="k5 f0" opacity=".9"/><path d="M902 462 V420 M902 432 Q886 420 880 428 Q890 440 902 436 M902 424 Q918 410 926 420 Q914 432 902 428" class="k5"/>
     <ellipse cx="902" cy="466" rx="44" ry="6" class="k1"/>${rect(856, 466, 92, 6, 'bench')}`,
   tx: () => `${rect(1036, 360, 74, 46, 'f0 k1 thick')}<path d="M1066 372 L1084 383 L1066 394Z" fill="#ffc23a"/><path d="M1046 410 H1100 M1073 406 V418" class="k2"/>
@@ -2724,6 +2740,7 @@ function svg(vm) {
     rooms += `<g class="room${nx ? ' next' : ''}${lk ? ' lock' : ''}${r.ext ? ' ext' : ''}" data-act="room" data-arg="${r.id}" role="button" tabindex="0" aria-label="${esc(r.n + ': ' + r.s + (lk ? ' (' + lk + ')' : nx ? ' · siguiente misión' : ''))}">${shape}<g class="rin">${IN[r.id](vm)}</g>${plate(r)}${lk ? lock(r, lk) : ''}${nx ? badge(r) : ''}</g>`;
   });
   const spot = (ROOM[vm.next] && ROOM[vm.next].doc && !vm.locks[vm.next] ? ROOM[vm.next] : ROOM.lab).doc;
+  const crew = (vm.crew || []).map((c, i) => `<g class="crew" data-act="crew" data-arg="${c.i}" role="button" tabindex="0" aria-label="${esc(c.n)}: tócalo para un consejo" transform="translate(${c.at[0] - 22} ${c.at[1] - 91}) scale(.45)"><g class="docb" style="animation-delay:-${i * .7}s">${DE.CH.body(c.mood || 'neutral', 0, c.look)}</g></g>`).join('');
   const docG = `<g class="docw" data-act="custom" role="button" tabindex="0" aria-label="Tu personaje: tócalo para cambiar su aspecto" transform="translate(${spot[0] - 30} ${spot[1] - 122}) scale(.6)"><g class="docb">${DE.CH.body(vm.mood, vm.rank)}</g></g>`;
   return `<svg id="ship" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid meet" aria-label="Nave Ouroboros">
   <defs><pattern id="haz" width="16" height="8" patternUnits="userSpaceOnUse" patternTransform="skewX(-40)"><rect width="8" height="8" fill="#ffc23a"/><rect x="8" width="8" height="8" fill="#000"/></pattern>
@@ -2735,7 +2752,7 @@ function svg(vm) {
   <path d="M124 126 H1040 C1140 126 1226 204 1244 300 C1226 396 1140 474 1040 474 H124Z" class="inner"/>
   ${rooms}
   ${rect(124, 296, 1120, 8, 'deck')}
-  ${docG}
+  ${crew}${docG}
   <text x="214" y="520" class="stencil">OUROBOROS</text>
   </svg>`;
 }
@@ -2816,8 +2833,8 @@ let TQ = [], TCB = null;
 let LASTL = null;
 function showLine(l) {
   const [who, mood, text] = l, el = $('#comms'); if (!el) return; LASTL = l;
-  $('#cPor').innerHTML = who === 'doc' ? D.CH.doc(mood, rankN()) : D.CH.eter(mood);
-  $('#cWho').textContent = who === 'doc' ? (S.name || 'Doc') : 'ÉTER';
+  $('#cPor').innerHTML = who === 'doc' ? D.CH.doc(mood, rankN()) : who === 'crew' ? D.CH.doc(mood, 0, l[3]) : D.CH.eter(mood);
+  $('#cWho').textContent = who === 'doc' ? (S.name || 'Doc') : who === 'crew' ? l[4] : 'ÉTER'; VOZ.say(text, who);
   $('#cTxt').textContent = text; el.className = 'who-' + who;
   $('#cNext').hidden = !TQ.length && !TCB; $('#cNext').textContent = TQ.length ? '▸ ' + TQ.length : '▸';
   el.classList.remove('say'); void el.offsetWidth; el.classList.add('say');
@@ -2831,7 +2848,7 @@ function hud() {
   $('#hLv').innerHTML = 'Nivel <b>' + S.cur + '</b>';
   $('#hEn').innerHTML = '⚡<b>' + Math.round(S.en) + '</b>';
   $('#hSc').innerHTML = '★<b>' + D.totalStars(S) + '</b>';
-  $('#hRk').textContent = D.rankOf(S);
+  $('#hRk').textContent = D.rankOf(S); checkAch();
 }
 let TAB = 'nave', NEWFR = false;
 function setTab(t) {
@@ -3619,6 +3636,60 @@ const ICON = { m: '⚗', p: '⛓', f: '☢', b: '☣', r: '⇄', s: '⚱', g: '�
 /* ============================================================
    LA NAVE: cada sala es un botón dibujado (ship.js)
    ============================================================ */
+/* ---------- tripulación: un tripulante despierta al terminar cada temporada ---------- */
+const CREW = [
+  { n: 'Ingeniera Vega', s: 1, room: 'forja', at: [146, 296], look: { skin: 3, hair: 'mono', hc: 5, eyes: 'antiparras', suit: 4, acc: 'nada', fl: 3 }, tips: ['Fusionar núcleos ligeros da energía; los pesados la cuestan.', 'Z es el número de protones: decide qué elemento sale de la forja.', 'Los neutrones extra no cambian el elemento, solo su masa.'] },
+  { n: 'Farmacéutico Ibarra', s: 2, room: 'bodega', at: [212, 474], look: { skin: 1, hair: 'corto', hc: 4, eyes: 'gafas', suit: 5, acc: 'insignia', fl: 1 }, tips: ['La dosis hace el veneno: hasta el agua en exceso daña.', 'Un antídoto no siempre es lo contrario: a veces bloquea un receptor.', 'Repetir la misma medicina en batalla la hace menos eficaz: varía.'] },
+  { n: 'Bióloga Nakamura', s: 3, room: 'gen', at: [872, 296], look: { skin: 0, hair: 'largo', hc: 5, eyes: 'nada', suit: 2, acc: 'nada', fl: 2 }, tips: ['A con T, G con C. En el ARN, la T se cambia por U.', 'Los codones se leen de tres en tres, como palabras de tres letras.', 'Una sola letra cambiada puede cambiar toda una proteína.'] },
+  { n: 'Doctor Adeyemi', s: 4, room: 'cult', at: [962, 474], look: { skin: 5, hair: 'calvo', hc: 0, eyes: 'gafas', suit: 1, acc: 'bufanda', fl: 1 }, tips: ['Los antibióticos no sirven contra virus.', 'En un brote, cierra primero los pasos estrechos.', 'De cada cien tipos de bacterias, menos de uno enferma.'] },
+  { n: 'Astrónoma Ríos', s: 5, room: 'obs', at: [700, 112], look: { skin: 2, hair: 'rizos', hc: 6, eyes: 'visor', suit: 0, acc: 'orbitas', fl: 2 }, tips: ['Cada elemento tiene su código de barras de luz.', 'Los electrones llenan primero el piso de abajo.', 'El hierro es el último elemento que una estrella fabrica sin explotar.'] }
+];
+const seasonDone = n => LEVELS.filter(l => SEASON(l.n)[0] === String(n)).every(l => D.levelDone(S, l.n));
+const crewAwake = () => CREW.map((c, i) => Object.assign({ i }, c)).filter(c => seasonDone(c.s));
+/* ---------- logros (S.ach = { id: fecha }) ---------- */
+const ACH = [
+  ['enlace', '⚛', 'Primer enlace', 'Crea tu primera molécula.', () => S.st.synth >= 1],
+  ['quimico', '⚗', 'Químico', 'Crea 25 moléculas.', () => S.st.synth >= 25, () => [S.st.synth, 25]],
+  ['alquimista', '✦', 'Alquimista', 'Crea 100 moléculas.', () => S.st.synth >= 100, () => [S.st.synth, 100]],
+  ['forja', '☢', 'Forjador', 'Haz 20 fusiones en la forja.', () => S.st.fuse >= 20, () => [S.st.fuse, 20], 'Casco de forja'],
+  ['inventor', '✷', 'Inventor', 'Crea 5 híbridos que no existían.', () => S.st.hyb >= 5, () => [S.st.hyb, 5]],
+  ['coleccion', '⚱', 'Coleccionista', 'Reúne 50 sustancias en la Bodega.', () => Object.keys(S.fr).length >= 50, () => [Object.keys(S.fr).length, 50]],
+  ['perfecto', '★', 'Perfeccionista', 'Consigue 3 estrellas en 100 problemas.', () => Object.values(S.prog).filter(v => v === 3).length >= 100, () => [Object.values(S.prog).filter(v => v === 3).length, 100]],
+  ['escuela', '🍼', 'Primeros pasos', 'Termina la Escuela de ÉTER.', () => S.seen.school === 1],
+  ['estilo', '🪞', 'Con estilo', 'Cambia el aspecto de tu personaje.', () => JSON.stringify(DE.CH.clean(S.look)) !== JSON.stringify(DE.CH.LOOK0)],
+  ['explorador', '🧭', 'Explorador', 'Entra a 10 salas distintas de la nave.', () => (S.seen.rooms || '').split(',').filter(Boolean).length >= 10, () => [(S.seen.rooms || '').split(',').filter(Boolean).length, 10]],
+  ['racha', '🔥', 'Constante', 'Juega el reto diario 3 días seguidos.', () => (S.daily.streak || 0) >= 3, () => [S.daily.streak || 0, 3]],
+  ['cuantico', 'ψ', 'Cuántico', 'Resuelve 10 problemas de orbitales.', () => orbDone() >= 10, () => [orbDone(), 10], 'Órbitas'],
+  ['eternio', '♾', 'Eternio', 'Forja el elemento 126 en la isla de estabilidad.', () => !!S.eternio],
+  ['t1', '①', 'Temporada 1', 'Termina NÚCLEO. Despierta la Ingeniera Vega.', () => seasonDone(1)],
+  ['t2', '②', 'Temporada 2', 'Termina FÁRMACOS. Despierta el Farmacéutico Ibarra.', () => seasonDone(2)],
+  ['t3', '③', 'Temporada 3', 'Termina GENES. Despierta la Bióloga Nakamura.', () => seasonDone(3)],
+  ['t4', '④', 'Temporada 4', 'Termina ORGANISMOS. Despierta el Doctor Adeyemi.', () => seasonDone(4)],
+  ['t5', '⑤', 'Tesis aprobada', 'Termina TESIS. Despierta la Astrónoma Ríos.', () => seasonDone(5), null, 'Traje dorado'],
+  ['ente', '◉', 'Ente de la Creación', 'Llega al rango máximo.', () => rankN() >= 4]
+];
+const orbDone = () => LEVELS.reduce((a, l) => a + l.P.filter((p, i) => p.k === 'e' && p.mode === 'orb' && S.prog[D.pk(l.n, i)]).length, 0);
+function checkAch() {
+  if (!S.ach) S.ach = {}; const nw = ACH.filter(a => !S.ach[a[0]] && a[4]());
+  nw.forEach(a => { S.ach[a[0]] = Date.now(); if (!QUIET) { toast(`🏅 Logro: <b>${esc(a[2])}</b>${a[6] ? ' · premio: ' + esc(a[6]) : ''}`, 'ok'); sfx('win'); } });
+  if (nw.length) save();
+}
+function achSheet() {
+  checkAch(); const got = ACH.filter(a => S.ach[a[0]]).length;
+  modal(`<div class="pag">Ouroboros · vitrina</div><h2 class="mega">🏅 Logros</h2><p class="kick">${got} de ${ACH.length} · los premios aparecen en el espejo de tu personaje</p>
+    <div class="achs">${ACH.map(a => { const ok = !!S.ach[a[0]], pr = !ok && a[5] ? a[5]() : null; return `<div class="ach${ok ? ' ok' : ''}"><i>${a[1]}</i><div><b>${esc(a[2])}</b><small>${esc(a[3])}</small>${a[6] ? `<em>Premio: ${esc(a[6])}</em>` : ''}${pr ? `<span class="tbar"><i style="width:${Math.min(100, 100 * pr[0] / pr[1])}%"></i></span><small>${Math.min(pr[0], pr[1])} / ${pr[1]}</small>` : ''}</div>${ok ? '<span class="ok">✓</span>' : ''}</div>`; }).join('')}</div>
+    <div class="sec-t">Tripulación despierta · ${crewAwake().length} de ${CREW.length}</div><div class="row">${CREW.map((c, i) => { const on = seasonDone(c.s); return `<div class="crewc${on ? '' : ' off'}"><div class="por">${on ? D.CH.doc('feliz', 0, c.look) : ''}</div><small>${on ? esc(c.n) : '❄ Temporada ' + c.s}</small></div>`; }).join('')}</div>`);
+}
+/* ---------- voz: lee en voz alta (sintetizador del dispositivo, funciona sin internet si tiene voces) ---------- */
+const VOZ = {
+  ok: () => 'speechSynthesis' in window && !TEST && !QUIET,
+  say(text, who, force) {
+    if (!(force || S.set.voz) || !VOZ.ok()) return;
+    try { const ss = speechSynthesis; ss.cancel(); const u = new SpeechSynthesisUtterance(String(text).replace(/<[^>]+>/g, '').replace(/[⚗⚛☢⇄☣✺❀⚭⚱▸▶◂★⚡]/g, ''));
+      const vs = ss.getVoices().filter(v => /^es/i.test(v.lang)); u.lang = 'es-ES'; if (vs.length) u.voice = vs.find(v => /es-(MX|US|419|CO|AR)/i.test(v.lang)) || vs[0];
+      u.rate = .96; u.pitch = who === 'eter' ? .72 : who === 'doc' ? 1.18 : 1; ss.speak(u); } catch (e) { }
+  }
+};
 const ROOM_OF = { m: 'lab', p: 'lab', r: 'react', f: 'forge', s: 'destil', g: 'gen', o: 'cult', b: 'puente', e: 'obs' };
 const TYPED = ['destil', 'gen', 'cult', 'obs'], roomOfP = p => p.room || ROOM_OF[p.k] || 'lab';
 const ENTER = { lab: () => { setTab('lab'); setMode('mol'); }, react: () => { setTab('lab'); setMode('react'); }, forge: () => { setTab('lab'); setMode('forge'); }, bodega: () => setTab('fr'), puente: () => setTab('bt'), tx: () => setTab('tx'), eter: () => menu(), cryo: () => cryoSheet(), antena: () => antenaSheet() };
@@ -3628,7 +3699,8 @@ function roomLocks() { const lk = {}; [['destil', 's'], ['gen', 'g'], ['cult', '
 function nextInfo() { const nx = nextOpen(); if (!nx) return null; const p = LEVELS[nx[0] - 1].P[nx[1]]; return { L: nx[0], i: nx[1], p, room: roomOfP(p) }; }
 function renderHub() {
   const box = $('#hub'); if (!box) return; const n = nextInfo(), se = SEASON(n ? n.L : S.cur), RM = DE.ship.ROOM;
-  box.innerHTML = DE.ship.svg({ next: n && n.room, threat: n && n.p.k === 'b', locks: roomLocks(), newFr: NEWFR, nFr: Object.keys(S.fr).length, lvl: S.cur, mood: n ? 'feliz' : 'loco', rank: rankN(), eter: n && n.p.k === 'b' ? 'enojado' : 'neutral' });
+  const cw = crewAwake();
+  box.innerHTML = DE.ship.svg({ crew: cw, awake: cw.length, next: n && n.room, threat: n && n.p.k === 'b', locks: roomLocks(), newFr: NEWFR, nFr: Object.keys(S.fr).length, lvl: S.cur, mood: n ? 'feliz' : 'loco', rank: rankN(), eter: n && n.p.k === 'b' ? 'enojado' : 'neutral' });
   $('#hubGo').innerHTML = MIS ? `<button class="console" data-act="resume"><span class="ck">◂ Misión en curso</span><b>${esc(MIS.ch ? 'Reto' : MIS.p.t)}</b><small>Volver a la sala · el reloj sigue corriendo</small></button>` : n ? `<button class="console" data-act="go" data-arg="${n.L},${n.i}"><span class="ck">▶ Siguiente misión · ${RM[n.room].ic} ${esc(RM[n.room].n)}</span><b>${esc(n.p.t)}</b><small>Temporada ${se[0]} · nivel ${n.L} · problema ${n.i + 1}</small></button>` : `<button class="console" data-act="antena"><span class="ck">✦ Todo resuelto</span><b>Reto diario y duelos</b><small>en la Antena</small></button>`;
   const lk = roomLocks();
   $('#hubList').innerHTML = DE.ship.ROOMS.map(r => `<button class="hroom${n && n.room === r.id ? ' next' : ''}${lk[r.id] ? ' lock' : ''}" data-act="room" data-arg="${r.id}"><i>${r.ic}</i><b>${esc(r.n)}</b><small>${esc(lk[r.id] || r.s)}</small></button>`).join('');
@@ -3643,6 +3715,7 @@ function roomBar() {
 function openRoom(id) {
   const r = DE.ship.ROOM[id]; if (!r) return; const lk = roomLocks()[id];
   if (lk) { sfx('bad'); return toast(esc(r.n) + ': ' + esc(lk), 'bad'); }
+  { const v = (S.seen.rooms || '').split(',').filter(Boolean); if (!v.includes(id)) { v.push(id); S.seen.rooms = v.join(','); save(); checkAch(); } }
   sfx('tap'); const n = nextInfo(), here = n && n.room === id, k = TYPED.includes(id);
   if (!here && !k && ENTER[id]) return ENTER[id]();
   const done = k ? LEVELS.flatMap(l => l.P.map((p, i) => [l.n, i, p])).filter(([L, i, p]) => roomOfP(p) === id && S.prog[D.pk(L, i)]).slice(-6).reverse() : [];
@@ -3665,7 +3738,7 @@ function antenaSheet() {
    ============================================================ */
 let CUST_CB = null;
 const lookReq = (k, v) => ((DE.CH.OPT[k] || {}).req || {})[v] || 0;
-const lookLocked = (k, v) => { const r = lookReq(k, v); return r && D.totalStars(S) < r && !S.set.sandbox ? r : 0; };
+const lookLocked = (k, v) => { if (S.set.sandbox) return 0; const a = ((DE.CH.OPT[k] || {}).ach || {})[v]; if (a && !(S.ach || {})[a]) { const x = ACH.find(z => z[0] === a); return '🏅 ' + (x ? x[2] : a); } const r = lookReq(k, v); return r && D.totalStars(S) < r ? '★' + r : 0; };
 function custom(cb) {
   CUST_CB = cb || null; S.look = DE.CH.setLook(S.look);
   modal(`<div class="pag">Ouroboros · espejo de la cápsula</div><h2 class="mega">🪞 Tu personaje</h2>
@@ -3676,15 +3749,15 @@ function custom(cb) {
 function lookRender() {
   const O = DE.CH.OPT, L = S.look, rk = rankN(), box = $('#cRows'); if (!box) return;
   box.innerHTML = Object.keys(O).map(k => { const q = O[k];
-    const items = (q.k || q.c).map((x, i) => { const v = q.k ? x : i, lk = lookLocked(k, v), on = L[k] === v ? ' on' : '', lab = esc(q.t + ': ' + q.n[i] + (lk ? ' · se desbloquea con ★' + lk : ''));
-      return q.k ? `<button class="swk${on}${lk ? ' lock' : ''}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" aria-pressed="${!!on}"><span class="mini">${DE.CH.doc('feliz', rk, Object.assign({}, L, { [k]: v }))}</span><small>${esc(q.n[i])}</small>${lk ? `<i>★${lk}</i>` : ''}</button>`
+    const items = (q.k || q.c).map((x, i) => { const v = q.k ? x : i, lk = lookLocked(k, v), on = L[k] === v ? ' on' : '', lab = esc(q.t + ': ' + q.n[i] + (lk ? ' · se desbloquea con ' + lk : ''));
+      return q.k ? `<button class="swk${on}${lk ? ' lock' : ''}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" aria-pressed="${!!on}"><span class="mini">${DE.CH.doc('feliz', rk, Object.assign({}, L, { [k]: v }))}</span><small>${esc(q.n[i])}</small>${lk ? `<i>${lk}</i>` : ''}</button>`
         : `<button class="swc${on}${lk ? ' lock' : ''}" style="--c:${x}" data-act="look" data-arg="${k}:${v}" aria-label="${lab}" title="${esc(q.n[i])}" aria-pressed="${!!on}">${lk ? '🔒' : ''}</button>`; }).join('');
     return `<div class="crow"><b>${esc(q.t)}</b><div class="opts2">${items}</div></div>`; }).join('');
   const pv = $('#cPrev'); if (pv) pv.innerHTML = `<div class="full">${DE.CH.full('feliz', rk)}</div><div class="por big">${D.CH.doc('loco', rk)}</div>`;
 }
 function lookSet(k, v) {
   const q = DE.CH.OPT[k]; if (!q) return; if (!q.k) v = +v;
-  const lk = lookLocked(k, v); if (lk) { sfx('bad'); return toast('Se desbloquea con ★' + lk + ' (tienes ★' + D.totalStars(S) + ')', 'bad'); }
+  const lk = lookLocked(k, v); if (lk) { sfx('bad'); return toast('Se desbloquea con ' + esc(lk) + (lk[0] === '★' ? ' (tienes ★' + D.totalStars(S) + ')' : ''), 'bad'); }
   S.look = DE.CH.setLook(Object.assign({}, S.look, { [k]: v })); sfx('tap'); vib(8); lookRender();
 }
 function lookDone() {
@@ -3743,7 +3816,7 @@ function enterGame() {
   if (!S.intro) { S.intro = 1; save(); slides(STORY.intro, () => custom(() => { const go = () => { levelTalk(1); startProblem(1, 0); }; if (DE.school && !S.seen.school) DE.school.start(go); else go(); })); }
   else { levelTalk(S.cur); if (!TQ.length) say('win'); }
 }
-function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['custom', '🪞 Tu personaje'], ['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
+function menu() { modal(`<div class="pag">Ouroboros · menú</div><h2 class="mega">Menú</h2><div class="grid g3">${[['custom', '🪞 Tu personaje'], ['logros', '🏅 Logros'], ['school', '🍼 Química para bebés'], ['daily', '🔥 Reto diario'], ['duel', '⚔ Duelo LAN / Bluetooth'], ['cards', '🃏 Cartas imprimibles'], ['guide', '📖 Guía'], ['credits', '✦ Créditos'], ['settings', '⚙ Ajustes'], ['donate', '☕ Apoyar'], ['diag', '🤖 Bot de pruebas'], ['tocover', '⌂ Portada']].map(([a, t]) => `<button class="btn gh" data-act="${a}">${t}</button>`).join('')}</div><div class="film" style="margin-top:12px">Rango: ${esc(D.rankOf(S))} · ${D.totalStars(S)} ★ · síntesis ${S.st.synth} · reacciones ${S.st.react || 0} · fusiones ${S.st.fuse} · híbridos ${S.st.hyb} · victorias ${S.st.win} · fallos ${S.st.fail}</div>`); }
 function guide() { modal(`<div class="pag">Manual de ÉTER</div><h2 class="mega">Guía</h2><div class="gcols">` + GUIDE.map(([t, x]) => `<div><div class="sec-t">${esc(t)}</div><p>${esc(x)}</p></div>`).join('') + '</div>'); }
 function credits() {
   modal(`<div class="pag">Doc Element · v${CFG.VERSION} · Temporadas 1–3: Núcleo, Fármacos y Genes</div><h2 class="mega">Créditos</h2><div class="boxed" style="text-align:center"><div class="mega" style="font-size:42px">${esc(CFG.STUDIO)}</div><div class="spaced" style="font-size:12px;margin:6px 0">por</div><div class="mega" style="font-size:34px;color:var(--grn)">${esc(CFG.PUBLISHER)}</div></div>
@@ -3751,8 +3824,8 @@ function credits() {
 }
 function settings() {
   const tg = (k, t) => `<button class="btn ${S.set[k] ? 'pri' : 'gh'}" data-act="set" data-arg="${k}">${t}: ${S.set[k] ? 'Sí' : 'No'}</button>`;
-  modal(`<div class="pag">Ajustes · tu partida es tuya</div><h2 class="mega">Ajustes</h2><div class="row">${tg('snd', '♪ Sonido')}${tg('mus', '♫ Música')}${tg('vib', '≋ Vibración')}${tg('sandbox', '⚛ Sandbox')}</div><p class="m">Sandbox: todos los elementos comunes en la bandeja para experimentar libremente.</p><div class="sec-t">Partida</div><div class="row"><button class="btn" data-act="export">⇩ Exportar</button><label class="btn">⇧ Importar<input type="file" accept=".json,application/json" id="impF" hidden></label><button class="btn gh" data-act="reset" style="border-color:var(--mag)">Borrar partida</button></div><div class="sec-t">Pruebas con jugadores</div><p class="m sm">El juego anota intentos, fallos, pistas y tiempos por problema (solo en este dispositivo). Exporta el informe para ajustar la dificultad.</p><div class="row"><button class="btn" data-act="report">⇩ Informe de prueba (CSV)</button><button class="btn" data-act="cards">🃏 Cartas imprimibles</button></div>`);
-  $('#impF').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = D.sanitize(JSON.parse(rd.result)); if (!o.intro && !Object.keys(o.prog).length) throw 0; S = o; S.seen = S.seen || {}; save(true); closeModal(); hud(); renderTray(); setTab(TAB); toast('Partida importada', 'ok'); } catch (x) { toast('Archivo inválido', 'bad'); } }; rd.readAsText(f); });
+  modal(`<div class="pag">Ajustes · tu partida es tuya</div><h2 class="mega">Ajustes</h2><div class="row">${tg('snd', '♪ Sonido')}${tg('mus', '♫ Música')}${tg('vib', '≋ Vibración')}${tg('sandbox', '⚛ Sandbox')}${tg('voz', '🔊 Leer en voz alta')}</div><p class="m">Sandbox: todos los elementos comunes en la bandeja para experimentar libremente.</p><div class="sec-t">Partida</div><div class="row"><button class="btn" data-act="export">⇩ Exportar</button><label class="btn">⇧ Importar<input type="file" accept=".json,application/json" id="impF" hidden></label><button class="btn gh" data-act="reset" style="border-color:var(--mag)">Borrar partida</button></div><div class="sec-t">Pruebas con jugadores</div><p class="m sm">El juego anota intentos, fallos, pistas y tiempos por problema (solo en este dispositivo). Exporta el informe para ajustar la dificultad.</p><div class="row"><button class="btn" data-act="report">⇩ Informe de prueba (CSV)</button><button class="btn" data-act="cards">🃏 Cartas imprimibles</button></div>`);
+  $('#impF').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = D.sanitize(JSON.parse(rd.result)); if (!o.intro && !Object.keys(o.prog).length) throw 0; S = o; S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); save(true); closeModal(); hud(); renderTray(); setTab(TAB); toast('Partida importada', 'ok'); } catch (x) { toast('Archivo inválido', 'bad'); } }; rd.readAsText(f); });
 }
 function download(text, fname, mime) { try { const b = new Blob([text], { type: mime || 'text/plain' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = fname; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800); toast('Archivo: ' + esc(fname), 'ok'); return true; } catch (e) { toast('No se pudo guardar el archivo', 'bad'); return false; } }
 function exportSave() { download(JSON.stringify(S), 'doc-element-partida-' + dateKey() + '.json', 'application/json'); }
@@ -3792,6 +3865,8 @@ const ACT = {
   resume: () => { if (!MIS) return setTab('nave'); setTab('lab'); setMode(MIS.ch ? 'mol' : { r: 'react', f: 'forge' }[MIS.p.k] || 'mol'); },
   look: a => { const i = a.indexOf(':'); lookSet(a.slice(0, i), a.slice(i + 1)); }, lookRand: () => { const O = DE.CH.OPT, o = {}; Object.keys(O).forEach(k => { const q = O[k], vs = (q.k || q.c).map((x, i) => q.k ? x : i).filter(v => !lookLocked(k, v)); o[k] = vs[Math.floor(Math.random() * vs.length)]; }); S.look = DE.CH.setLook(o); sfx('tap'); lookRender(); },
   lookReset: () => { S.look = DE.CH.setLook({}); sfx('tap'); lookRender(); }, lookDone: () => lookDone(), custom: () => custom(),
+  logros: () => achSheet(), speak: () => { if (LASTL) VOZ.say(LASTL[2], LASTL[0], true); },
+  crew: i => { const c = CREW[+i]; if (!c) return; sfx('tap'); showLine(['crew', 'feliz', c.tips[Math.floor(Math.random() * c.tips.length)], c.look, c.n]); },
   hubgo: () => { if (MIS) return ACT.resume(); const nx = nextOpen(); if (nx) startProblem(nx[0], nx[1]); else openRoom('lab'); }, story: k => { closeModal(); const n = { ending: 1, s2e: 2, s3e: 3, s4e: 4, s5e: 5 }[k]; slides(STORY[k] || STORY.intro, () => { if (n) credits(); }); }, cryo: () => cryoSheet(), antena: () => antenaSheet(),
   spawn: s => spawn(s), mono: id => spawnMono(id), synth: () => synth(), autoH: () => autoH(), undo: () => undo(), del: () => delSel(), clear: () => { clearLab(); toast('Laboratorio limpio'); },
   zin: () => zoom(1.2), zout: () => zoom(1 / 1.2), fit: () => fit(Lab.ghost && !Lab.atoms.length ? Lab.ghost.atoms : null),
@@ -3804,7 +3879,7 @@ const ACT = {
   abandon: () => { if (MIS) failMission('Abandonaste la misión.'); }, tomap: () => { closeModal(); setTab('bt'); }, toship: () => { closeModal(); setTab('nave'); },
   det: id => detail(id), filt: f => { FF = f; renderFr(); }, txl: L => txLevel(+L), talk: () => nextLine(),
   menu: () => menu(), guide: () => guide(), credits: () => credits(), settings: () => settings(), diag: () => diag(), fs: () => fullscreen(), vok: () => document.body.classList.add('vok'),
-  set: k => { S.set[k] = S.set[k] ? 0 : 1; save(); settings(); if (k === 'sandbox') renderTray(); if (k === 'mus') S.set.mus ? MUS.start() : MUS.stop(); },
+  set: k => { S.set[k] = S.set[k] ? 0 : 1; save(); settings(); if (k === 'voz' && S.set.voz) VOZ.say('Voz activada. Leeré lo que digan ÉTER y la tripulación.', 'eter'); if (k === 'sandbox') renderTray(); if (k === 'mus') S.set.mus ? MUS.start() : MUS.stop(); },
   daily: () => { if (!D.levelDone(S, 1)) return toast('Completa el nivel 1 primero'); closeModal(); const d = new Date(); startChallenge('daily', d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()); },
   chskip: () => chalSkip(), chquit: () => chalEnd(true), cards: () => printCards(), report: () => download(reportCSV(), 'informe-doc-element-' + dateKey() + '.csv', 'text/csv'), dshare: t => shareOut(t),
   export: () => exportSave(), reset: () => { if (confirm('¿Borrar toda tu partida? No se puede deshacer.')) { S = D.newState(); save(true); location.reload(); } },
@@ -3855,7 +3930,7 @@ function frame(t) {
 function boot() {
   load(); giftLevel(1);
   document.body.innerHTML = `<div id="app">
-  <header id="hud"><button class="back" data-act="nave" aria-label="Volver a la nave">◂ Nave</button><div class="brand">Doc<b>Element</b></div><div id="hRoom"></div><span class="chip" id="hLv"></span><span class="chip en" id="hEn"></span><span class="chip" id="hSc"></span><span class="chip rk" id="hRk"></span><span class="sp"></span><button class="hb2" data-act="fs" aria-label="Pantalla completa">⛶</button><button class="hb2" data-act="menu" aria-label="Menú">☰</button></header>
+  <header id="hud"><button class="back" data-act="nave" aria-label="Volver a la nave">◂ Nave</button><div class="brand">Doc<b>Element</b></div><div id="hRoom"></div><span class="chip" id="hLv"></span><span class="chip en" id="hEn"></span><span class="chip" id="hSc"></span><button class="chip rk" id="hRk" data-act="logros" aria-label="Logros"></button><span class="sp"></span><button class="hb2" data-act="fs" aria-label="Pantalla completa">⛶</button><button class="hb2" data-act="menu" aria-label="Menú">☰</button></header>
   <main id="stage">
    <div class="tab" id="t-nave"><div id="hub"></div><div id="hubCom"></div><div id="hubGo"></div><div id="hubList"></div></div>
    <div class="tab" id="t-lab">
@@ -3865,7 +3940,7 @@ function boot() {
    <div class="tab" id="t-bt"><div class="lvls" id="lvls"></div><div class="scroll" id="mapBody"></div></div>
    <div class="tab" id="t-tx"><div class="scroll" id="txBody"></div></div>
   </main>
-  <aside id="side"><div id="comms" data-act="talk"><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
+  <aside id="side"><div id="comms" data-act="talk"><button id="cVoz" data-act="speak" aria-label="Escuchar en voz alta">🔊</button><div class="por" id="cPor"></div><div class="cb"><b id="cWho"></b><p id="cTxt"></p></div><button id="cNext" hidden>▸</button></div><div id="mis"></div><div id="ana"></div></aside></div>
   <div class="ov" id="ov" hidden></div><div id="sortOv" hidden></div><div id="geneOv" hidden></div><div id="orgOv" hidden></div><div id="obsOv" hidden></div><div id="toast" aria-live="polite"></div>
   <div id="rotate"><div class="phone"></div><h2 class="mega">Gira tu dispositivo</h2><p>Doc Element se juega en horizontal.</p><div class="row"><button class="btn pri" data-act="fs">⛶ Pantalla completa</button><button class="btn gh" data-act="vok">Seguir en vertical</button></div></div>`;
   bindCanvas(); window.addEventListener('resize', resize);
@@ -3876,10 +3951,10 @@ function boot() {
   if (window.Capacitor) document.body.classList.add('native', 'vok');
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.Capacitor && !TEST) { const had = !!navigator.serviceWorker.controller; navigator.serviceWorker.register('./sw.js').catch(() => { }); navigator.serviceWorker.addEventListener('controllerchange', () => { if (!had || document.querySelector('.upd')) return; const u = document.createElement('button'); u.className = 'upd'; u.textContent = '✦ Nueva versión de Doc Element lista · toca para actualizar'; u.onclick = () => { save(true); location.reload(); }; document.body.appendChild(u); }); }
 }
-DE.k = { win, lose, dOf, S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
+DE.k = { voz: (t, w) => VOZ.say(t, w), win, lose, dOf, S: () => S, save, toast, modal, closeModal, sfx, vib, say, talk, renderSide, startChallenge, shareOut, download, hud, Lab, Forge, React: React_, fxBurst, setTab, setMode, clearLab, startProblem, quiet: () => QUIET, MIS: () => MIS, BT: () => BT, SO: () => SO, TAB: () => TAB,
   atomRect: id => { const a = A(id), cv = $('#cv'); if (!a || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s(a.x, a.y), r = (rad(a) || 30) * Lab.view.z + 6; return { left: c.left + x - r, top: c.top + y - r, width: 2 * r, height: 2 * r }; },
   bondRect: b => { const p = A(b.a), q = A(b.b), cv = $('#cv'); if (!p || !q || !cv) return null; const c = cv.getBoundingClientRect(), [x, y] = w2s((p.x + q.x) / 2, (p.y + q.y) / 2); return { left: c.left + x - 16, top: c.top + y - 16, width: 32, height: 32 }; } };
-DE.ui = { custom, lookSet, openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
+DE.ui = { achSheet, checkAch, ACH, CREW, crewAwake, VOZ, custom, lookSet, openRoom, renderHub, roomLocks, TAB: () => TAB, startChallenge, CH: () => CH, chalSkip, chalEnd, chalList, labEls, cardsHTML, reportCSV, shareOut, MUS, Lab, Forge, React: React_, spawn, spawnMono, tapAtom, tapBond, dropAtom, synth, autoH, clearLab, buildSmiles, addNuc, fuse, rxAdd, rxCoef, react, startProblem, startBattle, throwCard, openProblem, setTab, setMode, closeModal, renderMap, renderFr, renderSide, detail, txLevel, menu, guide, credits, settings, endBattle, sortTap, SO: () => SO,
   guideStep, tick, delSel, undo, flee, failMission, useHint, render: () => { draw(); analysis(); }, quiet: v => { QUIET = !!v; }, ADS, state: () => S, setState: s => { S = D.sanitize(s); S.seen = S.seen || {}; S.look = DE.CH.setLook(S.look); hud(); renderTray(); renderSide(); }, MIS: () => MIS, BT: () => BT, squit: () => ACT.squit(), enterGame, identify, toGraph, KEY, TEST, talk, say };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
@@ -4386,7 +4461,7 @@ function rectOf(t) { if (!t) return null; if (typeof t === 'function') return t(
 function render() {
   const c = ensure(), st = RUN.steps[RUN.i]; c.hidden = false;
   c.querySelector('.cm-por').innerHTML = st.who === 'doc' ? DE.CH.doc(st.mood || 'feliz', 1) : DE.CH.eter(st.mood || 'feliz');
-  c.querySelector('.cm-t').textContent = st.t; c.querySelector('.cm-p').innerHTML = st.p;
+  c.querySelector('.cm-t').textContent = st.t; c.querySelector('.cm-p').innerHTML = st.p; if (K().voz) K().voz(st.t + '. ' + st.p, st.who || 'eter');
   c.querySelector('.cm-row').innerHTML = (st.btn ? `<button class="btn pri sm" data-act="cmNext">${st.btn}</button>` : '<span class="m sm">Hazlo y sigo solo ✨</span>') + (RUN.skip ? `<button class="btn gh sm" data-act="cmSkip">${RUN.skip}</button>` : '') + `<span class="cm-n">${RUN.i + 1}/${RUN.steps.length}</span>`;
   place(performance.now());
 }
